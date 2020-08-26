@@ -1,6 +1,4 @@
-import React from 'react'
-import styles from './styles.module.css'
+import EditorSection from './editorBase/EditorSection'
+// import reducer from './editorBase/reducer'
 
-export const ExampleComponent = ({ text }) => {
-  return <div className={styles.test}>Example Component: {text}</div>
-}
+export { EditorSection }

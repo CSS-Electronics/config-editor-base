@@ -1,10 +1,13 @@
-import React from 'react'
+import React from 'react';
+import Editor from "./editor/Editor";
+// import 'config-editor-base/dist/index.css'
 
-import { ExampleComponent } from 'config-editor-base'
-import 'config-editor-base/dist/index.css'
-
-const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+export const App = () => {
+  return <Editor/>
 }
+
+// const App = () => {
+//   return <ExampleComponent text="Create React Library Example 😄" />
+// }
 
 export default App
