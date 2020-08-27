@@ -30,7 +30,7 @@ export default (state = initialState, action) => {
         message: action.alert.message
       };
     case actionsAlert.CLEAR:
-      if (action.alert && action.alert.id != state.id) {
+      if (action.alert && action.alert.id !== state.id) {
         return state;
       } else {
         return initialState;

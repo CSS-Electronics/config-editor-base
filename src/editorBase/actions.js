@@ -193,12 +193,10 @@ export const resetUISchemaList = () => ({
   UISchemaFiles: [],
 });
 
-export const setUISchemaContent = (uiContent) => {
-  return {
+export const setUISchemaContent = (uiContent) => ({
     type: SET_UI_SCHEMA_DATA,
     uiContent,
-  };
-};
+});
 
 export const resetLocalUISchemaList = () => ({
   type: RESET_LOCAL_UISCHEMA_LIST,
@@ -285,12 +283,10 @@ export const setUpdatedFormData = (formData) => {
   };
 };
 
-export const setUpdatedFormDataValue = (formData) => {
-  return {
+export const setUpdatedFormDataValue = (formData) => ({
     type: SET_UPDATED_FORM_DATA,
     formData,
-  };
-};
+});
 
 
 export const setConfigFile = (configFiles) => ({
