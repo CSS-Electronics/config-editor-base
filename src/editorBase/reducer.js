@@ -41,11 +41,6 @@ export default (
         ...state,
         uiContent: action.uiContent
       };
-    case actionsEditor.SET_UPDATED_CONFIG:
-      return {
-        ...state,
-        configUpdate: action.configUpdate
-      };
     case actionsEditor.SET_UISCHEMA_LIST:
       return {
         ...state,
@@ -103,7 +98,7 @@ export default (
       return {
         ...state,
         editorSchemaFiles: state.editorSchemaFiles.filter(
-          file => file.name.split(".").slice(-1)[0] == "json"
+          file => !file.name.includes("(local)")
         )
       };
     case actionsEditor.RESET_UPLOADED_SCHEMA_LIST:

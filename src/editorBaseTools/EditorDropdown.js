@@ -47,10 +47,10 @@ class EditorDropDown extends React.Component {
 
   handleSelectChange = selectedValue => {
     if (selectedValue.value === "Upload") {
-      this.props.onChange("None");
+      this.props.onChange("None", this.props.name);
       this.refs.fileUploader.click();
     } else if (!selectedValue.value.includes("(local)")) {
-      this.props.onChange(selectedValue.value);
+      this.props.onChange(selectedValue.value, this.props.name);
     }
   };
 
@@ -80,7 +80,7 @@ class EditorDropDown extends React.Component {
           ref="fileUploader"
           style={{ display: "none" }}
           onChange={e => {
-            handleUploadedFile(e.target.files[0]);
+            handleUploadedFile(e.target.files[0], this.props.name);
             e.target.value = "";
           }}
         />
