@@ -1,6 +1,6 @@
-# config-editor-base
+# Config Editor - Base Module
 
-> React-based JSON Schema editor base-tool
+This project includes a React based JSON Schema editor.
 
 [![NPM](https://img.shields.io/npm/v/config-editor-base.svg)](https://www.npmjs.com/package/config-editor-base) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
@@ -13,7 +13,7 @@ npm install --save config-editor-base
 ## Usage
 
 ```jsx
-import React, { Component } from 'react'
+import React, { EditorSection } from 'react'
 
 import MyComponent from 'config-editor-base'
 import 'config-editor-base/dist/index.css'
