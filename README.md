@@ -14,38 +14,13 @@ npm install --save config-editor-base
 
 The module uses redux, hence you'll need to import the base module and the `reducer` as follows:
 
-
-The index.js connects the store and parses the App 
-
-```jsx
-// index.js
-
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-
-import configureStore from './store/configure-store'
-import App from './App'
-
-const store = configureStore()
-
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-)
-```
-
-To set up the store, it is necessary to load the editor reducer from the module 
-
 ```jsx 
 // reducers.js 
 
 import { combineReducers } from "redux";
 import alert from "./alert/reducer";
 
-import editor from 'config-editor-base/src/editorBase/reducer'
+import editor from 'config-editor-base'
 
 
 const rootReducer = combineReducers({
