@@ -6,7 +6,7 @@ import {editorReducer} from 'config-editor-base'
 
 const rootReducer = combineReducers({
   alert,
-  editorReducer,
+  editor,
 });
 
 export default rootReducer;
