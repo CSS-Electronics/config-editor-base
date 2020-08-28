@@ -76,7 +76,7 @@ export const getFileType = (dropdown) => {
 }
 
 export const loadFile = (fileName) => {
-  const schema = require(`../schema/${
+  const schema = require(`./schema/${
     fileName.split(" | ")[1]
   }/${fileName.split(" ")[0]}`);
 
