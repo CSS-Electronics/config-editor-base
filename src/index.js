@@ -1,4 +1,4 @@
 import EditorSection from './editorBase/EditorSection'
-import editorReducer from './editorBase/reducer'
+import editor from './editorBase/reducer'
 
-export {EditorSection, editorReducer}
+export {EditorSection, editor}
