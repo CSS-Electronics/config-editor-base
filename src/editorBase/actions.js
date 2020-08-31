@@ -65,13 +65,15 @@ export const setCrc32EditorLive = (crc32EditorLive) => ({
 // -------------------------------------------------------
 // UISCHEMA: load the Simple/Advanced default UIschema in the online & offline editor
 export const publicUiSchemaFiles = (uiSchemaAry, schemaAry) => {
+  
   return function (dispatch) {
+    if(uiSchemaAry && uiSchemaAry.length){
     dispatch(resetUISchemaList());
     dispatch(setUISchemaFile(uiSchemaAry));
     dispatch(setUISchemaContent(loadFile(uiSchemaAry[0])));
-
+    }
     // If demoMode, load the Rule Schema by default for use in the online simple editor
-    if (demoMode) {
+    if (demoMode && schemaAry.length) {
       dispatch(publicSchemaFiles(demoConfig, schemaAry));
     }
   };
@@ -161,7 +163,7 @@ export const handleUploadedFile = (file, dropdown, schemaAry) => {
 
             const noSchema = getState().editor.editorSchemaFiles[0] == undefined;
 
-            if (file && file.name && file.name.length && noSchema) {
+            if (file && file.name && file.name.length && noSchema && schemaAry && schemaAry.length) {
               dispatch(publicSchemaFiles(file.name, schemaAry));
             }
 
@@ -216,6 +218,7 @@ export const publicSchemaFiles = (selectedConfig, schemaAry) => {
   return function (dispatch) {
     dispatch(resetSchemaFiles());
 
+
     if (selectedConfig) {
       let schemaAryFiltered = schemaAry.filter((e) =>
         e.includes(selectedConfig.substr(7, 5))
@@ -225,9 +228,13 @@ export const publicSchemaFiles = (selectedConfig, schemaAry) => {
         schemaAryFiltered = schemaAry.filter((e) => e.includes("CANedge1"));
       }
 
-      if (schemaAryFiltered[0]) {
+      const loadedSchema = loadFile(schemaAryFiltered[0])
+
+      if (schemaAryFiltered[0] && loadedSchema) {
         dispatch(setSchemaFile(schemaAryFiltered));
-        dispatch(setSchemaContent(loadFile(schemaAryFiltered[0])));
+        dispatch(setSchemaContent(loadedSchema));
+      }else{
+        console.log("Unable to load embedded Rule Schema")
       }
     }
   };
