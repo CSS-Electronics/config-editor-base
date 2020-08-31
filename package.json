@@ -1,11 +1,10 @@
-
 {
   "name": "config-editor-base",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "React-based JSON Schema editor base-tool",
   "author": "CSS Electronics",
   "license": "MIT",
-  "repository": "MartinF/config-editor-base",
+  "repository": "CSS-Electronics/config-editor-base",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
