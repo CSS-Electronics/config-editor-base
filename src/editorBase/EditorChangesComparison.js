@@ -1,6 +1,7 @@
 import React from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { connect } from "react-redux";
+import "../css/diff2html.min.css";
 import Select from "react-select";
 
 const selectOptions = (Files) => {
@@ -58,11 +59,12 @@ class EditorChangesComparison extends React.Component {
       crc32EditorLive,
       isCompareChanges,
       enableDownload,
+      s3
     } = this.props;
 
-    let pastCleaned = past ? JSON.stringify(JSON.parse(past), null, 2) : "";
+    let pastCleaned = past && Object.keys(past).length ? JSON.stringify(JSON.parse(past), null, 2) : "";
 
-    if (crcBrowserSupport == 1 && past) {
+    if (crcBrowserSupport == 1 && past && Object.keys(past).length) {
       const { crc32 } = require("crc");
       pastCrc32 = crc32(past).toString(16).toUpperCase().padStart(8, "0");
     } else {
@@ -173,7 +175,7 @@ class EditorChangesComparison extends React.Component {
           </div>
 
           <div className="modal-custom-footer">
-            <button type="submit" className="btn btn-primary" disabled={true}>
+            <button type="submit" className="btn btn-primary" disabled={!s3}>
               {" "}
               Submit to S3{" "}
             </button>{" "}

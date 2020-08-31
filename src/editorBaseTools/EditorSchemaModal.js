@@ -21,7 +21,8 @@ class EditorSchemaModal extends React.Component {
       selecteduischema,
       selectedschema,
       selectedconfig,
-      handleDropdownChange
+      handleDropdownChange,
+      schemaAry
     } = this.props;
 
     return (
@@ -34,6 +35,7 @@ class EditorSchemaModal extends React.Component {
           selected={selecteduischema}
           onChange={handleDropdownChange}
           handleUploadedFile={handleUploadedFile}
+          schemaAry={schemaAry}
           customBackground={true}
           comment="The UIschema affects the visual presentation of the editor. It does not impact the Configuration File. It can also be used to hide e.g. advanced settings via a Simple variant - or show all settings via an Advanced variant."
         />
@@ -43,6 +45,7 @@ class EditorSchemaModal extends React.Component {
           selected={selectedschema}
           onChange={handleDropdownChange}
           handleUploadedFile={handleUploadedFile}
+          schemaAry={schemaAry}
           customBackground={true}
           comment="The Rule Schema serves as a guide for populating the Configuration File - and for automatically validating a Configuration File."
         /><hr/>
@@ -52,6 +55,7 @@ class EditorSchemaModal extends React.Component {
           selected={selectedconfig}
           onChange={handleDropdownChange}
           handleUploadedFile={handleUploadedFile}
+          schemaAry={schemaAry}
           comment="The Configuration File contains the settings that will be used on the device. You can upload a new Configuration File via the dropdown to modify it using the editor."
         />
       </div>
@@ -61,8 +65,8 @@ class EditorSchemaModal extends React.Component {
 
 const mapDispatchToProps = dispatch => {
   return {
-    handleUploadedFile: (file, type) =>
-      dispatch(actionsEditor.handleUploadedFile(file, type)),
+    handleUploadedFile: (file, type, schemaAry) =>
+      dispatch(actionsEditor.handleUploadedFile(file, type, schemaAry)),
     resetFiles: () => dispatch(actionsEditor.resetFiles())
   };
 };

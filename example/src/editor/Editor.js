@@ -1,5 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
+import classNames from "classnames";
+
 
 import {
   EncryptionModal,
@@ -11,6 +13,19 @@ import {EditorSection} from "config-editor-base";
 
 import * as actionsAlert from "../alert/actions";
 import AlertContainer from "../alert/AlertContainer";
+
+// define UIschema and Rule Schema names for auto-loading purposes
+export const uiSchemaAry = [
+  "uischema-01.02.json | Simple",
+  "uischema-01.02.json | Advanced",
+];
+
+export const schemaAry = [
+  "schema-01.02.json | CANedge2",
+  "schema-01.02.json | CANedge1",
+  "schema-00.07.json | CANedge2",
+  "schema-00.07.json | CANedge1",
+];
 
 class Editor extends React.Component {
   render() {
@@ -36,13 +51,19 @@ class Editor extends React.Component {
     ];
 
     return (
-      <React.Fragment>
+      <div className="file-explorer">
+	  <div
+          className={classNames({ "fe-body ": true, "fe-body-offline": true })}
+        >
         <AlertContainer />
         <EditorSection
           editorTools={editorTools}
           showAlert={this.props.showAlert}
+          uiSchemaAry={uiSchemaAry}
+          schemaAry={schemaAry}
         />
-      </React.Fragment>
+		</div>
+      </div>
     );
   }
 }

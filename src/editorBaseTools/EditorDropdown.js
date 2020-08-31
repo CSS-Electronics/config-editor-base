@@ -16,6 +16,7 @@ const selectOptions = Files => {
     value: File.name,
     label: File.name
   }));
+
 };
 
 class EditorDropDown extends React.Component {
@@ -62,7 +63,7 @@ class EditorDropDown extends React.Component {
 
   render() {
 
-    let { handleUploadedFile, options } = this.props;
+    let { handleUploadedFile, options, schemaAry } = this.props;
 
     return (
       <div className="form-group pl0 field-string">
@@ -80,7 +81,7 @@ class EditorDropDown extends React.Component {
           ref="fileUploader"
           style={{ display: "none" }}
           onChange={e => {
-            handleUploadedFile(e.target.files[0], this.props.name);
+            handleUploadedFile(e.target.files[0], this.props.name, schemaAry);
             e.target.value = "";
           }}
         />

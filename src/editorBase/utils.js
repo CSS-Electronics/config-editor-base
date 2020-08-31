@@ -5,28 +5,13 @@
 export const demoMode = false;
 export const demoConfig = "config-01.02.json" 
 
-// Note: These need to be updated with future firmware revisions
-export const uiSchemaAry = [
-  "uischema-01.02.json | Simple",
-  "uischema-01.02.json | Advanced",
-];
-
-export const schemaAry = [
-  "schema-01.02.json | CANedge2",
-  "schema-01.02.json | CANedge1",
-  "schema-01.02.json | CANedge2",
-  "schema-01.02.json | CANedge1",
-  "schema-00.07.json | CANedge2",
-  "schema-00.07.json | CANedge1",
-];
-
 export const regexUISchemaPublic = new RegExp(
-  /^uischema-\d{2}\.\d{2}\.json \| (Advanced|Simple)$/,
+  /^uischema-\d{2}\.\d{2}\.json/,
   "g"
 );
 
 export const regexSchemaPublic = new RegExp(
-  /^schema-\d{2}\.\d{2}\.json \| CANedge(1|2)$/,
+  /^schema-\d{2}\.\d{2}\.json/,
   "g"
 );
 

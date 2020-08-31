@@ -14,13 +14,14 @@ export const SET_UI_SCHEMA_DATA = "editor/SET_UI_SCHEMA_DATA";
 export const SET_SCHEMA_DATA = "editor/SET_SCHEMA_DATA";
 export const SET_UPDATED_CONFIG = "editor/SET_UPDATED_CONFIG";
 export const RESET_SCHEMA_FILES = "editor/RESET_SCHEMA_FILES";
-export const RESET_UPLOADED_SCHEMA_LIST = "editor/RESET_UPLOADED_SCHEMA_LIST";
 export const SET_CONFIG_DATA_PRE_CHANGE = "editor/SET_CONFIG_DATA_PRE_CHANGE";
 export const SET_UPDATED_FORM_DATA = "editor/SET_UPDATED_FORM_DATA";
 export const SET_ACTIVE_NAV = "editor/SET_ACTIVE_NAV";
 export const SET_UISCHEMA_SOURCE = "editor/SET_UISCHEMA_SOURCE";
 export const SET_CONFIG_DATA_LOCAL = "SET_CONFIG_DATA_LOCAL";
 export const SET_CRC32_EDITOR_LIVE = "SET_CRC32_EDITOR_LIVE";
+
+
 
 import {
   regexUISchemaPublic,
@@ -31,8 +32,6 @@ import {
   loadFile,
   demoMode,
   demoConfig,
-  uiSchemaAry,
-  schemaAry,
   crcBrowserSupport,
   getFileType,
 } from "./utils";
@@ -65,7 +64,7 @@ export const setCrc32EditorLive = (crc32EditorLive) => ({
 
 // -------------------------------------------------------
 // UISCHEMA: load the Simple/Advanced default UIschema in the online & offline editor
-export const publicUiSchemaFiles = () => {
+export const publicUiSchemaFiles = (uiSchemaAry, schemaAry) => {
   return function (dispatch) {
     dispatch(resetUISchemaList());
     dispatch(setUISchemaFile(uiSchemaAry));
@@ -73,7 +72,7 @@ export const publicUiSchemaFiles = () => {
 
     // If demoMode, load the Rule Schema by default for use in the online simple editor
     if (demoMode) {
-      dispatch(publicSchemaFiles(demoConfig));
+      dispatch(publicSchemaFiles(demoConfig, schemaAry));
     }
   };
 };
@@ -97,6 +96,7 @@ export const fetchFileContent = (fileName, type) => {
 
         break;
       case type == "schema":
+        dispatch(resetLocalSchemaList());
         if (fileName.match(regexSchemaPublic) != null) {
           dispatch(setSchemaContent(loadFile(fileName)));
         } else {
@@ -128,7 +128,7 @@ export const fetchFileContent = (fileName, type) => {
 };
 
 // handle files uploaded via the Schema Loader dropdowns
-export const handleUploadedFile = (file, dropdown) => {
+export const handleUploadedFile = (file, dropdown, schemaAry) => {
   let type = getFileType(dropdown);
 
   return function (dispatch, getState) {
@@ -158,12 +158,11 @@ export const handleUploadedFile = (file, dropdown) => {
             break;
           case type == "config" && isValidConfig(file.name):
             // load the matching schema files if a schema file is not already uploaded
-            const localLoaded =
-              getState().editor.editorSchemaFiles[0] &&
-              getState().editor.editorSchemaFiles[0].name.includes("local");
 
-            if (file && file.name && file.name.length && !localLoaded) {
-              dispatch(publicSchemaFiles(file.name));
+            const noSchema = getState().editor.editorSchemaFiles[0] == undefined;
+
+            if (file && file.name && file.name.length && noSchema) {
+              dispatch(publicSchemaFiles(file.name, schemaAry));
             }
 
             // TBD: Look intro trimming below
@@ -212,7 +211,8 @@ export const setUISchemaFile = (UISchemaFiles) => ({
 
 // -------------------------------------------------------
 // RULE SCHEMA: load the relevant Rule Schema file when a user uploads a config file (based on revision)
-export const publicSchemaFiles = (selectedConfig) => {
+export const publicSchemaFiles = (selectedConfig, schemaAry) => {
+
   return function (dispatch) {
     dispatch(resetSchemaFiles());
 
@@ -241,6 +241,7 @@ export const setSchemaFile = (schemaFiles) => ({
   })),
 });
 
+
 export const resetSchemaFiles = () => ({
   type: RESET_SCHEMA_LIST,
   schemaFiles: [],
@@ -258,10 +259,6 @@ export const resetFiles = () => ({
 
 export const resetLocalSchemaList = () => ({
   type: RESET_LOCAL_SCHEMA_LIST,
-});
-
-export const resetUploadedSchemaList = () => ({
-  type: RESET_UPLOADED_SCHEMA_LIST,
 });
 
 // -------------------------------------------------------

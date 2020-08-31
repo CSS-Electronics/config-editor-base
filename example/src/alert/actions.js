@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
+import {editorActions} from "config-editor-base";
+
 export const SET = "alert/SET";
 export const CLEAR = "alert/CLEAR";
 
 export let alertId = 0;
+
+// test that actions import works
+
+export const testEditorActionImport = () => {
+  return function (dispatch) {
+    dispatch(editorActions.resetUISchemaList());
+  };
+};
 
 export const set = alert => {
   const id = alertId++;
