@@ -1,7 +1,7 @@
 
 {
   "name": "config-editor-base",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "React-based JSON Schema editor base-tool",
   "author": "CSS Electronics",
   "license": "MIT",
