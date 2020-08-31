@@ -35,9 +35,7 @@ export class EditorSection extends React.Component {
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
 
     this.state = {
-      uischema: "",
       schema: "",
-      config: "",
       selecteduischema: "",
       selectedschema: "",
       selectedconfig: "",
@@ -51,7 +49,7 @@ export class EditorSection extends React.Component {
     };
 
     this.input = "";
-    this.s3 = this.props.fetchFileContentS3 ? true : false;
+    this.s3 = this.props.fetchFileContentExt ? true : false;
   }
 
   escFunction(event) {
@@ -87,7 +85,7 @@ export class EditorSection extends React.Component {
           fileType != "uischema" &&
           !selection.includes("(local)")
         ) {
-          this.props.fetchFileContentS3(selection, fileType);
+          this.props.fetchFileContentExt(selection, fileType);
         } else {
           this.props.fetchFileContent(selection, fileType);
         }
@@ -176,7 +174,7 @@ export class EditorSection extends React.Component {
           if (configName.includes("(local)")) {
             this.props.fetchFileContent(configName, "config-review");
           } else if (this.s3) {
-            this.props.fetchFileContentS3(configName, "config-review");
+            this.props.fetchFileContentExt(configName, "config-review");
           }
         }
       );
@@ -209,14 +207,9 @@ export class EditorSection extends React.Component {
       {
         schema: checkUpload
           ? checkUpload
-          : this.state.schema
-          ? this.state.schema
+          : this.state.selectedschema
+          ? this.state.selectedschema
           : checkSchemaList,
-        config: this.state.config
-          ? this.state.config
-          : this.props.editorConfigFiles.length
-          ? this.props.editorConfigFiles[0].name
-          : null,
         formData,
         isSubmitting: true,
       },
@@ -248,7 +241,7 @@ export class EditorSection extends React.Component {
               isCompareChanges: false,
             });
           } else {
-            this.props.updateConfigFileS3(
+            this.props.updateConfigFileExt(
               JSON.stringify(formData, null, 2),
               `${revisedConfigFile}`
             );
@@ -375,7 +368,7 @@ export class EditorSection extends React.Component {
                   handleDropdownChange={this.handleDropdownChange}
                   closeChangesModal={this.closeChangesModal}
                   enableDownload={this.enableDownload.bind(this)}
-                  s3={this.s3}
+                  externalSubmit={this.props.fetchFileContentExt ? true : false}
                 />
 
                 <div
