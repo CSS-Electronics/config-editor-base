@@ -144,10 +144,6 @@
           "ui:placeholder": "To/Mask (HEX)",
           "ui:title": " "
         },
-        "prescaler": {
-          "classNames": "col-sm-1 smaller-margins",
-          "ui:title": " "
-        },
         "prescaler_type": {
           "classNames": "col-sm-1 smaller-margins",
           "ui:title": " "
@@ -340,10 +336,6 @@
           "ui:placeholder": "To/Mask (HEX)",
           "ui:title": " "
         },
-		"prescaler": {
-          "classNames": "col-sm-1 smaller-margins",
-          "ui:title": " "
-        },
         "prescaler_type": {
           "classNames": "col-sm-1 smaller-margins",
           "ui:title": " "
@@ -509,12 +501,12 @@
       },
       "server": {
         "endpoint": {
-          "ui:placeholder": "E.g. http://s3.amazonaws.com",
+          "ui:placeholder": "E.g. http://s3.us-east-1.amazonaws.com",
           "classNames": "col-sm-3"
         },
         "port": {
           "ui:placeholder": "E.g. 80 (http)",
-          "classNames": "col-sm-3"
+          "classNames": "col-sm-2"
         },
         "bucket": {
           "ui:placeholder": "E.g. mybucket",
@@ -522,7 +514,10 @@
         },
         "region": {
           "ui:placeholder": "E.g. eu-central-1",
-          "classNames": "col-sm-3"
+          "classNames": "col-sm-2"
+        },
+        "request_style": {
+          "classNames": "col-sm-2"
         },
         "accesskey": {
           "classNames": "col-sm-3"
@@ -535,43 +530,6 @@
         },
         "signed_payload": {
           "classNames": "col-sm-3"
-        }
-      }
-    }
-  },
-  "devicemeta": {
-    "nav": "DEVICE META",
-    "devices": {
-      "items": {
-        "serialno": {
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:placeholder": "Serialno",
-          "ui:title": " "
-        },
-        "name": {
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:placeholder": "Name",
-          "ui:title": " "
-        },
-        "group": {
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:placeholder": "Group",
-          "ui:title": " "
-        },
-        "subgroup": {
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:placeholder": "Subgroup",
-          "ui:title": " "
-        },
-        "comment": {
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:placeholder": "Comment",
-          "ui:title": " "
-        },
-        "imageurl": {
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:placeholder": "truck.png, https://...",
-          "ui:title": " "
         }
       }
     }
