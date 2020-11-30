@@ -145,7 +145,7 @@ The config editor relies on styling from the parent application. For examples of
 --- 
 ## Regarding JSON Schema files 
 
-The module expects to find JSON Rule Schema and UIschema files in the folder structure below in order to facilitate auto-loading:
+The module expects to find JSON Schema files in the structure below to facilitate auto-loading of these:
 
 ```
 /
