@@ -141,3 +141,22 @@ The config editor also supports various S3 calls, e.g. for loading Rule Schema a
 ## Regarding styling
 
 The config editor relies on styling from the parent application. For examples of styling, see the CANedge configuration editor.
+
+--- 
+## Regarding JSON Schema files 
+
+The module expects to find JSON Rule Schema and UIschema files in the folder structure below in order to facilitate auto-loading:
+
+```
+/
+|-- dist/
+	|-- schema/
+		|-- Advanded/
+			|-- uischema-XX.YY.json 
+		|-- Simple/
+			|-- uischema-XX.YY.json 
+		|-- CANedge1/
+			|-- schema-XX.YY.json 
+		|-- CANedge2/
+			|-- schema-XX.YY.json 		
+```
