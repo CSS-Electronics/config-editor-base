@@ -74,7 +74,7 @@ export const publicUiSchemaFiles = (uiSchemaAry, schemaAry) => {
     }
     // If demoMode, load the Rule Schema by default for use in the online simple editor
     if (demoMode && schemaAry.length) {
-      dispatch(publicSchemaFiles(demoConfig, schemaAry));
+      dispatch(publicSchemaFiles(demoConfig, schemaAry, {}, uiSchemaAry));
     }
   };
 };
@@ -130,7 +130,7 @@ export const fetchFileContent = (fileName, type) => {
 };
 
 // handle files uploaded via the Schema Loader dropdowns
-export const handleUploadedFile = (file, dropdown, schemaAry) => {
+export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
   let type = getFileType(dropdown);
 
   return function (dispatch, getState) {
@@ -161,10 +161,10 @@ export const handleUploadedFile = (file, dropdown, schemaAry) => {
           case type == "config" && isValidConfig(file.name):
             // load the matching schema files if a schema file is not already uploaded
 
-            const noSchema = getState().editor.editorSchemaFiles[0] == undefined;
-
-            if (file && file.name && file.name.length && noSchema && schemaAry && schemaAry.length) {
-              dispatch(publicSchemaFiles(file.name, schemaAry));
+            const localSchema = getState().editor.editorSchemaFiles[0] && getState().editor.editorSchemaFiles[0].name.includes("(local)") ? true : false;
+            
+            if (file && file.name && file.name.length && localSchema == false && schemaAry && schemaAry.length) {
+              dispatch(publicSchemaFiles(file.name, schemaAry, contentJSON, uiSchemaAry));
             }
 
             // TBD: Look intro trimming below
@@ -213,16 +213,30 @@ export const setUISchemaFile = (UISchemaFiles) => ({
 
 // -------------------------------------------------------
 // RULE SCHEMA: load the relevant Rule Schema file when a user uploads a config file (based on revision)
-export const publicSchemaFiles = (selectedConfig, schemaAry) => {
+export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSchemaAry) => {
 
   return function (dispatch) {
     dispatch(resetSchemaFiles());
 
 
     if (selectedConfig) {
+      // test if config is from a CANedge1 to enable further filtering of Rule Schemas
+      let deviceType = (contentJSON.can_2 != undefined && contentJSON.connect == undefined) ? "CANedge1" : (contentJSON.can_2 != undefined) ? "CANedge2" : "Other"
+
       let schemaAryFiltered = schemaAry.filter((e) =>
-        e.includes(selectedConfig.substr(7, 5))
+        (e.includes(selectedConfig.substr(7, 5))
+      ))
+
+      let uiSchemaAryFiltered = uiSchemaAry.filter((e) =>
+        (e.includes(selectedConfig.substr(7, 5))
+      ))
+
+      if(deviceType.includes("CANedge")){
+        schemaAryFiltered = schemaAryFiltered.filter((e) =>
+        e.includes(deviceType)
       );
+      }
+      
 
       if (demoMode) {
         schemaAryFiltered = schemaAry.filter((e) => e.includes("CANedge1"));
@@ -236,6 +250,13 @@ export const publicSchemaFiles = (selectedConfig, schemaAry) => {
       }else{
         console.log("Unable to load embedded Rule Schema")
       }
+
+      // load uiSchemaFiltered
+      if(uiSchemaAryFiltered && uiSchemaAryFiltered.length){
+        dispatch(resetUISchemaList());
+        dispatch(setUISchemaFile(uiSchemaAryFiltered));
+        dispatch(setUISchemaContent(loadFile(uiSchemaAryFiltered[0])));
+        }
     }
   };
 };

@@ -95,13 +95,13 @@ export default connect(null, mapDispatchToProps)(Editor)
 
 ## Parsing embedded Rule Schema and UISchema files
 
-The config editor can take a list of UIschema and Rule Schema files. This enables the editor to "auto-load" the UIschemas upon initial load, as well as "auto-load" the Rule Schema files matching the revision of the loaded Configuration File.
+The [config editor](https://github.com/CSS-Electronics/config-editor) can take a list of UIschema and Rule Schema files. This enables the editor to "auto-load" the UIschemas upon initial load, as well as "auto-load" the Rule Schema files matching the revision of the loaded Configuration File.
 
 Note that the parsed list of files should match the actual files that are included in the config-editor-base `dist/` folder.
 
 For example, the Rule Schema for `"schema-01.02.json | CANedge2"` should be contained in `dist/schema/CANedge2/schema-01.02.json`.
 
-The syntax for parsing these lists is as below:
+The syntax for parsing these lists is as below (in the [config-editor](https://github.com/CSS-Electronics/config-editor) repo `Editor.js` file):
 
 ```jsx
 
@@ -129,6 +129,9 @@ export const schemaAry = [
 ...
 
 ```
+
+Note that the code distinguishes between a `config-XX.YY.json` file loaded from a CANedge1 and CANedge2 unit. This is done by evaluating whether a `connect` section exists or not in the Configuration File. Based on this test, the editor either loads the Rule Schema for the CANedge2 (if `connect` exists) or the CANedge1.
+
 
 ---
 

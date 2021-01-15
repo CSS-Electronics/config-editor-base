@@ -63,7 +63,7 @@ class EditorDropDown extends React.Component {
 
   render() {
 
-    let { handleUploadedFile, options, schemaAry } = this.props;
+    let { handleUploadedFile, options, schemaAry, uiSchemaAry } = this.props;
 
     return (
       <div className="form-group pl0 field-string">
@@ -81,7 +81,7 @@ class EditorDropDown extends React.Component {
           ref="fileUploader"
           style={{ display: "none" }}
           onChange={e => {
-            handleUploadedFile(e.target.files[0], this.props.name, schemaAry);
+            handleUploadedFile(e.target.files[0], this.props.name, schemaAry, uiSchemaAry);
             e.target.value = "";
           }}
         />

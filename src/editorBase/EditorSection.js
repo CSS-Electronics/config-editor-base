@@ -309,6 +309,7 @@ export class EditorSection extends React.Component {
             editorConfigFiles={editorConfigFiles}
             handleDropdownChange={this.handleDropdownChange}
             schemaAry={this.props.schemaAry}
+            uiSchemaAry={this.props.uiSchemaAry}
           />
         ),
       }

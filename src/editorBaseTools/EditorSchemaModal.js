@@ -22,7 +22,8 @@ class EditorSchemaModal extends React.Component {
       selectedschema,
       selectedconfig,
       handleDropdownChange,
-      schemaAry
+      schemaAry,
+      uiSchemaAry
     } = this.props;
 
     return (
@@ -36,6 +37,7 @@ class EditorSchemaModal extends React.Component {
           onChange={handleDropdownChange}
           handleUploadedFile={handleUploadedFile}
           schemaAry={schemaAry}
+          uiSchemaAry={uiSchemaAry}
           customBackground={true}
           comment="The UIschema affects the visual presentation of the editor. It does not impact the Configuration File. It can also be used to hide e.g. advanced settings via a Simple variant - or show all settings via an Advanced variant."
         />
@@ -46,6 +48,7 @@ class EditorSchemaModal extends React.Component {
           onChange={handleDropdownChange}
           handleUploadedFile={handleUploadedFile}
           schemaAry={schemaAry}
+          uiSchemaAry={uiSchemaAry}
           customBackground={true}
           comment="The Rule Schema serves as a guide for populating the Configuration File - and for automatically validating a Configuration File."
         /><hr/>
@@ -56,6 +59,7 @@ class EditorSchemaModal extends React.Component {
           onChange={handleDropdownChange}
           handleUploadedFile={handleUploadedFile}
           schemaAry={schemaAry}
+          uiSchemaAry={uiSchemaAry}
           comment="The Configuration File contains the settings that will be used on the device. You can upload a new Configuration File via the dropdown to modify it using the editor."
         />
       </div>
@@ -65,8 +69,8 @@ class EditorSchemaModal extends React.Component {
 
 const mapDispatchToProps = dispatch => {
   return {
-    handleUploadedFile: (file, type, schemaAry) =>
-      dispatch(actionsEditor.handleUploadedFile(file, type, schemaAry)),
+    handleUploadedFile: (file, type, schemaAry, uiSchemaAry) =>
+      dispatch(actionsEditor.handleUploadedFile(file, type, schemaAry, uiSchemaAry)),
     resetFiles: () => dispatch(actionsEditor.resetFiles())
   };
 };
