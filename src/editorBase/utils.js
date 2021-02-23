@@ -2,8 +2,8 @@
 // UTILS: Utils for testing schema name validity
 
 // Toggle demo mode on/off
-export const demoMode = false
-export const demoConfig = 'config-01.02.json'
+// export const demoMode = false
+export const demoConfig = 'config-01.04.json'
 
 export const regexUISchemaPublic = new RegExp(
   /^uischema-\d{2}\.\d{2}\.json/,

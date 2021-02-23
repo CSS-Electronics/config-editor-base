@@ -30,7 +30,6 @@ import {
   isValidSchema,
   isValidConfig,
   loadFile,
-  demoMode,
   demoConfig,
   crcBrowserSupport,
   getFileType,
@@ -64,7 +63,7 @@ export const setCrc32EditorLive = (crc32EditorLive) => ({
 
 // -------------------------------------------------------
 // UISCHEMA: load the Simple/Advanced default UIschema in the online & offline editor
-export const publicUiSchemaFiles = (uiSchemaAry, schemaAry) => {
+export const publicUiSchemaFiles = (uiSchemaAry, schemaAry, demoMode) => {
   
   return function (dispatch) {
     if(uiSchemaAry && uiSchemaAry.length){
@@ -238,9 +237,9 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
       }
       
 
-      if (demoMode) {
-        schemaAryFiltered = schemaAry.filter((e) => e.includes("CANedge1"));
-      }
+      //if (demoMode) {
+      //  schemaAryFiltered = schemaAry.filter((e) => e.includes("CANedge2"));
+      //}
 
       const loadedSchema = loadFile(schemaAryFiltered[0])
 

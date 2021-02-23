@@ -111,7 +111,7 @@ export class EditorSection extends React.Component {
   }
 
   componentWillMount() {
-    this.props.publicUiSchemaFiles(this.props.uiSchemaAry, this.props.schemaAry);
+    this.props.publicUiSchemaFiles(this.props.uiSchemaAry, this.props.schemaAry, this.props.demoMode);
   }
 
   componentDidMount() {
@@ -429,7 +429,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(actionsEditor.setUpdatedFormData(formData)),
     setConfigContentPreSubmit: () =>
       dispatch(actionsEditor.setConfigContentPreSubmit()),
-    publicUiSchemaFiles: (uiSchemaAry, schemaAry) => dispatch(actionsEditor.publicUiSchemaFiles(uiSchemaAry, schemaAry)),
+    publicUiSchemaFiles: (uiSchemaAry, schemaAry, demoMode) => dispatch(actionsEditor.publicUiSchemaFiles(uiSchemaAry, schemaAry, demoMode)),
   };
 };
 
