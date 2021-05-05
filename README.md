@@ -154,7 +154,7 @@ The module expects to find JSON Schema files in the structure below to facilitat
 /
 |-- dist/
 	|-- schema/
-		|-- Advanded/
+		|-- Advanced/
 			|-- uischema-XX.YY.json 
 		|-- Simple/
 			|-- uischema-XX.YY.json 

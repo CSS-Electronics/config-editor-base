@@ -63,12 +63,13 @@ class EditorDropDown extends React.Component {
 
   render() {
 
-    let { handleUploadedFile, options, schemaAry, uiSchemaAry } = this.props;
+    let { handleUploadedFile, options, schemaAry, uiSchemaAry, disabled } = this.props;
 
     return (
       <div className="form-group pl0 field-string">
         <p>{this.props.name}</p>
         <Select
+          isDisabled={disabled}
           value={this.state.defaultOption}
           options={selectOptions(options)}
           onChange={this.handleSelectChange}

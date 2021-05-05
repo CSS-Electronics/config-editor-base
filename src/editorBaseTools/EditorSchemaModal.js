@@ -31,6 +31,7 @@ class EditorSchemaModal extends React.Component {
         <h4>Schema & config loader</h4>
 
         <EditorDropdown
+          disabled={editorSchemaFiles.length == 0 ? true : false}
           options={editorUISchemaFiles}
           name="Presentation Mode"
           selected={selecteduischema}
@@ -42,6 +43,7 @@ class EditorSchemaModal extends React.Component {
           comment="The UIschema affects the visual presentation of the editor. It does not impact the Configuration File. It can also be used to hide e.g. advanced settings via a Simple variant - or show all settings via an Advanced variant."
         />
         <EditorDropdown
+          disabled={editorConfigFiles.length == 0 ? true : false}
           options={editorSchemaFiles}
           name="Rule Schema"
           selected={selectedschema}
@@ -53,6 +55,7 @@ class EditorSchemaModal extends React.Component {
           comment="The Rule Schema serves as a guide for populating the Configuration File - and for automatically validating a Configuration File."
         /><hr/>
         <EditorDropdown
+          disabled={false}
           options={editorConfigFiles}
           name="Configuration File"
           selected={selectedconfig}
