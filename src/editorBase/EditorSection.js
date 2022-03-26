@@ -287,7 +287,8 @@ export class EditorSection extends React.Component {
       sideBarPadding
     } = this.props
 
-    console.log('editorConfigFiles', editorConfigFiles)
+    let editorUISchemaFile = editorUISchemaFiles[0] ? editorUISchemaFiles[0].name : ""
+    let editorUIAdvancedSimpleTest = editorUISchemaFile.includes("Simple") || editorUISchemaFile.includes("Advanced")
 
     // add navigation bar
     let FormWithNav = schemaContent ? applyNav(Form, EditorNavs) : Form
@@ -378,6 +379,16 @@ export class EditorSection extends React.Component {
                   <p className='loader-callout'>
                     Load your UIschema File <br />
                     (uischema-XX.YY.json)
+                  </p>
+                </div>
+              ) : null}
+
+              {editorConfigFiles.length != 0 &&
+              editorSchemaFiles.length != 0 &&
+              editorUIAdvancedSimpleTest == true ? (
+                <div className='schema-loader-callout uischema-loader fadeout-box'>
+                  <p className='loader-callout'>
+                    Change 'Presentation Mode' to unhide/hide advanced settings
                   </p>
                 </div>
               ) : null}

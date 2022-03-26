@@ -23,7 +23,7 @@ export const isValidSchema = (file) => {
 }
 
 export const isValidConfig = (file) => {
-  const regexConfig = new RegExp('config-\\d{2}\\.\\d{2}\\.json', 'g')
+  const regexConfig = new RegExp('config-\\d{2}\\.\\d{2}.{0,35}\\.json', 'g')
   return regexConfig.test(file)
 }
 
