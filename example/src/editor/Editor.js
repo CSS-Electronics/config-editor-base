@@ -13,25 +13,26 @@ import * as actionsAlert from "../alert/actions";
 import AlertContainer from "../alert/AlertContainer";
 
 // define editor title and version
-let TYPE = "CANedge"
+const TYPE = "CANedge"
 const title = TYPE + " config editor"
-const version = "v1.4.3"
+const version = "v1.4.7"
 
 // define UIschema and Rule Schema names for auto-loading purposes
 export const uiSchemaAry = {"CANedge": [
-  "uischema-01.03.json | Simple",
-  "uischema-01.03.json | Advanced",
   "uischema-01.04.json | Simple",
   "uischema-01.04.json | Advanced",
-], "CANmod.gps": []}
+  "uischema-01.06.json | Simple",
+  "uischema-01.06.json | Advanced",
+], "CANmod": []}
 
 export const schemaAry = {"CANedge": [
   "schema-01.04.json | CANedge2",
   "schema-01.04.json | CANedge1",
-  "schema-01.03.json | CANedge2",
-  "schema-01.03.json | CANedge1",
-], "CANmod.gps":[]}
+  "schema-01.06.json | CANedge2",
+  "schema-01.06.json | CANedge1",
+], "CANmod":[]}
 
+export const demoMode = false
 
 class Editor extends React.Component {
   render() {
@@ -54,7 +55,7 @@ class Editor extends React.Component {
         class: "fa fa-calculator",
         modal: <BitRateModal showAlert={this.props.showAlert} />,
       },
-    ], "CANmod.gps": []};
+    ], "CANmod": []};
 
     return (
        <div className="file-explorer">
@@ -72,6 +73,7 @@ class Editor extends React.Component {
           showAlert={this.props.showAlert}
 		      uiSchemaAry={uiSchemaAry[TYPE]}
           schemaAry={schemaAry[TYPE]}
+          demoMode={demoMode}
         />
 		</div>
       </div>

@@ -21,6 +21,7 @@ export const SET_UISCHEMA_SOURCE = "editor/SET_UISCHEMA_SOURCE";
 export const SET_CONFIG_DATA_LOCAL = "SET_CONFIG_DATA_LOCAL";
 export const SET_CRC32_EDITOR_LIVE = "SET_CRC32_EDITOR_LIVE";
 
+import * as alertActions from "../alert/actions";
 
 
 import {
@@ -164,6 +165,19 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
             
             if (file && file.name && file.name.length && localSchema == false && schemaAry && schemaAry.length) {
               dispatch(publicSchemaFiles(file.name, schemaAry, contentJSON, uiSchemaAry));
+            }
+
+            
+            // add warning regarding OTA update overwrites
+            let configIncludesServerDetails = JSON.stringify(contentJSON, null, 2).includes("http://") || JSON.stringify(contentJSON, null, 2).includes("https://")
+            if (configIncludesServerDetails){
+              dispatch(
+                alertActions.set({
+                  type: "warning",
+                  message: "If your device is already connected to your server, changes made via the SD will be overwritten by the server Configuration File",
+                  autoClear: false,
+                })
+              );
             }
 
             // TBD: Look intro trimming below
