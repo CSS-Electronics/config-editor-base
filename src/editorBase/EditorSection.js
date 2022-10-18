@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Form from 'react-jsonschema-form'
-import applyNav from 'react-jsonschema-form-pagination'
 import classNames from 'classnames'
+import validator from "@rjsf/validator-ajv6";
+import Form from "@rjsf/core";
 
 import EditorSchemaModal from '../editorBaseTools/EditorSchemaModal'
 import PartialConfigLoader from '../editorBaseTools/PartialConfigLoader'
@@ -11,6 +11,7 @@ import PartialConfigLoader from '../editorBaseTools/PartialConfigLoader'
 import EditorToolButton from '../editorBaseTools/EditorToolButton'
 import EditorToolModalWrapper from '../editorBaseTools/EditorToolModalWrapper'
 
+import applyNav from 'rjsf-tabs'
 import EditorNavs from './EditorNavs'
 import EditorArrayFieldTemplate from './EditorArrayFieldTemplate'
 import EditorChangesComparison from './EditorChangesComparison'
@@ -394,6 +395,7 @@ export class EditorSection extends React.Component {
               ) : null}
 
               <FormWithNav
+               validator={validator}
                 omitExtraData={true}
                 liveOmit={true}
                 liveValidate={true}

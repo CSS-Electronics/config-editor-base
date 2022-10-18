@@ -1,6 +1,6 @@
 {
   "name": "config-editor-base",
-  "version": "1.5.8",
+  "version": "1.6.2",
   "description": "React-based JSON Schema editor base-tool",
   "author": "CSS Electronics",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "react": "^16.0.0",
     "react-files": "^2.4.8",
     "react-redux": "^5.0.7",
-    "react-select": "^2.4.1"
+    "react-select": "^3.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
@@ -57,9 +57,11 @@
     "dist"
   ],
   "dependencies": {
+    "@rjsf/core": "^5.0.0-beta.10",
+    "@rjsf/utils": "^5.0.0-beta.10",
+    "@rjsf/validator-ajv6": "^5.0.0-beta.10",
     "deepmerge": "^4.1.1",
     "react-gh-like-diff": "^2.0.2",
-    "react-jsonschema-form": "^2.0.0-alpha.1",
-    "react-jsonschema-form-pagination": "0.3.12"
+    "rjsf-tabs": "^0.0.1"
   }
 }

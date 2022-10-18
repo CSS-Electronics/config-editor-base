@@ -2,7 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import Files from "react-files";
 import * as actionsEditor from "../editorBase/actions";
-import Form from "react-jsonschema-form";
+import validator from "@rjsf/validator-ajv6";
+import Form from "@rjsf/core";
 
 let yourForm;
 const merge = require("deepmerge");
@@ -169,6 +170,7 @@ class PartialConfigLoader extends React.Component {
             <div style={{ display: "none" }}>
               {JSON.stringify(mergedConfig, null, 2)}
               <Form
+                validator={validator}
                 onError={this.onValidationError}
                 schema={schemaContent ? schemaContent : {}}
                 formData={mergedConfig ? mergedConfig : {}}

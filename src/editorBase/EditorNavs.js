@@ -1,5 +1,5 @@
 import React from "react";
-import { GENERIC_NAV } from "react-jsonschema-form-pagination/lib/utils";
+import { GENERIC_NAV } from "rjsf-tabs";
 
 function EditorNavs({ navs: { links }, onNavChange }) {
   let relLinks = links.filter(({ nav }) => nav !== GENERIC_NAV);

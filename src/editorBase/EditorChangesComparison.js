@@ -2,6 +2,8 @@ import React from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { connect } from "react-redux";
 import Select from "react-select";
+import _ from "lodash";
+
 
 const selectOptions = (Files) => {
   Files = _.orderBy(Files, ["name"], ["desc"]);
