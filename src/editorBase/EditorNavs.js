@@ -4,6 +4,7 @@ import { GENERIC_NAV } from "rjsf-tabs";
 function EditorNavs({ navs: { links }, onNavChange }) {
   let relLinks = links.filter(({ nav }) => nav !== GENERIC_NAV);
   return (
+    <div className="col-md-12">
     <nav className="navbar navbar-default navbar-margin-reduce">
       <div className="container-fluid">
         <div className="collapse navbar-collapse">
@@ -24,6 +25,7 @@ function EditorNavs({ navs: { links }, onNavChange }) {
         </div>
       </div>
     </nav>
+    </div>
   );
 }
 

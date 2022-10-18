@@ -13,7 +13,7 @@ import EditorToolModalWrapper from '../editorBaseTools/EditorToolModalWrapper'
 
 import applyNav from 'rjsf-tabs'
 import EditorNavs from './EditorNavs'
-import EditorArrayFieldTemplate from './EditorArrayFieldTemplate'
+import ArrayFieldTemplate from './EditorArrayFieldTemplate'
 import EditorChangesComparison from './EditorChangesComparison'
 
 import * as actionsEditor from './actions'
@@ -34,8 +34,10 @@ export class EditorSection extends React.Component {
     this.escFunction = this.escFunction.bind(this)
     this.subMenuBtnClick = this.subMenuBtnClick.bind(this)
     this.handleDropdownChange = this.handleDropdownChange.bind(this)
+    this.hideUischemaModal = this.hideUischemaModal.bind(this)
 
     this.state = {
+      showUischemaModal: true,
       schema: '',
       selecteduischema: '',
       selectedschema: '',
@@ -71,6 +73,11 @@ export class EditorSection extends React.Component {
       }
     )
   }
+
+  hideUischemaModal(){
+    this.setState({ showUischemaModal: false })
+  }
+  
 
   handleDropdownChange(selection, dropdown) {
     const fileType = getFileType(dropdown)
@@ -387,7 +394,8 @@ export class EditorSection extends React.Component {
               {editorConfigFiles.length != 0 &&
               editorSchemaFiles.length != 0 &&
               editorUIAdvancedSimpleTest == true ? (
-                <div className='schema-loader-callout uischema-loader fadeout-box'>
+                <div onClick={this.hideUischemaModal} className='schema-loader-callout uischema-loader fadeout-box'
+                style={{display: this.state.showUischemaModal ? 'block' : 'none' }}>
                   <p className='loader-callout'>
                     Change 'Presentation Mode' to unhide/hide advanced settings
                   </p>
@@ -407,7 +415,7 @@ export class EditorSection extends React.Component {
                 onChange={this.handleChange}
                 onError={this.handleError}
                 onNavChange={this.onNavChange.bind(this)}
-                ArrayFieldTemplate={EditorArrayFieldTemplate}
+                templates={{ArrayFieldTemplate}}
                 activeNav={activatedTab}
               >
                 <EditorChangesComparison

@@ -1,6 +1,6 @@
 import React from "react";
 
-function EditorArrayFieldTemplate(props) {
+function ArrayFieldTemplate(props) {
   return (
     <div className="reset-margins">
       <legend>{props.title}</legend>
@@ -62,4 +62,4 @@ function EditorArrayFieldTemplate(props) {
   );
 }
 
-export default EditorArrayFieldTemplate;
+export default ArrayFieldTemplate;
