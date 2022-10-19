@@ -9,7 +9,7 @@ function ArrayFieldTemplate(props) {
         props.items.map(element => (
           <div key={element.index}>
             <div className="position-relative">
-              <div>
+              <div className="rjsf-array-list">
                 <div>{element.children}</div>
                 <div className="special-array-buttons">
                   {element.hasMoveDown && (

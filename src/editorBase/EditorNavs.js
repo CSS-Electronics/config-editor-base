@@ -10,6 +10,7 @@ function EditorNavs({ navs: { links }, onNavChange }) {
         <div className="collapse navbar-collapse">
           <ul className="nav navbar-nav navbar-ul-margin-reduce">
             {relLinks.map(({ nav, name, icon, isActive }, i) => (
+              nav !== "GEOFENCE" ? ( // short term fix for CANmod.gps FW 01.03.01 uischema bug
               <li
                 key={i}
                 onClick={() => onNavChange(nav)}
@@ -19,7 +20,7 @@ function EditorNavs({ navs: { links }, onNavChange }) {
                   {icon && <span className={icon} aria-hidden="true" />}
                   &nbsp;{name || nav}
                 </a>
-              </li>
+              </li>) : null
             ))}
           </ul>
         </div>

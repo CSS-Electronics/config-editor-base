@@ -90,7 +90,8 @@ export class EditorSection extends React.Component {
       () => {
         if (
           this.s3 &&
-          fileType != 'uischema' &&
+          !selection.includes('Simple') &&
+          !selection.includes('Advanced') &&
           !selection.includes('(local)')
         ) {
           this.props.fetchFileContentExt(selection, fileType)
