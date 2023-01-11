@@ -5,11 +5,13 @@
       "LOG",
       "RTC",
       "2ND-PORT",
+      "CAN INTERNAL",
       "CAN CH1",
       "CAN CH2",
       "LIN CH1",
       "LIN CH2",
-      "CONNECT"
+      "CONNECT",
+      "GNSS"
     ]
   },
   "general": {
@@ -19,27 +21,18 @@
     }
   },
   "log": {
-    "nav": "LOG",
-    "compression": {
-      "ui:widget": "hidden"
-    },
-    "encryption": {
-      "ui:widget": "hidden"
-    }
+    "nav": "LOG"
   },
   "rtc": {
     "nav": "RTC",
-    "ntp_server": {
-      "classNames": "col-sm-4",
-      "ui:widget": "hidden"
+    "timezone": {
+      "classNames": "col-sm-6"
     },
-    "ntp_fallback": {
-      "classNames": "col-sm-4",
-      "ui:widget": "hidden"
+    "adjustment": {
+      "classNames": "col-sm-6"
     },
     "tolerance": {
-      "classNames": "col-sm-4",
-      "ui:widget": "hidden"
+      "classNames": "col-sm-12"
     },
     "manual_date_time": {
       "ui:widget": "alt-datetime",
@@ -50,11 +43,64 @@
         ]
       }
     },
-    "sync": {
-      "ui:widget": "hidden"
+    "ntp_server": {
+      "classNames": "col-sm-12"
     },
-    "adjustment": {
-      "ui:widget": "hidden"
+    "message": {
+      "chn": {
+        "classNames": "col-sm-3"
+      },
+      "id_format": {
+        "classNames": "col-sm-3"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "id_mask": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "valid_signal": {
+      "type": {
+        "classNames": "col-sm-2",
+        "ui:disabled": true
+      },
+      "byteorder": {
+        "classNames": "col-sm-2"
+      },
+      "bitpos": {
+        "classNames": "col-sm-2"
+      },
+      "length": {
+        "classNames": "col-sm-2"
+      },
+      "factor": {
+        "classNames": "col-sm-2"
+      },
+      "offset": {
+        "classNames": "col-sm-2"
+      }
+    },
+    "time_signal": {
+      "type": {
+        "classNames": "col-sm-2",
+        "ui:disabled": true
+      },
+      "byteorder": {
+        "classNames": "col-sm-2"
+      },
+      "bitpos": {
+        "classNames": "col-sm-2"
+      },
+      "length": {
+        "classNames": "col-sm-2"
+      },
+      "factor": {
+        "classNames": "col-sm-2"
+      },
+      "offset": {
+        "classNames": "col-sm-2"
+      }
     }
   },
   "secondaryport": {
@@ -72,41 +118,14 @@
       }
     }
   },
-  "can_1": {
-    "nav": "CAN CH1",
+  "can_internal": {
+    "nav": "CAN INTERNAL",
     "general": {
       "rx_state": {
         "classNames": "col-sm-6"
       },
       "tx_state": {
         "classNames": "col-sm-6"
-      },
-      "ui:widget": "hidden"
-    },
-    "phy": {
-      "bit_rate_std": {
-        "classNames": "col-sm-6"
-      },
-      "bit_rate_fd": {
-        "classNames": "col-sm-6"
-      },
-      "brp": {
-        "classNames": "col-sm-3"
-      },
-      "seg1": {
-        "classNames": "col-sm-3"
-      },
-      "seg2": {
-        "classNames": "col-sm-3"
-      },
-      "sjw": {
-        "classNames": "col-sm-3"
-      },
-      "fd_spec": {
-        "ui:widget": "hidden"
-      },
-      "retransmission": {
-        "ui:widget": "hidden"
       }
     },
     "filter": {
@@ -152,20 +171,201 @@
             "classNames": "col-sm-2 smaller-margins"
           }
         }
+      }
+    },
+    "control": {
+      "control_rx_state": {
+        "classNames": "col-sm-6"
       },
-      "ui:widget": "hidden"
+      "control_tx_state": {
+        "classNames": "col-sm-6"
+      },
+      "start": {
+        "message": {
+          "chn": {
+            "classNames": "col-sm-3"
+          },
+          "id_format": {
+            "classNames": "col-sm-3"
+          },
+          "id": {
+            "classNames": "col-sm-3"
+          },
+          "id_mask": {
+            "classNames": "col-sm-3"
+          }
+        },
+        "signal": {
+          "type": {
+            "classNames": "col-sm-2",
+            "ui:disabled": true
+          },
+          "byteorder": {
+            "classNames": "col-sm-2"
+          },
+          "bitpos": {
+            "classNames": "col-sm-2"
+          },
+          "length": {
+            "classNames": "col-sm-2"
+          },
+          "factor": {
+            "classNames": "col-sm-2"
+          },
+          "offset": {
+            "classNames": "col-sm-2"
+          }
+        },
+        "trigger_high": {
+          "classNames": "col-sm-6"
+        },
+        "trigger_low": {
+          "classNames": "col-sm-6"
+        }
+      },
+      "stop": {
+        "message": {
+          "chn": {
+            "classNames": "col-sm-3"
+          },
+          "id_format": {
+            "classNames": "col-sm-3"
+          },
+          "id": {
+            "classNames": "col-sm-3"
+          },
+          "id_mask": {
+            "classNames": "col-sm-3"
+          }
+        },
+        "signal": {
+          "type": {
+            "classNames": "col-sm-2",
+            "ui:disabled": true
+          },
+          "byteorder": {
+            "classNames": "col-sm-2"
+          },
+          "bitpos": {
+            "classNames": "col-sm-2"
+          },
+          "length": {
+            "classNames": "col-sm-2"
+          },
+          "factor": {
+            "classNames": "col-sm-2"
+          },
+          "offset": {
+            "classNames": "col-sm-2"
+          }
+        },
+        "trigger_high": {
+          "classNames": "col-sm-6"
+        },
+        "trigger_low": {
+          "classNames": "col-sm-6"
+        }
+      }
+    }
+  },
+  "can_1": {
+    "nav": "CAN CH1",
+    "general": {
+      "rx_state": {
+        "classNames": "col-sm-6"
+      },
+      "tx_state": {
+        "classNames": "col-sm-6"
+      }
+    },
+    "phy": {
+      "mode": {
+        "classNames": "col-sm-4"
+      },
+      "retransmission": {
+        "classNames": "col-sm-4"
+      },
+      "fd_spec": {
+        "classNames": "col-sm-4"
+      },
+      "bit_rate_cfg_mode": {
+        "classNames": "col-sm-12"
+      },
+      "bit_rate_std": {
+        "classNames": "col-sm-6"
+      },
+      "bit_rate_fd": {
+        "classNames": "col-sm-6"
+      },
+      "brp": {
+        "classNames": "col-sm-3"
+      },
+      "seg1": {
+        "classNames": "col-sm-3"
+      },
+      "seg2": {
+        "classNames": "col-sm-3"
+      },
+      "sjw": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "filter": {
+      "id": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-1 smaller-margins"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1 smaller-margins"
+          },
+          "type": {
+            "ui:title": " ",
+            "classNames": "col-sm-1 smaller-margins"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1 smaller-margins"
+          },
+          "method": {
+            "ui:title": " ",
+            "classNames": "col-sm-1 smaller-margins"
+          },
+          "f1": {
+            "ui:title": " ",
+            "ui:placeholder": "From/ID (HEX)",
+            "classNames": "col-sm-2 smaller-margins"
+          },
+          "f2": {
+            "ui:title": " ",
+            "ui:placeholder": "To/Mask (HEX)",
+            "classNames": "col-sm-2 smaller-margins"
+          },
+          "prescaler_type": {
+            "ui:title": " ",
+            "classNames": "col-sm-1 smaller-margins"
+          },
+          "prescaler_value": {
+            "ui:title": " ",
+            "classNames": "col-sm-2 smaller-margins"
+          }
+        }
+      }
     },
     "transmit": {
       "items": {
         "name": {
           "ui:title": " ",
           "ui:placeholder": "Name",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "id": {
           "ui:title": " ",
           "ui:placeholder": "ID (HEX)",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "id_format": {
           "ui:title": " ",
@@ -175,28 +375,25 @@
           "ui:title": " ",
           "ui:placeholder": "Period",
           "ui:widget": "updown",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "delay": {
           "ui:title": " ",
           "ui:placeholder": "Delay",
           "ui:widget": "updown",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "frame_format": {
           "ui:title": " ",
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-2 smaller-margins"
         },
         "brs": {
           "ui:title": " ",
-          "classNames": "col-sm-1 smaller-margins",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "state": {
           "ui:title": " ",
-          "classNames": "col-sm-1 smaller-margins",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "log": {
           "ui:title": " ",
@@ -218,8 +415,7 @@
       },
       "id": {
         "classNames": "col-sm-3"
-      },
-      "ui:widget": "hidden"
+      }
     },
     "control": {
       "control_rx_state": {
@@ -229,46 +425,91 @@
         "classNames": "col-sm-6"
       },
       "start": {
-        "id_format": {
-          "classNames": "col-sm-4"
+        "message": {
+          "chn": {
+            "classNames": "col-sm-3"
+          },
+          "id_format": {
+            "classNames": "col-sm-3"
+          },
+          "id": {
+            "classNames": "col-sm-3"
+          },
+          "id_mask": {
+            "classNames": "col-sm-3"
+          }
         },
-        "id": {
-          "classNames": "col-sm-4"
+        "signal": {
+          "type": {
+            "classNames": "col-sm-2",
+            "ui:disabled": true
+          },
+          "byteorder": {
+            "classNames": "col-sm-2"
+          },
+          "bitpos": {
+            "classNames": "col-sm-2"
+          },
+          "length": {
+            "classNames": "col-sm-2"
+          },
+          "factor": {
+            "classNames": "col-sm-2"
+          },
+          "offset": {
+            "classNames": "col-sm-2"
+          }
         },
-        "id_mask": {
-          "classNames": "col-sm-4"
+        "trigger_high": {
+          "classNames": "col-sm-6"
         },
-        "data_mask": {
-          "classNames": "col-sm-4"
-        },
-        "data_high": {
-          "classNames": "col-sm-4"
-        },
-        "data_low": {
-          "classNames": "col-sm-4"
+        "trigger_low": {
+          "classNames": "col-sm-6"
         }
       },
       "stop": {
-        "id_format": {
-          "classNames": "col-sm-4"
+        "message": {
+          "chn": {
+            "classNames": "col-sm-3"
+          },
+          "id_format": {
+            "classNames": "col-sm-3"
+          },
+          "id": {
+            "classNames": "col-sm-3"
+          },
+          "id_mask": {
+            "classNames": "col-sm-3"
+          }
         },
-        "id": {
-          "classNames": "col-sm-4"
+        "signal": {
+          "type": {
+            "classNames": "col-sm-2",
+            "ui:disabled": true
+          },
+          "byteorder": {
+            "classNames": "col-sm-2"
+          },
+          "bitpos": {
+            "classNames": "col-sm-2"
+          },
+          "length": {
+            "classNames": "col-sm-2"
+          },
+          "factor": {
+            "classNames": "col-sm-2"
+          },
+          "offset": {
+            "classNames": "col-sm-2"
+          }
         },
-        "id_mask": {
-          "classNames": "col-sm-4"
+        "trigger_high": {
+          "classNames": "col-sm-6"
         },
-        "data_mask": {
-          "classNames": "col-sm-4"
-        },
-        "data_high": {
-          "classNames": "col-sm-4"
-        },
-        "data_low": {
-          "classNames": "col-sm-4"
+        "trigger_low": {
+          "classNames": "col-sm-6"
         }
-      },
-      "ui:widget": "hidden"
+      }
     }
   },
   "can_2": {
@@ -279,10 +520,21 @@
       },
       "tx_state": {
         "classNames": "col-sm-6"
-      },
-      "ui:widget": "hidden"
+      }
     },
     "phy": {
+      "mode": {
+        "classNames": "col-sm-4"
+      },
+      "retransmission": {
+        "classNames": "col-sm-4"
+      },
+      "fd_spec": {
+        "classNames": "col-sm-4"
+      },
+      "bit_rate_cfg_mode": {
+        "classNames": "col-sm-12"
+      },
       "bit_rate_std": {
         "classNames": "col-sm-6"
       },
@@ -300,12 +552,6 @@
       },
       "sjw": {
         "classNames": "col-sm-3"
-      },
-      "fd_spec": {
-        "ui:widget": "hidden"
-      },
-      "retransmission": {
-        "ui:widget": "hidden"
       }
     },
     "filter": {
@@ -351,20 +597,19 @@
             "classNames": "col-sm-2 smaller-margins"
           }
         }
-      },
-      "ui:widget": "hidden"
+      }
     },
     "transmit": {
       "items": {
         "name": {
           "ui:title": " ",
           "ui:placeholder": "Name",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "id": {
           "ui:title": " ",
           "ui:placeholder": "ID (HEX)",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "id_format": {
           "ui:title": " ",
@@ -374,28 +619,25 @@
           "ui:title": " ",
           "ui:placeholder": "Period",
           "ui:widget": "updown",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "delay": {
           "ui:title": " ",
           "ui:placeholder": "Delay",
           "ui:widget": "updown",
-          "classNames": "col-sm-2 smaller-margins"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "frame_format": {
           "ui:title": " ",
-          "classNames": "col-sm-2 smaller-margins",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-2 smaller-margins"
         },
         "brs": {
           "ui:title": " ",
-          "classNames": "col-sm-1 smaller-margins",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "state": {
           "ui:title": " ",
-          "classNames": "col-sm-1 smaller-margins",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-1 smaller-margins"
         },
         "log": {
           "ui:title": " ",
@@ -417,8 +659,7 @@
       },
       "id": {
         "classNames": "col-sm-3"
-      },
-      "ui:widget": "hidden"
+      }
     },
     "control": {
       "control_rx_state": {
@@ -428,46 +669,91 @@
         "classNames": "col-sm-6"
       },
       "start": {
-        "id_format": {
-          "classNames": "col-sm-4"
+        "message": {
+          "chn": {
+            "classNames": "col-sm-3"
+          },
+          "id_format": {
+            "classNames": "col-sm-3"
+          },
+          "id": {
+            "classNames": "col-sm-3"
+          },
+          "id_mask": {
+            "classNames": "col-sm-3"
+          }
         },
-        "id": {
-          "classNames": "col-sm-4"
+        "signal": {
+          "type": {
+            "classNames": "col-sm-2",
+            "ui:disabled": true
+          },
+          "byteorder": {
+            "classNames": "col-sm-2"
+          },
+          "bitpos": {
+            "classNames": "col-sm-2"
+          },
+          "length": {
+            "classNames": "col-sm-2"
+          },
+          "factor": {
+            "classNames": "col-sm-2"
+          },
+          "offset": {
+            "classNames": "col-sm-2"
+          }
         },
-        "id_mask": {
-          "classNames": "col-sm-4"
+        "trigger_high": {
+          "classNames": "col-sm-6"
         },
-        "data_mask": {
-          "classNames": "col-sm-4"
-        },
-        "data_high": {
-          "classNames": "col-sm-4"
-        },
-        "data_low": {
-          "classNames": "col-sm-4"
+        "trigger_low": {
+          "classNames": "col-sm-6"
         }
       },
       "stop": {
-        "id_format": {
-          "classNames": "col-sm-4"
+        "message": {
+          "chn": {
+            "classNames": "col-sm-3"
+          },
+          "id_format": {
+            "classNames": "col-sm-3"
+          },
+          "id": {
+            "classNames": "col-sm-3"
+          },
+          "id_mask": {
+            "classNames": "col-sm-3"
+          }
         },
-        "id": {
-          "classNames": "col-sm-4"
+        "signal": {
+          "type": {
+            "classNames": "col-sm-2",
+            "ui:disabled": true
+          },
+          "byteorder": {
+            "classNames": "col-sm-2"
+          },
+          "bitpos": {
+            "classNames": "col-sm-2"
+          },
+          "length": {
+            "classNames": "col-sm-2"
+          },
+          "factor": {
+            "classNames": "col-sm-2"
+          },
+          "offset": {
+            "classNames": "col-sm-2"
+          }
         },
-        "id_mask": {
-          "classNames": "col-sm-4"
+        "trigger_high": {
+          "classNames": "col-sm-6"
         },
-        "data_mask": {
-          "classNames": "col-sm-4"
-        },
-        "data_high": {
-          "classNames": "col-sm-4"
-        },
-        "data_low": {
-          "classNames": "col-sm-4"
+        "trigger_low": {
+          "classNames": "col-sm-6"
         }
-      },
-      "ui:widget": "hidden"
+      }
     }
   },
   "lin_1": {
@@ -525,8 +811,7 @@
           "ui:placeholder": "Data (HEX)",
           "ui:title": " "
         }
-      },
-      "ui:widget": "hidden"
+      }
     }
   },
   "lin_2": {
@@ -584,13 +869,18 @@
           "ui:placeholder": "Data (HEX)",
           "ui:title": " "
         }
-      },
-      "ui:widget": "hidden"
+      }
     }
   },
   "connect": {
     "nav": "CONNECT",
     "wifi": {
+      "mode": {
+        "classNames": "col-sm-6 smaller-margins"
+      },
+      "keyformat": {
+        "classNames": "col-sm-6 smaller-margins"
+      },
       "accesspoint": {
         "items": {
           "ssid": {
@@ -604,15 +894,12 @@
             "classNames": "col-sm-3 smaller-margins"
           },
           "minrssi": {
-            "ui:widget": "hidden",
+            "ui:widget": "updown",
             "ui:title": " ",
             "ui:placeholder": "Minimum RSSI, 0-100%",
             "classNames": "col-sm-3 smaller-margins"
           }
         }
-      },
-      "mode": {
-        "ui:widget": "hidden"
       }
     },
     "s3": {
@@ -657,8 +944,37 @@
           "classNames": "col-sm-3"
         },
         "signed_payload": {
-          "classNames": "col-sm-3",
-          "ui:widget": "hidden"
+          "classNames": "col-sm-3"
+        }
+      }
+    }
+  },
+  "gnss": {
+    "nav": "GNSS",
+    "alignment": {
+      "method": {
+        "classNames": "col-sm-3 smaller-margins"
+      },
+      "z": {
+        "classNames": "col-sm-3 smaller-margins"
+      },
+      "y": {
+        "classNames": "col-sm-3 smaller-margins"
+      },
+      "x": {
+        "classNames": "col-sm-3 smaller-margins"
+      }
+    },
+    "geofence": {
+      "items": {
+        "lat": {
+          "classNames": "col-sm-4 smaller-margins"
+        },
+        "lon": {
+          "classNames": "col-sm-4 smaller-margins"
+        },
+        "radius": {
+          "classNames": "col-sm-4 smaller-margins"
         }
       }
     }

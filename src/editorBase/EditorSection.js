@@ -362,7 +362,7 @@ export class EditorSection extends React.Component {
             <br />
 
             <div>
-              {editorConfigFiles.length == 0 ? (
+              {(editorConfigFiles.length == 0 && this.props.demoMode == false) ? (
                 <div className='schema-loader-callout config-loader'>
                   <p className='loader-callout'>
                     Load your Configuration File <br />

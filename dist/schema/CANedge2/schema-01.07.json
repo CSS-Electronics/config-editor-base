@@ -1,14 +1,43 @@
 {
   "type": "object",
   "definitions": {
-    "control_signal": {
+    "can_message": {
       "type": "object",
       "properties": {
-        "id_format": {
-          "title": "ID Format",
-          "description": "ID format of the control message.",
+        "chn": {
+          "title": "Channel",
+          "description": "CAN-bus channel",
           "type": "integer",
-          "default": 1,
+          "default": 0,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "CAN internal",
+              "enum": [
+                0
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "CAN 1",
+              "enum": [
+                1
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "CAN 2",
+              "enum": [
+                2
+              ]
+            }
+          ]
+        },
+        "id_format": {
+          "title": "ID format",
+          "description": "ID format of message.",
+          "type": "integer",
+          "default": 0,
           "oneOf": [
             {
               "type": "integer",
@@ -27,40 +56,16 @@
           ]
         },
         "id": {
-          "title": "Message ID (hex)",
-          "description": "ID of the control message in hex. Example: 00435354.",
-          "default": "00435354",
-          "type": "string"
+          "title": "ID (hex)",
+          "description": "ID of message in hex. Example: 1FF.",
+          "type": "string",
+          "default": "0"
         },
         "id_mask": {
-          "title": "Message ID mask (hex)",
-          "description": "ID mask of the control message in hex. Example: 1FFFFFFF.",
+          "title": "ID mask (hex)",
+          "description": "ID mask in hex. Example: 7FF.",
           "type": "string",
-          "default": "1FFFFFFF"
-        },
-        "data_mask": {
-          "title": "Data mask (hex)",
-          "description": "Data trigger mask (byte 0 to the left). Shall match the length of the control signal message.",
-          "type": "string",
-          "pattern": "^([a-fA-F0-9]{2}){0,8}$",
-          "maxLength": 16,
-          "default": "FFFFFFFFFFFFFFFF"
-        },
-        "data_high": {
-          "title": "Data trigger high (hex)",
-          "description": "Data trigger high range (byte 0 to the left)",
-          "type": "string",
-          "pattern": "^([a-fA-F0-9]{2}){0,8}$",
-          "maxLength": 16,
-          "default": "0100000000000000"
-        },
-        "data_low": {
-          "title": "Data trigger low (hex)",
-          "description": "Data trigger low range (byte 0 to the left)",
-          "type": "string",
-          "pattern": "^([a-fA-F0-9]{2}){0,8}$",
-          "maxLength": 16,
-          "default": "0000000000000000"
+          "default": "7FF"
         }
       },
       "dependencies": {
@@ -105,72 +110,503 @@
       },
       "additionalProperties": false,
       "required": [
+        "chn",
         "id_format",
         "id",
-        "id_mask",
-        "data_mask",
-        "data_high",
-        "data_low"
+        "id_mask"
+      ]
+    },
+    "can_signal": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Signal type",
+          "type": "integer",
+          "default": 0,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "Unsigned",
+              "enum": [
+                0
+              ]
+            }
+          ]
+        },
+        "byteorder": {
+          "title": "Signal byteorder",
+          "description": "Can be Motorola (big endian) or Intel (little endian)",
+          "type": "integer",
+          "default": 1,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "Motorola",
+              "enum": [
+                0
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "Intel",
+              "enum": [
+                1
+              ]
+            }
+          ]
+        },
+        "bitpos": {
+          "title": "Signal bit position",
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 512
+        },
+        "length": {
+          "title": "Signal bit length",
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 64
+        },
+        "factor": {
+          "title": "Signal scaling",
+          "type": "number",
+          "default": 0
+        },
+        "offset": {
+          "title": "Signal offset",
+          "type": "number",
+          "default": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "byteorder",
+        "bitpos",
+        "length",
+        "factor",
+        "offset"
+      ]
+    },
+    "can_control_startstop": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "title": "Message",
+          "$ref": "#/definitions/can_message"
+        },
+        "signal": {
+          "title": "Signal",
+          "$ref": "#/definitions/can_signal"
+        },
+        "trigger_high": {
+          "title": "Trigger high (dec)",
+          "type": "number",
+          "default": 0
+        },
+        "trigger_low": {
+          "title": "Trigger low (dec)",
+          "type": "number",
+          "default": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "message",
+        "signal",
+        "trigger_high",
+        "trigger_low"
+      ]
+    },
+    "can_filter_id": {
+      "title": "ID filters",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "description": "Optional filter name.",
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 16
+          },
+          "state": {
+            "title": "State",
+            "description": "Disabled filters are ignored.",
+            "type": "integer",
+            "default": 1,
+            "oneOf": [
+              {
+                "type": "integer",
+                "title": "Disable",
+                "enum": [
+                  0
+                ]
+              },
+              {
+                "type": "integer",
+                "title": "Enable",
+                "enum": [
+                  1
+                ]
+              }
+            ]
+          },
+          "type": {
+            "title": "Type",
+            "description": "Action on match, accept or reject message.",
+            "type": "integer",
+            "default": 0,
+            "oneOf": [
+              {
+                "title": "Acceptance",
+                "enum": [
+                  0
+                ]
+              },
+              {
+                "title": "Rejection",
+                "enum": [
+                  1
+                ]
+              }
+            ]
+          },
+          "id_format": {
+            "title": "ID format",
+            "description": "Filter ID format. Filters apply to messages with matching ID format.",
+            "type": "integer",
+            "default": 0,
+            "oneOf": [
+              {
+                "title": "Standard (11-bit)",
+                "enum": [
+                  0
+                ]
+              },
+              {
+                "title": "Extended (29-bit)",
+                "enum": [
+                  1
+                ]
+              }
+            ]
+          },
+          "method": {
+            "title": "Filter method",
+            "description": "The filter ID matching mechanism.",
+            "type": "integer",
+            "default": 0,
+            "oneOf": [
+              {
+                "title": "Range",
+                "enum": [
+                  0
+                ],
+                "description": "ID ranges"
+              },
+              {
+                "title": "Mask",
+                "enum": [
+                  1
+                ],
+                "description": "ID masking"
+              }
+            ]
+          },
+          "f1": {
+            "title": "From (range) / ID (mask) (HEX)",
+            "description": "If filter method is Range, this field defines the start of range. If filter method is Mask, this field defines the filter ID.",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]+$",
+            "maxLength": 8,
+            "default": "0"
+          },
+          "f2": {
+            "title": "To (range) / mask (mask) (HEX)",
+            "description": "If filter method is Range, this field defines the end of range. If filter method is Mask, this field defines the filter mask.",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]+$",
+            "maxLength": 8,
+            "default": "7FF"
+          }
+        },
+        "dependencies": {
+          "type": {
+            "oneOf": [
+              {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      0
+                    ]
+                  },
+                  "prescaler_type": {
+                    "title": "Prescaling type",
+                    "description": "Select prescaling type. Prescale by message count, time or data. Select None to disable prescaling.",
+                    "type": "integer",
+                    "default": 0,
+                    "oneOf": [
+                      {
+                        "title": "None",
+                        "enum": [
+                          0
+                        ]
+                      },
+                      {
+                        "title": "Count",
+                        "enum": [
+                          1
+                        ]
+                      },
+                      {
+                        "title": "Time",
+                        "enum": [
+                          2
+                        ]
+                      },
+                      {
+                        "title": "Data",
+                        "enum": [
+                          3
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "dependencies": {
+                  "prescaler_type": {
+                    "oneOf": [
+                      {
+                        "properties": {
+                          "prescaler_type": {
+                            "enum": [
+                              0
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "prescaler_type": {
+                            "enum": [
+                              1
+                            ]
+                          },
+                          "prescaler_value": {
+                            "title": "Count",
+                            "type": "integer",
+                            "description": "Count prescaler value. Example: Set to 2 to sample a message with a specific ID every second time.",
+                            "default": 1,
+                            "minimum": 1,
+                            "maximum": 256
+                          }
+                        },
+                        "required": [
+                          "prescaler_value"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "prescaler_type": {
+                            "enum": [
+                              2
+                            ]
+                          },
+                          "prescaler_value": {
+                            "title": "Time",
+                            "description": "Time prescaler value in milliseconds. Example: Set to 1000 to sample a message with a specific ID with a minimum period time of 1 second. Note that messages are not resampled to a specific fixed period time.",
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1,
+                            "maximum": 4194304
+                          }
+                        },
+                        "required": [
+                          "prescaler_value"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "prescaler_type": {
+                            "enum": [
+                              3
+                            ]
+                          },
+                          "prescaler_value": {
+                            "title": "Mask",
+                            "description": "Data prescaler mask value in hex. Each bit corresponds to a data byte (up to 64 bytes). Leave empty to disable the mask (triggers on any data change). Example 1: Set to FF (0b11111111) to sample a message with a specific ID if any of the first 8 data bytes change. Example 2: Set to 03 (0b00000011) to sample if any of the two first data bytes change. Example 3: Set to 9 (0b00001001) to sample if any of the first or fourth data bytes change.",
+                            "type": "string",
+                            "default": "FF",
+                            "pattern": "^[a-fA-F0-9]*$",
+                            "maxLength": 16
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "prescaler_type"
+                ]
+              },
+              {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      1
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "patternProperties": {
+          "prescaler_type": {},
+          "prescaler_value": {}
+        },
+        "required": [
+          "state",
+          "type",
+          "id_format",
+          "method",
+          "f1",
+          "f2"
+        ]
+      }
+    },
+    "can_general": {
+      "title": "General",
+      "description": "CAN bus general configuration",
+      "type": "object",
+      "properties": {
+        "rx_state": {
+          "title": "Reception (rx) initial state",
+          "description": "The initial state of CAN-bus reception. Can be changed using the control signal.",
+          "type": "integer",
+          "default": 1,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "Disable",
+              "enum": [
+                0
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "Enable",
+              "enum": [
+                1
+              ]
+            }
+          ]
+        },
+        "tx_state": {
+          "title": "Transmission (tx) initial state",
+          "description": "The initial state of CAN-bus transmissions. Can be changed using the control signal.",
+          "type": "integer",
+          "default": 1,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "Disable",
+              "enum": [
+                0
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "Enable",
+              "enum": [
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "rx_state",
+        "tx_state"
+      ]
+    },
+    "can_control": {
+      "title": "Control",
+      "description": "Control signal",
+      "type": "object",
+      "properties": {
+        "control_rx_state": {
+          "title": "Control reception (rx) state",
+          "description": "Control CAN-bus reception state (including logging) ",
+          "type": "integer",
+          "default": 0,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "Disable",
+              "enum": [
+                0
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "Enable",
+              "enum": [
+                1
+              ]
+            }
+          ]
+        },
+        "control_tx_state": {
+          "title": "Control transmission (tx) state",
+          "description": "Control CAN-bus transmission state (including logging) ",
+          "type": "integer",
+          "default": 0,
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "Disable",
+              "enum": [
+                0
+              ]
+            },
+            {
+              "type": "integer",
+              "title": "Enable",
+              "enum": [
+                1
+              ]
+            }
+          ]
+        },
+        "start": {
+          "title": "Start",
+          "$ref": "#/definitions/can_control_startstop"
+        },
+        "stop": {
+          "title": "Stop",
+          "$ref": "#/definitions/can_control_startstop"
+        }
+      },
+      "required": [
+        "control_rx_state",
+        "control_tx_state",
+        "start",
+        "stop"
       ]
     },
     "can": {
       "type": "object",
       "properties": {
         "general": {
-          "title": "General",
-          "description": "CAN bus general configuration",
-          "type": "object",
-          "properties": {
-            "rx_state": {
-              "title": "Reception (rx) initial state",
-              "description": "The initial state of CAN-bus reception. Can be changed using the control signal.",
-              "type": "integer",
-              "default": 1,
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "title": "Disable",
-                  "enum": [
-                    0
-                  ]
-                },
-                {
-                  "type": "integer",
-                  "title": "Enable",
-                  "enum": [
-                    1
-                  ]
-                }
-              ]
-            },
-            "tx_state": {
-              "title": "Transmission (tx) initial state",
-              "description": "The initial state of CAN-bus transmissions. Can be changed using the control signal.",
-              "type": "integer",
-              "default": 1,
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "title": "Disable",
-                  "enum": [
-                    0
-                  ]
-                },
-                {
-                  "type": "integer",
-                  "title": "Enable",
-                  "enum": [
-                    1
-                  ]
-                }
-              ]
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "rx_state",
-            "tx_state"
-          ]
+          "$ref": "#/definitions/can_general"
         },
         "phy": {
           "title": "Physical (CAN bus low-level)",
@@ -182,7 +618,7 @@
               "description": "Device CAN bus mode. Configures how the device interacts with the bus. In Normal mode, the device can receive, acknowledge and transmit frames. In Restricted mode, the device can receive and acknowledge, but not transmit frames. In Bus Monitoring mode, the device can receive, but not acknowledge or transmit frames. It is recommended to always use the most restrictive mode possible.",
               "type": "integer",
               "default": 1,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Normal (receive, acknowledge and transmit)",
@@ -211,7 +647,7 @@
               "description": "Retransmission of frames that have lost arbitration or that have been disturbed by errors during transmission.",
               "type": "integer",
               "default": 1,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable",
@@ -233,7 +669,7 @@
               "description": "Configures the CAN FD specification used by the device. Shall match the specification used by the CAN bus network.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": " ISO CAN FD (11898-1)",
@@ -255,7 +691,7 @@
               "description": "Configures how the CAN bus bit-rate is set. Modes Auto-detect and Bit-rate support all standard bit-rates. Non-standard bit-rate configuration can be set using Bit-timing. It is recommended to set the bit-rate manually if it is known.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "title": "Auto-detect",
                   "enum": [
@@ -300,7 +736,7 @@
                       "title": "Bit-rate standard",
                       "type": "integer",
                       "default": 250000,
-                      "anyOf": [
+                      "oneOf": [
                         {
                           "title": "5K",
                           "enum": [
@@ -391,7 +827,7 @@
                       "title": "Bit-rate FD",
                       "type": "integer",
                       "default": 1000000,
-                      "anyOf": [
+                      "oneOf": [
                         {
                           "title": "1M",
                           "enum": [
@@ -531,7 +967,7 @@
               "description": "Controls if remote request frames are forwarded to the message filters. If `Reject` is selected, remote request frames are discarded before they reach the message filters.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Reject",
@@ -549,267 +985,9 @@
               ]
             },
             "id": {
-              "title": "ID filters",
               "description": "Filters are checked sequentially, execution stops with the first matching filter element. Max 128 11-bit filters and 64 29-bit filters.",
-              "type": "array",
-              "minItems": 1,
               "maxItems": 192,
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "title": "Name",
-                    "description": "Optional filter name.",
-                    "type": "string",
-                    "pattern": "^[ -~]*$",
-                    "maxLength": 16
-                  },
-                  "state": {
-                    "title": "State",
-                    "description": "Disabled filters are ignored.",
-                    "type": "integer",
-                    "default": 1,
-                    "anyOf": [
-                      {
-                        "type": "integer",
-                        "title": "Disable",
-                        "enum": [
-                          0
-                        ]
-                      },
-                      {
-                        "type": "integer",
-                        "title": "Enable",
-                        "enum": [
-                          1
-                        ]
-                      }
-                    ]
-                  },
-                  "type": {
-                    "title": "Type",
-                    "description": "Action on match, accept or reject message.",
-                    "type": "integer",
-                    "default": 0,
-                    "anyOf": [
-                      {
-                        "title": "Acceptance",
-                        "enum": [
-                          0
-                        ]
-                      },
-                      {
-                        "title": "Rejection",
-                        "enum": [
-                          1
-                        ]
-                      }
-                    ]
-                  },
-                  "id_format": {
-                    "title": "ID format",
-                    "description": "Filter ID format. Filters apply to messages with matching ID format.",
-                    "type": "integer",
-                    "default": 0,
-                    "anyOf": [
-                      {
-                        "title": "Standard (11-bit)",
-                        "enum": [
-                          0
-                        ]
-                      },
-                      {
-                        "title": "Extended (29-bit)",
-                        "enum": [
-                          1
-                        ]
-                      }
-                    ]
-                  },
-                  "method": {
-                    "title": "Filter method",
-                    "description": "The filter ID matching mechanism.",
-                    "type": "integer",
-                    "default": 0,
-                    "anyOf": [
-                      {
-                        "title": "Range",
-                        "enum": [
-                          0
-                        ],
-                        "description": "ID ranges"
-                      },
-                      {
-                        "title": "Mask",
-                        "enum": [
-                          1
-                        ],
-                        "description": "ID masking"
-                      }
-                    ]
-                  },
-                  "f1": {
-                    "title": "From (range) / ID (mask) (HEX)",
-                    "description": "If filter method is Range, this field defines the start of range. If filter method is Mask, this field defines the filter ID.",
-                    "type": "string",
-                    "pattern": "^[a-fA-F0-9]+$",
-                    "maxLength": 8,
-                    "default": "0"
-                  },
-                  "f2": {
-                    "title": "To (range) / mask (mask) (HEX)",
-                    "description": "If filter method is Range, this field defines the end of range. If filter method is Mask, this field defines the filter mask.",
-                    "type": "string",
-                    "pattern": "^[a-fA-F0-9]+$",
-                    "maxLength": 8,
-                    "default": "7FF"
-                  }
-                },
-                "dependencies": {
-                  "type": {
-                    "oneOf": [
-                      {
-                        "properties": {
-                          "type": {
-                            "enum": [
-                              0
-                            ]
-                          },
-                          "prescaler_type": {
-                            "title": "Prescaling type",
-                            "description": "Select prescaling type. Prescale by message count, time or data. Select None to disable prescaling.",
-                            "type": "integer",
-                            "default": 0,
-                            "anyOf": [
-                              {
-                                "title": "None",
-                                "enum": [
-                                  0
-                                ]
-                              },
-                              {
-                                "title": "Count",
-                                "enum": [
-                                  1
-                                ]
-                              },
-                              {
-                                "title": "Time",
-                                "enum": [
-                                  2
-                                ]
-                              },
-                              {
-                                "title": "Data",
-                                "enum": [
-                                  3
-                                ]
-                              }
-                            ]
-                          }
-                        },
-                        "dependencies": {
-                          "prescaler_type": {
-                            "oneOf": [
-                              {
-                                "properties": {
-                                  "prescaler_type": {
-                                    "enum": [
-                                      0
-                                    ]
-                                  }
-                                }
-                              },
-                              {
-                                "properties": {
-                                  "prescaler_type": {
-                                    "enum": [
-                                      1
-                                    ]
-                                  },
-                                  "prescaler_value": {
-                                    "title": "Count",
-                                    "type": "integer",
-                                    "description": "Count prescaler value. Example: Set to 2 to sample a message with a specific ID every second time.",
-                                    "default": 1,
-                                    "minimum": 1,
-                                    "maximum": 256
-                                  }
-                                },
-                                "required": [
-                                  "prescaler_value"
-                                ]
-                              },
-                              {
-                                "properties": {
-                                  "prescaler_type": {
-                                    "enum": [
-                                      2
-                                    ]
-                                  },
-                                  "prescaler_value": {
-                                    "title": "Time",
-                                    "description": "Time prescaler value in milliseconds. Example: Set to 1000 to sample a message with a specific ID with a minimum period time of 1 second. Note that messages are not resampled to a specific fixed period time.",
-                                    "type": "integer",
-                                    "default": 1,
-                                    "minimum": 1,
-                                    "maximum": 4194304
-                                  }
-                                },
-                                "required": [
-                                  "prescaler_value"
-                                ]
-                              },
-                              {
-                                "properties": {
-                                  "prescaler_type": {
-                                    "enum": [
-                                      3
-                                    ]
-                                  },
-                                  "prescaler_value": {
-                                    "title": "Mask",
-                                    "description": "Data prescaler mask value in hex. Each bit corresponds to a data byte (up to 64 bytes). Leave empty to disable the mask (triggers on any data change). Example 1: Set to FF (0b11111111) to sample a message with a specific ID if any of the first 8 data bytes change. Example 2: Set to 03 (0b00000011) to sample if any of the two first data bytes change. Example 3: Set to 9 (0b00001001) to sample if any of the first or fourth data bytes change.",
-                                    "type": "string",
-                                    "default": "FF",
-                                    "pattern": "^[a-fA-F0-9]*$",
-                                    "maxLength": 16
-                                  }
-                                }
-                              }
-                            ]
-                          }
-                        },
-                        "required": [
-                          "prescaler_type"
-                        ]
-                      },
-                      {
-                        "properties": {
-                          "type": {
-                            "enum": [
-                              1
-                            ]
-                          }
-                        }
-                      }
-                    ]
-                  }
-                },
-                "additionalProperties": false,
-                "patternProperties": {
-                  "prescaler_type": {},
-                  "prescaler_value": {}
-                },
-                "required": [
-                  "state",
-                  "type",
-                  "id_format",
-                  "method",
-                  "f1",
-                  "f2"
-                ]
-              }
+              "$ref": "#/definitions/can_filter_id"
             }
           },
           "required": [
@@ -837,7 +1015,7 @@
                 "description": "Disabled transmit messages are ignored.",
                 "type": "integer",
                 "default": 1,
-                "anyOf": [
+                "oneOf": [
                   {
                     "type": "integer",
                     "title": "Disable",
@@ -881,7 +1059,7 @@
                 "description": "Frame format of the transmit message.",
                 "type": "integer",
                 "default": 0,
-                "anyOf": [
+                "oneOf": [
                   {
                     "type": "integer",
                     "title": "Standard",
@@ -916,7 +1094,7 @@
                 "description": "Determines if the transmitted message is included in the log file.",
                 "type": "integer",
                 "default": 0,
-                "anyOf": [
+                "oneOf": [
                   {
                     "type": "integer",
                     "title": "Disable",
@@ -1003,7 +1181,7 @@
                         ]
                       },
                       "brs": {
-                        "anyOf": [
+                        "oneOf": [
                           {
                             "type": "integer",
                             "title": "Disable",
@@ -1027,7 +1205,7 @@
                         ]
                       },
                       "brs": {
-                        "anyOf": [
+                        "oneOf": [
                           {
                             "type": "integer",
                             "title": "Disable",
@@ -1051,7 +1229,7 @@
                         ]
                       },
                       "brs": {
-                        "anyOf": [
+                        "oneOf": [
                           {
                             "type": "integer",
                             "title": "Disable",
@@ -1101,7 +1279,7 @@
               "description": "Enable to periodically transmit heartbeat signal. ",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable",
@@ -1186,69 +1364,7 @@
           ]
         },
         "control": {
-          "title": "Control",
-          "description": "Control signal",
-          "type": "object",
-          "properties": {
-            "control_rx_state": {
-              "title": "Control reception (rx) state",
-              "description": "Control CAN-bus reception state (including logging) ",
-              "type": "integer",
-              "default": 0,
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "title": "Disable",
-                  "enum": [
-                    0
-                  ]
-                },
-                {
-                  "type": "integer",
-                  "title": "Enable",
-                  "enum": [
-                    1
-                  ]
-                }
-              ]
-            },
-            "control_tx_state": {
-              "title": "Control transmission (tx) state",
-              "description": "Control CAN-bus transmission state (including logging) ",
-              "type": "integer",
-              "default": 0,
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "title": "Disable",
-                  "enum": [
-                    0
-                  ]
-                },
-                {
-                  "type": "integer",
-                  "title": "Enable",
-                  "enum": [
-                    1
-                  ]
-                }
-              ]
-            },
-            "start": {
-              "title": "Start signal",
-              "$ref": "#/definitions/control_signal"
-            },
-            "stop": {
-              "title": "Stop signal",
-              "$ref": "#/definitions/control_signal"
-            }
-          },
-          "required": [
-            "control_rx_state",
-            "control_tx_state",
-            "start",
-            "stop"
-          ]
+          "$ref": "#/definitions/can_control"
         }
       },
       "additionalProperties": false,
@@ -1271,7 +1387,7 @@
               "description": "Device LIN bus mode.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Subscriber",
@@ -1292,7 +1408,7 @@
               "title": "Bit-rate",
               "type": "integer",
               "default": 19200,
-              "anyOf": [
+              "oneOf": [
                 {
                   "title": "2400",
                   "enum": [
@@ -1360,7 +1476,7 @@
                 "description": "Type of the checksum used on the LIN frame.",
                 "type": "integer",
                 "default": 0,
-                "anyOf": [
+                "oneOf": [
                   {
                     "title": "Enhanced",
                     "enum": [
@@ -1405,7 +1521,7 @@
                 "description": "Disabled transmit rules are ignored.",
                 "type": "integer",
                 "default": 1,
-                "anyOf": [
+                "oneOf": [
                   {
                     "title": "Disable",
                     "enum": [
@@ -1530,6 +1646,14 @@
       "required": [
         "phy"
       ]
+    },
+    "rtc_tolerance": {
+      "title": "Time synchronization tolerance",
+      "description": "If the time difference exceeds the tolerance, the internal time is abruptly updated. The unit is seconds.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3600,
+      "default": 30
     }
   },
   "properties": {
@@ -1577,7 +1701,7 @@
               "description": "System events logged to the SD-card. The log levels are listed in order of increasing amount of information logged. Should only be enabled if needed during installation or troubleshooting.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable (0)",
@@ -1629,7 +1753,7 @@
           "properties": {
             "split_size": {
               "title": "File split size (1 to 512 MB)",
-              "description": "Log file split size in MB. When the file split size is reached a new file is created and the logging continues. Closed log files can be pushed to a server if WiFi is available. Small split sizes may reduce performance.",
+              "description": "Log file split size in MB. When the file split size is reached a new file is created and the logging continues. Closed log files can be pushed to a server if network is available. Small split sizes may reduce performance.",
               "type": "integer",
               "default": 50,
               "minimum": 1,
@@ -1637,7 +1761,7 @@
             },
             "split_time_period": {
               "title": "File split time period (0 to 86400 seconds, 0 = disable)",
-              "description": "Log file split time period in seconds relative to midnight (00:00:00). When a split time is reached a new file is created and the logging continues. Closed log files can be pushed to a server if WiFi is available. Small split time periods may reduce performance.",
+              "description": "Log file split time period in seconds relative to midnight (00:00:00). When a split time is reached a new file is created and the logging continues. Closed log files can be pushed to a server if network is available. Small split time periods may reduce performance.",
               "type": "integer",
               "default": 0,
               "minimum": 0,
@@ -1658,7 +1782,7 @@
               "description": "With cycling logging mode enabled the oldest log file is deleted when the memory card becomes full, allowing the logging to continue.",
               "type": "integer",
               "default": 1,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable",
@@ -1693,7 +1817,7 @@
               "description": "Window size used during optional compression. Larger window sizes yield potentially better compression rates, but may reduce logging performance. Compressed log files need to be decompressed prior to processing.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable",
@@ -1735,7 +1859,7 @@
               "description": "Optional log file encryption. Encrypted log files need to be decrypted prior to processing. Decryption requires your encryption password in plain form - if this is lost, the encrypted data cannot be recovered.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable",
@@ -1777,7 +1901,7 @@
                       "description": "The format of the encryption password used for encrypting logged data on the device.",
                       "type": "integer",
                       "default": 0,
-                      "anyOf": [
+                      "oneOf": [
                         {
                           "type": "integer",
                           "title": "Plain",
@@ -1851,15 +1975,22 @@
           "properties": {
             "state": {
               "title": "State",
-              "description": "Should error frames be logged. Can negatively impact performance, as potentially many more frames needs to be written to the log.",
+              "description": "Specify whether to record error frames. Enabling this can negatively impact performance, as a potentially large number of additional frames may be recorded.",
               "type": "integer",
               "default": 0,
-              "anyOf": [
+              "oneOf": [
                 {
                   "type": "integer",
                   "title": "Disable",
                   "enum": [
                     0
+                  ]
+                },
+                {
+                  "type": "integer",
+                  "title": "Enable",
+                  "enum": [
+                    1
                   ]
                 }
               ]
@@ -1890,8 +2021,8 @@
           "title": "Time synchronization method",
           "description": "Internal real-time-clock synchronization method. The real-time-clock is maintained when the device is off.",
           "type": "integer",
-          "default": 0,
-          "anyOf": [
+          "default": 2,
+          "oneOf": [
             {
               "title": "Retain current time",
               "description": "The current internal time is not changed.",
@@ -1906,6 +2037,22 @@
               "type": "integer",
               "enum": [
                 1
+              ]
+            },
+            {
+              "title": "CAN-bus",
+              "description": "The internal time synchronized to the time provided by the payload of a CAN-bus message",
+              "type": "integer",
+              "enum": [
+                3
+              ]
+            },
+            {
+              "title": "Network",
+              "description": "The internal time is synchronized with the time provided by the network when available.",
+              "type": "integer",
+              "enum": [
+                2
               ]
             }
           ]
@@ -1956,13 +2103,71 @@
               "required": [
                 "manual_date_time"
               ]
+            },
+            {
+              "properties": {
+                "sync": {
+                  "enum": [
+                    3
+                  ]
+                },
+                "tolerance": {
+                  "$ref": "#/definitions/rtc_tolerance"
+                },
+                "message": {
+                  "title": "Message",
+                  "$ref": "#/definitions/can_message"
+                },
+                "valid_signal": {
+                  "title": "Time valid signal",
+                  "$ref": "#/definitions/can_signal"
+                },
+                "time_signal": {
+                  "title": "Time value signal",
+                  "$ref": "#/definitions/can_signal"
+                }
+              },
+              "required": [
+                "message",
+                "valid_signal",
+                "time_signal"
+              ]
+            },
+            {
+              "properties": {
+                "sync": {
+                  "enum": [
+                    2
+                  ]
+                },
+                "tolerance": {
+                  "$ref": "#/definitions/rtc_tolerance"
+                },
+                "ntp_server": {
+                  "title": "Time server",
+                  "description": "NTP server name used for time synchronization. If the first character is an asterisk (*) then the server name is treated as a server pool. Examples:  *.pool.ntp.org, *.us.pool.ntp.org, time.nist.gov",
+                  "type": "string",
+                  "default": "*.pool.ntp.org",
+                  "maxLength": 32,
+                  "pattern": "^\\*?[a-z0-9\\.-]*$"
+                }
+              },
+              "required": [
+                "ntp_server",
+                "tolerance"
+              ]
             }
           ]
         }
       },
       "additionalProperties": false,
       "patternProperties": {
-        "manual_date_time": {}
+        "manual_date_time": {},
+        "message": {},
+        "valid_signal": {},
+        "time_signal": {},
+        "ntp_server": {},
+        "tolerance": {}
       },
       "required": [
         "sync",
@@ -2012,12 +2217,46 @@
         "power_schedule"
       ]
     },
+    "can_internal": {
+      "title": "CAN Channel internal",
+      "description": "CAN Channel internal is a virtual channel used for signals generated by the device itself.",
+      "type": "object",
+      "properties": {
+        "general": {
+          "title": "General",
+          "$ref": "#/definitions/can_general"
+        },
+        "filter": {
+          "title": "Receive filters",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Filters are checked sequentially, execution stops with the first matching filter element. Max 20 filters in total.",
+              "maxItems": 20,
+              "$ref": "#/definitions/can_filter_id"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "control": {
+          "$ref": "#/definitions/can_control"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "filter"
+      ]
+    },
     "can_1": {
-      "title": "CAN Channel 1",
+      "title": "CAN Channel 1 (physical)",
+      "description": "CAN Channel 1 is an external physical channel.",
       "$ref": "#/definitions/can"
     },
     "can_2": {
-      "title": "CAN Channel 2",
+      "title": "CAN Channel 2 (physical)",
+      "description": "CAN Channel 2 is an external physical channel.",
       "$ref": "#/definitions/can"
     },
     "lin_1": {
@@ -2027,6 +2266,382 @@
     "lin_2": {
       "title": "LIN Channel 2",
       "$ref": "#/definitions/lin"
+    },
+    "connect": {
+      "title": "Connectivity",
+      "type": "object",
+      "properties": {
+        "wifi": {
+          "title": "WiFi",
+          "type": "object",
+          "properties": {
+            "mode": {
+              "title": "Mode",
+              "description": "In station mode, the device can use either active or passive scanning to find APs. Using active scan, the radio transmits a probe request and listens for responses. Using passive scan, the radio listens on each channel for beacons sent periodically by APs.",
+              "type": "integer",
+              "default": 0,
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "title": "Station mode (active scanning)",
+                  "enum": [
+                    0
+                  ]
+                },
+                {
+                  "type": "integer",
+                  "title": "Station mode (passive scanning)",
+                  "enum": [
+                    1
+                  ]
+                }
+              ]
+            },
+            "keyformat": {
+              "title": "Key format",
+              "description": "The format of the key used for all entries in the access point list. Can be used to hide the WiFi passwords stored on the device.",
+              "type": "integer",
+              "default": 0,
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "title": "Plain",
+                  "enum": [
+                    0
+                  ]
+                },
+                {
+                  "type": "integer",
+                  "title": "Encrypted",
+                  "enum": [
+                    1
+                  ]
+                }
+              ]
+            },
+            "accesspoint": {
+              "title": "Access points",
+              "description": "List of access points. Connects to the first available AP in list.",
+              "type": "array",
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ssid": {
+                    "title": "SSID",
+                    "description": "Access point SSID (name of access point)",
+                    "type": "string",
+                    "pattern": "^(?!\\s).+(?<!\\s)$",
+                    "minLength": 0,
+                    "maxLength": 32
+                  },
+                  "pwd": {
+                    "title": "Password",
+                    "type": "string",
+                    "pattern": "^(?!\\s).+(?<!\\s)$",
+                    "default": "",
+                    "maxLength": 64
+                  },
+                  "minrssi": {
+                    "title": "Minimum RSSI (received signal strength indicator), 0-100%",
+                    "description": "Sets a minimum required access point signal strength. The device will not connect to the access point if the measured signal strength is below the value of this field.",
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "ssid",
+                  "pwd",
+                  "minrssi"
+                ]
+              }
+            }
+          },
+          "dependencies": {
+            "keyformat": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "keyformat": {
+                      "enum": [
+                        0
+                      ]
+                    },
+                    "accesspoint": {
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "pwd": {
+                            "title": "Password",
+                            "description": "Access point password in plain form (max 64). Leave empty to connect to an open AP. Example: 31aAabC81@99.",
+                            "pattern": "^[ -~]*$",
+                            "minLength": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "keyformat": {
+                      "enum": [
+                        1
+                      ]
+                    },
+                    "accesspoint": {
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "pwd": {
+                            "title": "Encrypted password",
+                            "description": "Access point password in encrypted form (min 24, max 64). Example: rl8/EAy3qTChCsMIIeZPR6rvGEanRJCnL2xbzqo=. IMPORTANT: Ensure that you encrypt all access point passwords and that you include the server public key",
+                            "pattern": "^[a-zA-Z0-9+/=]*$",
+                            "minLength": 24
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "keyformat"
+          ]
+        },
+        "s3": {
+          "title": "S3 server settings",
+          "type": "object",
+          "properties": {
+            "sync": {
+              "title": "Synchronization",
+              "description": "This section configures how and when the device communicates with the S3 server.",
+              "type": "object",
+              "properties": {
+                "ota": {
+                  "title": "Firmware, config and certificate",
+                  "description": "Configures how often the device looks for firmware-, config- and certificate-over-the-air updates. Small values may reduce performance. Time period may sometimes become longer if device is busy. Set to 0 to disable.",
+                  "type": "integer",
+                  "default": 600,
+                  "minimum": 0,
+                  "maximum": 86400,
+                  "multipleOf": 5
+                },
+                "heartbeat": {
+                  "title": "Heartbeat",
+                  "description": "Configures how often the device transmits the heartbeat signal. Small values may reduce performance. Time period may sometimes become longer if device is busy. Set to 0 to disable.",
+                  "type": "integer",
+                  "default": 300,
+                  "minimum": 0,
+                  "maximum": 86400,
+                  "multipleOf": 5
+                },
+                "logfiles": {
+                  "title": "Log files",
+                  "description": "Configures if the device pushes closed log files to the server. The log files are deleted from the device when successfully uploaded.",
+                  "type": "integer",
+                  "default": 1,
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "title": "Disable",
+                      "enum": [
+                        0
+                      ]
+                    },
+                    {
+                      "type": "integer",
+                      "title": "Enable",
+                      "enum": [
+                        1
+                      ]
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "ota",
+                "heartbeat",
+                "logfiles"
+              ]
+            },
+            "server": {
+              "title": "Server",
+              "description": "This section contains the server connection parameters.",
+              "type": "object",
+              "properties": {
+                "endpoint": {
+                  "title": "Endpoint",
+                  "description": "S3 server endpoint. Prefix with http:// to connect using standard http. Prefix with https:// to connect using SSL/TLS - requires support by the server and that the server certificate is loaded onto the device. Examples: http://192.168.0.1, https://s3.mydomain.com, https://s3.amazonaws.com, http://s3-us-east-2.amazonaws.com.",
+                  "type": "string",
+                  "pattern": "^https*://[a-zA-Z0-9_/\\.-]+$",
+                  "maxLength": 128
+                },
+                "port": {
+                  "title": "Port",
+                  "description": "S3 server port. Examples: 80 (http), 443 (https), 9000 (custom).",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "bucket": {
+                  "title": "Bucket name",
+                  "description": "S3 server bucket name. Examples: logbucket, fleetbucket, testbucket.",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]{1}[a-z0-9\\.\\-]{0,62}[a-z0-9]{1}$",
+                  "maxLength": 64
+                },
+                "region": {
+                  "title": "Region",
+                  "description": "S3 server region. Example: us-east-1.",
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]*$",
+                  "minLength": 0,
+                  "maxLength": 32
+                },
+                "request_style": {
+                  "title": "Request style",
+                  "description": "Virtual-hosted-style or path-style S3 requests. Virtual hosted-style format: \"http://[BUCKET-NAME].[DOMAIN]/[OBJECT-NAME]\". Path-style format: \"http://[DOMAIN]/[BUCKET-NAME]/[OBJECT-NAME]\"",
+                  "type": "integer",
+                  "default": 0,
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "title": "Path-style",
+                      "enum": [
+                        0
+                      ]
+                    },
+                    {
+                      "type": "integer",
+                      "title": "Virtual hosted-style",
+                      "enum": [
+                        1
+                      ]
+                    }
+                  ]
+                },
+                "accesskey": {
+                  "title": "AccessKey",
+                  "description": "S3 server access key ID. Example: PRDDKN8R6PAAOGTEI53E",
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]+$",
+                  "minLength": 3,
+                  "maxLength": 128
+                },
+                "keyformat": {
+                  "title": "SecretKey format",
+                  "description": "The format of the secret key. Can be used to hide the secret key stored on the device.",
+                  "type": "integer",
+                  "default": 0,
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "title": "Plain",
+                      "enum": [
+                        0
+                      ]
+                    },
+                    {
+                      "type": "integer",
+                      "title": "Encrypted",
+                      "enum": [
+                        1
+                      ]
+                    }
+                  ]
+                },
+                "secretkey": {
+                  "title": "SecretKey",
+                  "type": "string"
+                },
+                "signed_payload": {
+                  "title": "Signed payload",
+                  "description": "Include payload checksum in signature. Reduces device upload performance.",
+                  "type": "integer",
+                  "default": 0,
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "title": "Off",
+                      "enum": [
+                        0
+                      ]
+                    },
+                    {
+                      "type": "integer",
+                      "title": "On",
+                      "enum": [
+                        1
+                      ]
+                    }
+                  ]
+                }
+              },
+              "dependencies": {
+                "endpoint": [
+                  "port",
+                  "bucket",
+                  "region",
+                  "request_style",
+                  "accesskey",
+                  "keyformat",
+                  "secretkey",
+                  "signed_payload"
+                ],
+                "keyformat": {
+                  "oneOf": [
+                    {
+                      "properties": {
+                        "keyformat": {
+                          "enum": [
+                            0
+                          ]
+                        },
+                        "secretkey": {
+                          "description": "S3 server secret key in plain form (max 128). Example: IAkwE9vvEh9ke4RH",
+                          "pattern": "^[ -~]*$",
+                          "minLength": 1,
+                          "maxLength": 128
+                        }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "keyformat": {
+                          "enum": [
+                            1
+                          ]
+                        },
+                        "secretkey": {
+                          "description": "S3 server secret key in encrypted form (min 24, max 150). Example: AKGaqGJWxEhTfJX6oeR/OIdu5Swm9HQY. IMPORTANT: Ensure that you correctly encrypt the secretKey and that you include the server public key",
+                          "pattern": "^[a-zA-Z0-9+/=]*$",
+                          "minLength": 24,
+                          "maxLength": 150
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "wifi"
+      ]
     }
   },
   "additionalProperties": false,
@@ -2035,6 +2650,7 @@
     "log",
     "rtc",
     "secondaryport",
+    "can_internal",
     "can_1",
     "can_2",
     "lin_1",
