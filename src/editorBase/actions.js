@@ -65,12 +65,12 @@ export const setCrc32EditorLive = (crc32EditorLive) => ({
 // -------------------------------------------------------
 // UISCHEMA: load the Simple/Advanced default UIschema in the online & offline editor
 export const publicUiSchemaFiles = (uiSchemaAry, schemaAry, demoMode) => {
-  
+
   return function (dispatch) {
-    if(uiSchemaAry && uiSchemaAry.length){
-    dispatch(resetUISchemaList());
-    dispatch(setUISchemaFile(uiSchemaAry));
-    dispatch(setUISchemaContent(loadFile(uiSchemaAry[0])));
+    if (uiSchemaAry && uiSchemaAry.length) {
+      dispatch(resetUISchemaList());
+      dispatch(setUISchemaFile(uiSchemaAry));
+      dispatch(setUISchemaContent(loadFile(uiSchemaAry[0])));
     }
     // If demoMode, load the Rule Schema by default for use in the online simple editor
     if (demoMode && schemaAry.length) {
@@ -121,7 +121,7 @@ export const fetchFileContent = (fileName, type) => {
         dispatch(
           setConfigContentPreChange(getState().editor.configContentLocal)
         );
-        if(fileName == "None"){
+        if (fileName == "None") {
           dispatch(setConfigContentPreChange(""));
         }
         break;
@@ -162,15 +162,15 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
             // load the matching schema files if a schema file is not already uploaded
 
             const localSchema = getState().editor.editorSchemaFiles[0] && getState().editor.editorSchemaFiles[0].name.includes("(local)") ? true : false;
-            
+
             if (file && file.name && file.name.length && localSchema == false && schemaAry && schemaAry.length) {
               dispatch(publicSchemaFiles(file.name, schemaAry, contentJSON, uiSchemaAry));
             }
 
-            
+
             // add warning regarding OTA update overwrites
             let configIncludesServerDetails = JSON.stringify(contentJSON, null, 2).includes("http://") || JSON.stringify(contentJSON, null, 2).includes("https://")
-            if (configIncludesServerDetails){
+            if (configIncludesServerDetails) {
               dispatch(
                 alertActions.set({
                   type: "warning",
@@ -208,8 +208,8 @@ export const resetUISchemaList = () => ({
 });
 
 export const setUISchemaContent = (uiContent) => ({
-    type: SET_UI_SCHEMA_DATA,
-    uiContent,
+  type: SET_UI_SCHEMA_DATA,
+  uiContent,
 });
 
 export const resetLocalUISchemaList = () => ({
@@ -231,25 +231,50 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
   return function (dispatch) {
     dispatch(resetSchemaFiles());
 
-
     if (selectedConfig) {
       // test if config is from a CANedge1 to enable further filtering of Rule Schemas
-      let deviceType = (contentJSON.can_2 != undefined && contentJSON.connect == undefined) ? "CANedge1" : (contentJSON.can_2 != undefined) ? "CANedge2" : "Other"
+      let deviceType = "Other"
 
-      let schemaAryFiltered = schemaAry.filter((e) =>
-        (e.includes(selectedConfig.substr(7, 5))
-      ))
-
-      let uiSchemaAryFiltered = uiSchemaAry.filter((e) =>
-        (e.includes(selectedConfig.substr(7, 5))
-      ))
-
-      if(deviceType.includes("CANedge")){
-        schemaAryFiltered = schemaAryFiltered.filter((e) =>
-        e.includes(deviceType)
-      );
+      if (contentJSON.can_2 != undefined && contentJSON.connect == undefined && contentJSON.gnss == undefined) {
+        deviceType = "CANedge1"
       }
-      
+
+      if (contentJSON.can_2 != undefined && contentJSON.connect == undefined && contentJSON.gnss != undefined) {
+        deviceType = "CANedge1 GNSS"
+      }
+
+      if (contentJSON.can_2 != undefined && contentJSON.connect != undefined && contentJSON.gnss == undefined) {
+        deviceType = "CANedge2"
+      }
+
+      if (contentJSON.can_2 != undefined && contentJSON.connect != undefined && contentJSON.gnss != undefined) {
+        deviceType = "CANedge2 GNSS"
+      }
+
+      // filter schema list based on FW major/minor version
+      let schemaAryFiltered = schemaAry.filter((e) =>
+      (e.includes(selectedConfig.substr(7, 5))
+      ))
+
+      // filter uischema list based on FW major/minor version
+      let uiSchemaAryFiltered = uiSchemaAry.filter((e) =>
+      (e.includes(selectedConfig.substr(7, 5))
+      ))
+
+      // filter schema list to exclude GNSS variants if no GNSS deviceType is selected
+      if (!deviceType.includes("GNSS")) {
+        schemaAryFiltered = schemaAryFiltered.filter((e) =>
+          !e.includes("GNSS")
+        );
+      }
+
+      // filter schema list based on CANedge1 vs CANedge2 vs. CANedge3 type
+      if (deviceType.includes("CANedge")) {
+        schemaAryFiltered = schemaAryFiltered.filter((e) =>
+          e.includes(deviceType)
+        );
+      }
+
 
       //if (demoMode) {
       //  schemaAryFiltered = schemaAry.filter((e) => e.includes("CANedge2"));
@@ -260,16 +285,16 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
       if (schemaAryFiltered[0] && loadedSchema) {
         dispatch(setSchemaFile(schemaAryFiltered));
         dispatch(setSchemaContent(loadedSchema));
-      }else{
+      } else {
         console.log("Unable to load embedded Rule Schema")
       }
 
       // load uiSchemaFiltered
-      if(uiSchemaAryFiltered && uiSchemaAryFiltered.length){
+      if (uiSchemaAryFiltered && uiSchemaAryFiltered.length) {
         dispatch(resetUISchemaList());
         dispatch(setUISchemaFile(uiSchemaAryFiltered));
         dispatch(setUISchemaContent(loadFile(uiSchemaAryFiltered[0])));
-        }
+      }
     }
   };
 };
@@ -302,10 +327,178 @@ export const resetLocalSchemaList = () => ({
   type: RESET_LOCAL_SCHEMA_LIST,
 });
 
+
+// function for testing for invalid transmit list entries
+export const checkConfigTransmitPeriodDelay = (content) => {
+  return function (dispatch) {
+    for (let i = 1; i < 3; i++) {
+      if (content["can_" + i].transmit != undefined) {
+        let transmitListFiltered = content["can_" + i].transmit.filter((e) =>
+          e.period < e.delay
+        );
+        if (transmitListFiltered.length > 0) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your CAN CH" + i + " transmit list includes one or more entries with period < delay. This is invalid and will cause the device to reject your Configuration File",
+              autoClear: false,
+            })
+          );
+        }
+      }
+    }
+  }
+}
+
+
+// function for testing for silent mode plus transmit lists
+export const checkConfigTransmitMonitoring = (content) => {
+
+  return function (dispatch) {
+    for (let i = 1; i < 3; i++) {
+      if (content["can_" + i].transmit != undefined && content["can_" + i].phy != undefined && content["can_" + i].phy.mode != undefined && content["can_" + i].transmit.length > 0) {
+        if (content["can_" + i].phy.mode != 0) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your CAN CH" + i + " has a non-empty transmit list, but the device will not transmit any messages unless the mode is set to Normal",
+              autoClear: false,
+            })
+          );
+        }
+      }
+    }
+  }
+}
+
+// function for testing if all filters are disabled
+export const checkConfigFiltersDisabled = (content) => {
+
+  return function (dispatch) {
+    for (let i = 1; i < 3; i++) {
+      if (content["can_" + i].filter != undefined && content["can_" + i].filter.id != undefined) {
+        let filterListFiltered = content["can_" + i].filter.id.filter((e) =>
+          e.state == 1
+        );
+        if (filterListFiltered.length == 0) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your CAN CH" + i + " filter list contains only disabled filters - no data will be recorded on this channel",
+              autoClear: false,
+            })
+          );
+        }
+      }
+    }
+  }
+}
+
+
+// function for testing if S3 settings contains https:// and port 80
+export const checkConfigTls = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined) {
+
+      if (content.connect.s3.server.endpoint != undefined && content.connect.s3.server.port != undefined) {
+        if (content.connect.s3.server.endpoint.includes("https://") && content.connect.s3.server.port == 80) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your S3 server endpoint uses TLS (https://), but your port is 80. This is most likely incorrect and may result in the device being unable to connect. Please review the documentation on how to enable TLS",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+// function for testing if S3 password is set as encrypted without kpub
+export const checkS3EncryptedPasswordsNoKpub = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.general != undefined && content.general.security != undefined) {
+
+      if (content.connect.s3.server.secretkey != undefined && content.connect.s3.server.keyformat != undefined) {
+        if (content.connect.s3.server.keyformat == 1 && (content.general.security.kpub == undefined || content.general.security.kpub == "")) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your S3 SecretKey format is set to Encrypted, but you have not provided the Server public key. Please review the documentation on how to encrypt passwords",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+
+// function for testing if S3 password is set as encrypted without kpub
+export const checkWiFiEncryptedPasswordsNoKpub = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.wifi != undefined && content.connect.wifi.keyformat != undefined && content.general != undefined && content.general.security != undefined) {
+
+      if (content.connect.wifi.keyformat != undefined) {
+        if (content.connect.wifi.keyformat == 1 && (content.general.security.kpub == undefined || content.general.security.kpub == "")) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your WiFi Key format is set to Encrypted, but you have not provided the Server public key. Please review the documentation on how to encrypt passwords",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+
+// function for testing if File split time offset is larger than period
+export const checkFileSplitOffsetPeriod = (content) => {
+
+  return function (dispatch) {
+    if (content.log != undefined && content.log.file != undefined && content.log.file.split_time_period != undefined && content.log.file.split_time_offset != undefined) {
+
+      if (content.log.file.split_time_offset > content.log.file.split_time_period) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your log file split time offset is set larger than your file split time period. This is invalid and will cause the device to reject the Configuration File",
+            autoClear: false,
+          })
+        );
+      }
+
+    }
+  }
+}
+
 // -------------------------------------------------------
 // CONFIGURATION FILE:
 export const saveUpdatedConfiguration = (filename, content) => {
   return function (dispatch) {
+
+    // if CANedge, warn if invalid/problematic content in Configuration File
+    if (content.can_2 != undefined) {
+      dispatch(checkConfigTransmitPeriodDelay(content))
+      dispatch(checkConfigTransmitMonitoring(content))
+      dispatch(checkConfigFiltersDisabled(content))
+      dispatch(checkConfigTls(content))
+      dispatch(checkS3EncryptedPasswordsNoKpub(content))
+      dispatch(checkWiFiEncryptedPasswordsNoKpub(content))
+      dispatch(checkFileSplitOffsetPeriod(content))
+    }
+
     dispatch(setConfigContent(content));
     let blob = new Blob([JSON.stringify(content, null, 2)], {
       type: "text/json",
@@ -322,8 +515,8 @@ export const setUpdatedFormData = (formData) => {
 };
 
 export const setUpdatedFormDataValue = (formData) => ({
-    type: SET_UPDATED_FORM_DATA,
-    formData,
+  type: SET_UPDATED_FORM_DATA,
+  formData,
 });
 
 

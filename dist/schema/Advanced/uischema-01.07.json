@@ -28,6 +28,7 @@
     "timezone": {
       "classNames": "col-sm-6"
     },
+    "sync": {},
     "adjustment": {
       "classNames": "col-sm-6"
     },

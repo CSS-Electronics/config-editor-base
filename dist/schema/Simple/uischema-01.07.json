@@ -5,7 +5,7 @@
       "LOG",
       "RTC",
       "2ND-PORT",
-	  "CAN INTERNAL",
+      "CAN INTERNAL",
       "CAN CH1",
       "CAN CH2",
       "LIN CH1",
@@ -22,11 +22,11 @@
   },
   "log": {
     "nav": "LOG",
-	"file": {
-		"split_time_offset": {
-		"ui:widget": "hidden"
-		}
-	},	
+    "file": {
+      "split_time_offset": {
+        "ui:widget": "hidden"
+      }
+    },
     "compression": {
       "ui:widget": "hidden"
     },
@@ -38,18 +38,18 @@
     "nav": "RTC",
     "timezone": {
       "classNames": "col-sm-6",
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
-	"sync": {
+    "sync": {
       "ui:widget": "hidden"
     },
     "adjustment": {
       "classNames": "col-sm-6",
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "tolerance": {
       "classNames": "col-sm-12",
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "manual_date_time": {
       "ui:widget": "alt-datetime",
@@ -62,10 +62,9 @@
     },
     "ntp_server": {
       "classNames": "col-sm-12",
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "message": {
-	  "ui:widget": "hidden",
       "chn": {
         "classNames": "col-sm-3"
       },
@@ -77,10 +76,10 @@
       },
       "id_mask": {
         "classNames": "col-sm-3"
-      }
+      },
+      "ui:widget": "hidden"
     },
     "valid_signal": {
-	  "ui:widget": "hidden",
       "type": {
         "classNames": "col-sm-2",
         "ui:disabled": true
@@ -99,10 +98,10 @@
       },
       "offset": {
         "classNames": "col-sm-2"
-      }
+      },
+      "ui:widget": "hidden"
     },
     "time_signal": {
-	  "ui:widget": "hidden",
       "type": {
         "classNames": "col-sm-2",
         "ui:disabled": true
@@ -121,7 +120,8 @@
       },
       "offset": {
         "classNames": "col-sm-2"
-      }
+      },
+      "ui:widget": "hidden"
     }
   },
   "secondaryport": {
@@ -148,7 +148,7 @@
       "tx_state": {
         "classNames": "col-sm-6"
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "filter": {
       "id": {
@@ -194,7 +194,7 @@
           }
         }
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "control": {
       "control_rx_state": {
@@ -289,7 +289,7 @@
           "classNames": "col-sm-6"
         }
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     }
   },
   "can_1": {
@@ -301,7 +301,7 @@
       "tx_state": {
         "classNames": "col-sm-6"
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "phy": {
       "mode": {
@@ -309,11 +309,11 @@
       },
       "retransmission": {
         "classNames": "col-sm-4",
-		"ui:widget": "hidden"
+        "ui:widget": "hidden"
       },
       "fd_spec": {
         "classNames": "col-sm-4",
-		"ui:widget": "hidden"
+        "ui:widget": "hidden"
       },
       "bit_rate_cfg_mode": {
         "classNames": "col-sm-12"
@@ -381,7 +381,7 @@
           }
         }
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "transmit": {
       "items": {
@@ -447,7 +447,7 @@
       "id": {
         "classNames": "col-sm-3"
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "control": {
       "control_rx_state": {
@@ -542,7 +542,7 @@
           "classNames": "col-sm-6"
         }
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     }
   },
   "can_2": {
@@ -554,7 +554,7 @@
       "tx_state": {
         "classNames": "col-sm-6"
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "phy": {
       "mode": {
@@ -562,11 +562,11 @@
       },
       "retransmission": {
         "classNames": "col-sm-4",
-		"ui:widget": "hidden"
+        "ui:widget": "hidden"
       },
       "fd_spec": {
         "classNames": "col-sm-4",
-		"ui:widget": "hidden"
+        "ui:widget": "hidden"
       },
       "bit_rate_cfg_mode": {
         "classNames": "col-sm-12"
@@ -634,7 +634,7 @@
           }
         }
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "transmit": {
       "items": {
@@ -700,7 +700,7 @@
       "id": {
         "classNames": "col-sm-3"
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     },
     "control": {
       "control_rx_state": {
@@ -795,7 +795,7 @@
           "classNames": "col-sm-6"
         }
       },
-	  "ui:widget": "hidden"
+      "ui:widget": "hidden"
     }
   },
   "lin_1": {
@@ -936,11 +936,10 @@
             "classNames": "col-sm-3 smaller-margins"
           },
           "minrssi": {
-            "ui:widget": "updown",
+            "ui:widget": "hidden",
             "ui:title": " ",
             "ui:placeholder": "Minimum RSSI, 0-100%",
-            "classNames": "col-sm-3 smaller-margins",
-			"ui:widget": "hidden"
+            "classNames": "col-sm-3 smaller-margins"
           }
         }
       }
@@ -988,7 +987,7 @@
         },
         "signed_payload": {
           "classNames": "col-sm-3",
-		  "ui:widget": "hidden"
+          "ui:widget": "hidden"
         }
       }
     }
