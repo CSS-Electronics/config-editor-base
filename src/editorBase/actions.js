@@ -334,7 +334,7 @@ export const checkConfigTransmitPeriodDelay = (content) => {
     for (let i = 1; i < 3; i++) {
       if (content["can_" + i].transmit != undefined) {
         let transmitListFiltered = content["can_" + i].transmit.filter((e) =>
-          e.period < e.delay
+          e.period > 0 && (e.period < e.delay)
         );
         if (transmitListFiltered.length > 0) {
           dispatch(
@@ -407,6 +407,31 @@ export const checkConfigTls = (content) => {
             alertActions.set({
               type: "warning",
               message: "Your S3 server endpoint uses TLS (https://), but your port is 80. This is most likely incorrect and may result in the device being unable to connect. Please review the documentation on how to enable TLS",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+// function for testing if S3 settings contain an invalid AWS endpoint syntax
+export const checkConfigAwsEndpoint = (content) => {
+
+  const regexAwsS3Endpoint = new RegExp("^https?:\\/\\/s3\\.[a-z]{2}-[a-z]+-\\d{1}\\.amazonaws\\.com$", "g");
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined) {
+
+      if (content.connect.s3.server.endpoint != undefined) {
+        let endpoint = content.connect.s3.server.endpoint
+        if (endpoint.includes("amazonaws") && !regexAwsS3Endpoint.test(endpoint)) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your S3 endpoint seems to be for AWS, but with incorrect syntax. Please review the documentation on how to configure the device for AWS S3 endpoints",
               autoClear: false,
             })
           );
@@ -494,6 +519,7 @@ export const saveUpdatedConfiguration = (filename, content) => {
       dispatch(checkConfigTransmitMonitoring(content))
       dispatch(checkConfigFiltersDisabled(content))
       dispatch(checkConfigTls(content))
+      dispatch(checkConfigAwsEndpoint(content))
       dispatch(checkS3EncryptedPasswordsNoKpub(content))
       dispatch(checkWiFiEncryptedPasswordsNoKpub(content))
       dispatch(checkFileSplitOffsetPeriod(content))
