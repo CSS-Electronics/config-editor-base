@@ -892,6 +892,7 @@
           "pwd": {
             "ui:title": " ",
             "ui:placeholder": "Access point password",
+            "ui:emptyValue": "",
             "classNames": "col-sm-3 smaller-margins"
           },
           "minrssi": {
@@ -901,6 +902,22 @@
             "classNames": "col-sm-3 smaller-margins"
           }
         }
+      }
+    },
+    "cellular": {
+      "keyformat": {
+        "classNames": "col-sm-3 smaller-margins"
+      },
+      "pin": {
+        "ui:emptyValue": "",
+        "classNames": "col-sm-3 smaller-margins"
+      },
+      "apn": {
+        "ui:emptyValue": "",
+        "classNames": "col-sm-3 smaller-margins"
+      },
+      "roaming": {
+        "classNames": "col-sm-3 smaller-margins"
       }
     },
     "s3": {

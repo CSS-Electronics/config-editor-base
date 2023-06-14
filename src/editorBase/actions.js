@@ -148,6 +148,8 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
       if (contentJSON != null) {
         switch (true) {
           case type == "uischema" && isValidUISchema(file.name):
+            console.log("contentJSON",contentJSON)
+            console.log("fileNameDisplay",fileNameDisplay)
             dispatch(setUISchemaContent(contentJSON));
             dispatch(resetLocalUISchemaList());
             dispatch(setUISchemaFile([fileNameDisplay]));
@@ -243,12 +245,20 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         deviceType = "CANedge1 GNSS"
       }
 
-      if (contentJSON.can_2 != undefined && contentJSON.connect != undefined && contentJSON.gnss == undefined) {
+      if (contentJSON.can_2 != undefined && contentJSON.connect && contentJSON.connect.wifi != undefined && contentJSON.gnss == undefined) {
         deviceType = "CANedge2"
       }
 
-      if (contentJSON.can_2 != undefined && contentJSON.connect != undefined && contentJSON.gnss != undefined) {
+      if (contentJSON.can_2 != undefined &&  contentJSON.connect && contentJSON.connect.wifi != undefined && contentJSON.gnss != undefined) {
         deviceType = "CANedge2 GNSS"
+      }
+
+      if (contentJSON.can_2 != undefined &&  contentJSON.connect && contentJSON.connect.cellular != undefined && contentJSON.gnss == undefined) {
+        deviceType = "CANedge3"
+      }
+
+      if (contentJSON.can_2 != undefined &&  contentJSON.connect && contentJSON.connect.cellular != undefined && contentJSON.gnss != undefined) {
+        deviceType = "CANedge3 GNSS"
       }
 
       // filter schema list based on FW major/minor version
@@ -291,6 +301,7 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
 
       // load uiSchemaFiltered
       if (uiSchemaAryFiltered && uiSchemaAryFiltered.length) {
+        console.log("uiSchemaAryFiltered", uiSchemaAryFiltered)
         dispatch(resetUISchemaList());
         dispatch(setUISchemaFile(uiSchemaAryFiltered));
         dispatch(setUISchemaContent(loadFile(uiSchemaAryFiltered[0])));
