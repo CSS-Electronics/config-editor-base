@@ -148,8 +148,8 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
       if (contentJSON != null) {
         switch (true) {
           case type == "uischema" && isValidUISchema(file.name):
-            console.log("contentJSON",contentJSON)
-            console.log("fileNameDisplay",fileNameDisplay)
+            console.log("contentJSON", contentJSON)
+            console.log("fileNameDisplay", fileNameDisplay)
             dispatch(setUISchemaContent(contentJSON));
             dispatch(resetLocalUISchemaList());
             dispatch(setUISchemaFile([fileNameDisplay]));
@@ -249,15 +249,15 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         deviceType = "CANedge2"
       }
 
-      if (contentJSON.can_2 != undefined &&  contentJSON.connect && contentJSON.connect.wifi != undefined && contentJSON.gnss != undefined) {
+      if (contentJSON.can_2 != undefined && contentJSON.connect && contentJSON.connect.wifi != undefined && contentJSON.gnss != undefined) {
         deviceType = "CANedge2 GNSS"
       }
 
-      if (contentJSON.can_2 != undefined &&  contentJSON.connect && contentJSON.connect.cellular != undefined && contentJSON.gnss == undefined) {
+      if (contentJSON.can_2 != undefined && contentJSON.connect && contentJSON.connect.cellular != undefined && contentJSON.gnss == undefined) {
         deviceType = "CANedge3"
       }
 
-      if (contentJSON.can_2 != undefined &&  contentJSON.connect && contentJSON.connect.cellular != undefined && contentJSON.gnss != undefined) {
+      if (contentJSON.can_2 != undefined && contentJSON.connect && contentJSON.connect.cellular != undefined && contentJSON.gnss != undefined) {
         deviceType = "CANedge3 GNSS"
       }
 
@@ -345,13 +345,13 @@ export const checkConfigTransmitPeriodDelay = (content) => {
     for (let i = 1; i < 3; i++) {
       if (content["can_" + i].transmit != undefined) {
         let transmitListFiltered = content["can_" + i].transmit.filter((e) =>
-          e.period > 0 && (e.period < e.delay)
+          e.period > 0 && (e.period <= e.delay)
         );
         if (transmitListFiltered.length > 0) {
           dispatch(
             alertActions.set({
               type: "warning",
-              message: "Your CAN CH" + i + " transmit list includes one or more entries with period < delay. This is invalid and will cause the device to reject your Configuration File",
+              message: "Your CAN CH" + i + " transmit list includes one or more entries with period <= delay. This is invalid and will cause the device to reject your Configuration File",
               autoClear: false,
             })
           );
@@ -402,6 +402,50 @@ export const checkConfigFiltersDisabled = (content) => {
         }
       }
     }
+  }
+}
+
+
+// function for testing if control signal scaling factor is 0 despite being enabled
+export const checkConfigControlSignalZeroScalingFactor = (content) => {
+  return function (dispatch) {
+    let channels = ["can_1", "can_2", "can_internal"]
+    let channel_names = ["CAN CH1", "CAN CH2", "CAN INTERNAL"]
+
+    for (let i = 0; i < 3; i++) {
+      if (content[channels[i]] != undefined && content[channels[i]].control != undefined) {
+        let can_control = content[channels[i]].control
+        if (can_control.control_rx_state != undefined && can_control.control_tx_state != undefined) {
+          if (can_control.control_rx_state != 0 || can_control.control_tx_state != 0) {
+            let type_list = ["start", "stop"]
+            for (let j = 0; j < 2; j++) {
+              let type = type_list[j]
+
+              if (can_control[type] != undefined && can_control[type].signal != undefined && can_control[type].signal.factor != undefined && can_control[type].signal.length != undefined) {
+                let fields = ["factor", "length"]
+                let field_names = ["signal scaling factor", "signal bit length"]
+                for (let k = 0; k < 2; k++) {
+                  if (can_control[type].signal[fields[k]] == 0) {
+                    dispatch(
+                      alertActions.set({
+                        type: "warning",
+                        message: "You have enabled a Control Signal on " + channel_names[i] + " (" + type + ") with a " + field_names[k] + " of 0 - this will result in a constant signal value and is most likely not intended.",
+                        autoClear: false,
+                      })
+                    );
+                  }
+                }
+
+              }
+            }
+
+          }
+
+        }
+      }
+
+    }
+
   }
 }
 
@@ -519,6 +563,94 @@ export const checkFileSplitOffsetPeriod = (content) => {
   }
 }
 
+// function for testing if RTC Adjustment field exceeds expected value (for CANedge2/CANedge3)
+export const checkRTCAdjustment = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.rtc != undefined && content.rtc.adjustment != undefined && content.rtc.adjustment > 400) {
+
+      dispatch(
+        alertActions.set({
+          type: "warning",
+          message: "Your RTC Adjustment value exceeds 400 seconds (this field is intended for small drift corrections, not e.g. time zone adjustments). Large values may cause issues with S3 connectivity",
+          autoClear: false,
+        })
+      );
+
+
+    }
+  }
+}
+
+
+
+// function for testing if S3 settings contains http:// and port 443
+export const checkConfigTlsPort = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined) {
+
+      if (content.connect.s3.server.endpoint != undefined && content.connect.s3.server.port != undefined) {
+        if (content.connect.s3.server.endpoint.includes("http://") && content.connect.s3.server.port == 443) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your S3 server endpoint does not use TLS (http://), but your port is 443. This is most likely incorrect and may result in the device being unable to connect. Please review the documentation on how to enable TLS",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+
+// function for testing if missing APN details
+export const checkMissingAPN = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined) {
+
+      console.log("content.connect.cellular.apn", content.connect.cellular.apn)
+      if (content.connect.s3.server.endpoint != undefined && content.connect.cellular.apn != undefined) {
+        if (content.connect.s3.server.endpoint.includes("http") && content.connect.cellular.apn == "") {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your SIM APN is blank. This is most likely incorrect and may result in the device being unable to connect. Please add the APN if it exists",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+
+// function for warning if 10S to 50S splits are used
+export const checkFileSplitValue = (content) => {
+
+  return function (dispatch) {
+    if (content.log != undefined && content.log.file != undefined && content.log.file.split_time_period != undefined) {
+
+      if (content.log.file.split_time_period < 60 && content.log.file.split_time_period > 0) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your log files are currently set to split every " + content.log.file.split_time_period + " seconds. This increases the storage used (due to overhead) and reduces data transfer/processing performance. Consider increasing your split time",
+            autoClear: false,
+          })
+        );
+      }
+
+    }
+  }
+}
+
 // -------------------------------------------------------
 // CONFIGURATION FILE:
 export const saveUpdatedConfiguration = (filename, content) => {
@@ -534,6 +666,12 @@ export const saveUpdatedConfiguration = (filename, content) => {
       dispatch(checkS3EncryptedPasswordsNoKpub(content))
       dispatch(checkWiFiEncryptedPasswordsNoKpub(content))
       dispatch(checkFileSplitOffsetPeriod(content))
+      dispatch(checkRTCAdjustment(content))
+      dispatch(checkConfigTlsPort(content))
+      dispatch(checkFileSplitValue(content))
+      dispatch(checkMissingAPN(content))
+      dispatch(checkConfigControlSignalZeroScalingFactor(content))
+
     }
 
     dispatch(setConfigContent(content));

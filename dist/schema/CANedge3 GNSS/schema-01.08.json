@@ -1754,7 +1754,7 @@
               "title": "System log",
               "description": "System events logged to the SD-card. The log levels are listed in order of increasing amount of information logged. Should only be enabled if needed during installation or troubleshooting.",
               "type": "integer",
-              "default": 0,
+              "default": 1,
               "oneOf": [
                 {
                   "type": "integer",
@@ -1772,19 +1772,27 @@
                 },
                 {
                   "type": "integer",
-                  "title": "Warning (2)",
+                  "title": "Error + Warning (2)",
                   "enum": [
                     2
                   ]
                 },
                 {
                   "type": "integer",
-                  "title": "Info (3)",
+                  "title": "Error + Warning + Info (3)",
                   "enum": [
                     3
                   ]
                 }
               ]
+            },
+            "restart_timer": {
+              "title": "Restart timer",
+              "description": "Number of runtime hours after which the device automatically restarts (set 0 to disable). Example: Set to 24 to restart after one day of runtime.",
+              "type": "integer",
+              "default": 24,
+              "minimum": 0,
+              "maximum": 168
             }
           },
           "additionalProperties": false
@@ -2418,229 +2426,267 @@
             "roaming"
           ]
         },
-        "s3": {
-          "title": "S3 server settings",
-          "type": "object",
-          "properties": {
-            "sync": {
-              "title": "Synchronization",
-              "description": "This section configures how and when the device communicates with the S3 server.",
-              "type": "object",
-              "properties": {
-                "ota": {
-                  "title": "Firmware, config and certificate",
-                  "description": "Configures how often the device looks for firmware-, config- and certificate-over-the-air updates. Small values may reduce performance. Time period may sometimes become longer if device is busy. Set to 0 to disable.",
-                  "type": "integer",
-                  "default": 600,
-                  "minimum": 0,
-                  "maximum": 86400,
-                  "multipleOf": 5
-                },
-                "heartbeat": {
-                  "title": "Heartbeat",
-                  "description": "Configures how often the device transmits the heartbeat signal. Small values may reduce performance. Time period may sometimes become longer if device is busy. Set to 0 to disable.",
-                  "type": "integer",
-                  "default": 300,
-                  "minimum": 0,
-                  "maximum": 86400,
-                  "multipleOf": 5
-                },
-                "logfiles": {
-                  "title": "Log files",
-                  "description": "Configures if the device pushes closed log files to the server. The log files are deleted from the device when successfully uploaded.",
-                  "type": "integer",
-                  "default": 1,
-                  "oneOf": [
-                    {
-                      "type": "integer",
-                      "title": "Disable",
-                      "enum": [
-                        0
-                      ]
-                    },
-                    {
-                      "type": "integer",
-                      "title": "Enable",
-                      "enum": [
-                        1
-                      ]
-                    }
-                  ]
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "ota",
-                "heartbeat",
-                "logfiles"
+        "protocol": {
+          "title": "Network protocol",
+          "description": "The network protocol used to communicate with the device.",
+          "type": "integer",
+          "default": 0,
+          "additionalProperties": false,
+          "required": [
+            "protocol"
+          ],
+          "oneOf": [
+            {
+              "type": "integer",
+              "title": "S3",
+              "enum": [
+                0
               ]
-            },
-            "server": {
-              "title": "Server",
-              "description": "This section contains the server connection parameters.",
-              "type": "object",
-              "properties": {
-                "endpoint": {
-                  "title": "Endpoint",
-                  "description": "S3 server endpoint. Prefix with http:// to connect using standard http. Prefix with https:// to connect using SSL/TLS - requires support by the server and that the server certificate is loaded onto the device. Examples: http://192.168.0.1, https://s3.mydomain.com, https://s3.amazonaws.com, http://s3-us-east-2.amazonaws.com.",
-                  "type": "string",
-                  "pattern": "^https*://[a-zA-Z0-9_/\\.-]+$",
-                  "maxLength": 128
-                },
-                "port": {
-                  "title": "Port",
-                  "description": "S3 server port. Examples: 80 (http), 443 (https), 9000 (custom).",
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 65535
-                },
-                "bucket": {
-                  "title": "Bucket name",
-                  "description": "S3 server bucket name. Examples: logbucket, fleetbucket, testbucket.",
-                  "type": "string",
-                  "pattern": "^[a-z0-9]{1}[a-z0-9\\.\\-]{0,62}[a-z0-9]{1}$",
-                  "maxLength": 64
-                },
-                "region": {
-                  "title": "Region",
-                  "description": "S3 server region. Example: us-east-1.",
-                  "type": "string",
-                  "pattern": "^[a-z0-9-]*$",
-                  "minLength": 0,
-                  "maxLength": 32
-                },
-                "request_style": {
-                  "title": "Request style",
-                  "description": "Virtual-hosted-style or path-style S3 requests. Virtual hosted-style format: \"http://[BUCKET-NAME].[DOMAIN]/[OBJECT-NAME]\". Path-style format: \"http://[DOMAIN]/[BUCKET-NAME]/[OBJECT-NAME]\"",
-                  "type": "integer",
-                  "default": 0,
-                  "oneOf": [
-                    {
-                      "type": "integer",
-                      "title": "Path-style",
-                      "enum": [
-                        0
-                      ]
-                    },
-                    {
-                      "type": "integer",
-                      "title": "Virtual hosted-style",
-                      "enum": [
-                        1
-                      ]
-                    }
-                  ]
-                },
-                "accesskey": {
-                  "title": "AccessKey",
-                  "description": "S3 server access key ID. Example: PRDDKN8R6PAAOGTEI53E",
-                  "type": "string",
-                  "pattern": "^[a-zA-Z0-9_-]+$",
-                  "minLength": 3,
-                  "maxLength": 128
-                },
-                "keyformat": {
-                  "title": "SecretKey format",
-                  "description": "The format of the secret key. Can be used to hide the secret key stored on the device.",
-                  "type": "integer",
-                  "default": 0,
-                  "oneOf": [
-                    {
-                      "type": "integer",
-                      "title": "Plain",
-                      "enum": [
-                        0
-                      ]
-                    },
-                    {
-                      "type": "integer",
-                      "title": "Encrypted",
-                      "enum": [
-                        1
-                      ]
-                    }
-                  ]
-                },
-                "secretkey": {
-                  "title": "SecretKey",
-                  "type": "string"
-                },
-                "signed_payload": {
-                  "title": "Signed payload",
-                  "description": "Include payload checksum in signature. Reduces device upload performance.",
-                  "type": "integer",
-                  "default": 0,
-                  "oneOf": [
-                    {
-                      "type": "integer",
-                      "title": "Off",
-                      "enum": [
-                        0
-                      ]
-                    },
-                    {
-                      "type": "integer",
-                      "title": "On",
-                      "enum": [
-                        1
-                      ]
-                    }
-                  ]
-                }
-              },
-              "dependencies": {
-                "endpoint": [
-                  "port",
-                  "bucket",
-                  "region",
-                  "request_style",
-                  "accesskey",
-                  "keyformat",
-                  "secretkey",
-                  "signed_payload"
-                ],
-                "keyformat": {
-                  "oneOf": [
-                    {
-                      "properties": {
-                        "keyformat": {
-                          "enum": [
-                            0
-                          ]
-                        },
-                        "secretkey": {
-                          "description": "S3 server secret key in plain form (max 128). Example: IAkwE9vvEh9ke4RH",
-                          "pattern": "^[ -~]*$",
-                          "minLength": 1,
-                          "maxLength": 128
-                        }
-                      }
-                    },
-                    {
-                      "properties": {
-                        "keyformat": {
-                          "enum": [
-                            1
-                          ]
-                        },
-                        "secretkey": {
-                          "description": "S3 server secret key in encrypted form (min 24, max 150). Example: AKGaqGJWxEhTfJX6oeR/OIdu5Swm9HQY. IMPORTANT: Ensure that you correctly encrypt the secretKey and that you include the server public key",
-                          "pattern": "^[a-zA-Z0-9+/=]*$",
-                          "minLength": 24,
-                          "maxLength": 150
-                        }
-                      }
-                    }
-                  ]
-                }
-              },
-              "additionalProperties": false
             }
-          },
-          "additionalProperties": false
+          ]
+        }
+      },
+      "dependencies": {
+        "protocol": {
+          "oneOf": [
+            {
+              "properties": {
+                "protocol": {
+                  "enum": [
+                    0
+                  ]
+                },
+                "s3": {
+                  "title": "S3 server settings",
+                  "type": "object",
+                  "properties": {
+                    "sync": {
+                      "title": "Synchronization",
+                      "description": "This section configures how and when the device communicates with the S3 server.",
+                      "type": "object",
+                      "properties": {
+                        "ota": {
+                          "title": "Firmware, config and certificate",
+                          "description": "Configures how often the device looks for firmware-, config- and certificate-over-the-air updates. Small values may reduce performance. Time period may sometimes become longer if device is busy. Set to 0 to disable.",
+                          "type": "integer",
+                          "default": 600,
+                          "minimum": 0,
+                          "maximum": 86400,
+                          "multipleOf": 5
+                        },
+                        "heartbeat": {
+                          "title": "Heartbeat",
+                          "description": "Configures how often the device transmits the heartbeat signal. Small values may reduce performance. Time period may sometimes become longer if device is busy. Set to 0 to disable.",
+                          "type": "integer",
+                          "default": 300,
+                          "minimum": 0,
+                          "maximum": 86400,
+                          "multipleOf": 5
+                        },
+                        "logfiles": {
+                          "title": "Log files",
+                          "description": "Configures if the device pushes closed log files to the server. The log files are deleted from the device when successfully uploaded.",
+                          "type": "integer",
+                          "default": 1,
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "title": "Disable",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "integer",
+                              "title": "Enable",
+                              "enum": [
+                                1
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "ota",
+                        "heartbeat",
+                        "logfiles"
+                      ]
+                    },
+                    "server": {
+                      "title": "Server",
+                      "description": "This section contains the server connection parameters.",
+                      "type": "object",
+                      "properties": {
+                        "endpoint": {
+                          "title": "Endpoint",
+                          "description": "S3 server endpoint. Prefix with http:// to connect using standard http. Prefix with https:// to connect using SSL/TLS - requires support by the server and that the server certificate is loaded onto the device. Examples: http://192.168.0.1, https://s3.mydomain.com, https://s3.amazonaws.com, http://s3-us-east-2.amazonaws.com.",
+                          "type": "string",
+                          "pattern": "^https*://[a-zA-Z0-9_/\\.-]+$",
+                          "maxLength": 128
+                        },
+                        "port": {
+                          "title": "Port",
+                          "description": "S3 server port. Examples: 80 (http), 443 (https), 9000 (custom).",
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 65535
+                        },
+                        "bucket": {
+                          "title": "Bucket name",
+                          "description": "S3 server bucket name. Examples: logbucket, fleetbucket, testbucket.",
+                          "type": "string",
+                          "pattern": "^[a-z0-9]{1}[a-z0-9\\.\\-]{0,62}[a-z0-9]{1}$",
+                          "maxLength": 64
+                        },
+                        "region": {
+                          "title": "Region",
+                          "description": "S3 server region. Example: us-east-1.",
+                          "type": "string",
+                          "pattern": "^[a-z0-9-]*$",
+                          "minLength": 0,
+                          "maxLength": 32
+                        },
+                        "request_style": {
+                          "title": "Request style",
+                          "description": "Virtual-hosted-style or path-style S3 requests. Virtual hosted-style format: \"http://[BUCKET-NAME].[DOMAIN]/[OBJECT-NAME]\". Path-style format: \"http://[DOMAIN]/[BUCKET-NAME]/[OBJECT-NAME]\"",
+                          "type": "integer",
+                          "default": 0,
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "title": "Path-style",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "integer",
+                              "title": "Virtual hosted-style",
+                              "enum": [
+                                1
+                              ]
+                            }
+                          ]
+                        },
+                        "accesskey": {
+                          "title": "AccessKey",
+                          "description": "S3 server access key ID. Example: PRDDKN8R6PAAOGTEI53E",
+                          "type": "string",
+                          "pattern": "^[a-zA-Z0-9_-]+$",
+                          "minLength": 3,
+                          "maxLength": 128
+                        },
+                        "keyformat": {
+                          "title": "SecretKey format",
+                          "description": "The format of the secret key. Can be used to hide the secret key stored on the device.",
+                          "type": "integer",
+                          "default": 0,
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "title": "Plain",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "integer",
+                              "title": "Encrypted",
+                              "enum": [
+                                1
+                              ]
+                            }
+                          ]
+                        },
+                        "secretkey": {
+                          "title": "SecretKey",
+                          "type": "string"
+                        },
+                        "signed_payload": {
+                          "title": "Signed payload",
+                          "description": "Include payload checksum in signature. Reduces device upload performance.",
+                          "type": "integer",
+                          "default": 0,
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "title": "Off",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "integer",
+                              "title": "On",
+                              "enum": [
+                                1
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "dependencies": {
+                        "endpoint": [
+                          "port",
+                          "bucket",
+                          "region",
+                          "request_style",
+                          "accesskey",
+                          "keyformat",
+                          "secretkey",
+                          "signed_payload"
+                        ],
+                        "keyformat": {
+                          "oneOf": [
+                            {
+                              "properties": {
+                                "keyformat": {
+                                  "enum": [
+                                    0
+                                  ]
+                                },
+                                "secretkey": {
+                                  "description": "S3 server secret key in plain form (max 128). Example: IAkwE9vvEh9ke4RH",
+                                  "pattern": "^[ -~]*$",
+                                  "minLength": 1,
+                                  "maxLength": 128
+                                }
+                              }
+                            },
+                            {
+                              "properties": {
+                                "keyformat": {
+                                  "enum": [
+                                    1
+                                  ]
+                                },
+                                "secretkey": {
+                                  "description": "S3 server secret key in encrypted form (min 24, max 150). Example: AKGaqGJWxEhTfJX6oeR/OIdu5Swm9HQY. IMPORTANT: Ensure that you correctly encrypt the secretKey and that you include the server public key",
+                                  "pattern": "^[a-zA-Z0-9+/=]*$",
+                                  "minLength": 24,
+                                  "maxLength": 150
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          ]
         }
       },
       "additionalProperties": false,
+      "patternProperties": {
+        "s3": {},
+        "webserver": {}
+      },
       "required": [
         "cellular"
       ]
