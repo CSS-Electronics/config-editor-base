@@ -47,7 +47,13 @@ class PartialConfigLoader extends React.Component {
   }
 
   testMergedFile() {
-    let mergedConfigTemp = merge(this.props.formData, this.state.jsonFile);
+    // Use deepmerge's built-in arrayMerge option to overwrite arrays
+    const overwriteMerge = (destinationArray, sourceArray, options) => sourceArray;
+
+    let mergedConfigTemp = merge(this.props.formData, this.state.jsonFile, {
+      arrayMerge: overwriteMerge,
+    });
+
     this.setState({ mergedConfig: mergedConfigTemp }, () => {
       yourForm.submit();
     });
@@ -187,19 +193,19 @@ class PartialConfigLoader extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     formData: state.editor.formData,
-    schemaContent: state.editor.schemaContent
+    schemaContent: state.editor.schemaContent,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setConfigContent: content =>
+    setConfigContent: (content) =>
       dispatch(actionsEditor.setConfigContent(content)),
     setUpdatedFormData: (formData) =>
-      dispatch(actionsEditor.setUpdatedFormData(formData))
+      dispatch(actionsEditor.setUpdatedFormData(formData)),
   };
 };
 
