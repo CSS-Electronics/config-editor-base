@@ -630,6 +630,92 @@ export const checkMissingAPN = (content) => {
   }
 }
 
+// function for testing if Telekom APN is incorrect
+export const checkIncorrectAPNTelekom = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined) {
+
+      if (content.connect.s3.server.endpoint != undefined && content.connect.cellular.apn != undefined) {
+        if (content.connect.s3.server.endpoint.includes("http") && content.connect.cellular.apn == "internet.v6.telekom") {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your SIM APN is set to 'internet.v6.telekom', which is not compatible with the device - please set it to 'internet.telekom' instead",
+              autoClear: false,
+            })
+          );
+        }
+
+      }
+    }
+  }
+}
+
+// function for testing if Super SIM APN is incorrect
+export const checkIncorrectAPNSuperSIM = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined && content.connect.s3.server.region != undefined) {
+
+        if (content.connect.s3.server.region.includes("eu") && content.connect.cellular.apn == "super") {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your Super SIM APN is set to 'super', but your S3 region appears to be in EU - please set your APN to 'de1.super' for optimal speed",
+              autoClear: false,
+            })
+          );
+        }
+
+      
+    }
+  }
+}
+
+
+// function for testing if Super SIM roaming is enabled
+export const checkIncorrectRoamingSuperSIM = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined && content.connect.cellular.roaming != undefined && content.connect.s3.server.endpoint != undefined) {
+
+        if (content.connect.s3.server.endpoint.includes("http") && content.connect.cellular.roaming == 0 && (content.connect.cellular.apn == "super" || content.connect.cellular.apn == "de1.super" || content.connect.cellular.apn == "sg.super")) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Roaming must be enabled when using a Super SIM",
+              autoClear: false,
+            })
+          );
+        }      
+    }
+  }
+}
+
+// function for testing if APN includes spaces incorrect
+export const checkIncorrectAPNSpaces = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined && content.connect.s3.server.endpoint != undefined) {
+
+        if (content.connect.s3.server.endpoint.includes("http") && (content.connect.cellular.apn.startsWith(" ") || content.connect.cellular.apn.endsWith(" "))) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your APN starts/ends with spaces - please review, as this is most likely not correct",
+              autoClear: false,
+            })
+          );
+        }
+    
+    }
+  }
+}
+
+
+
+
 
 // function for warning if 10S to 50S splits are used
 export const checkFileSplitValue = (content) => {
@@ -646,6 +732,29 @@ export const checkFileSplitValue = (content) => {
           })
         );
       }
+
+    }
+  }
+}
+
+
+
+// function for warning about GNSS Estimate
+export const checkGNSSEstimate = (content) => {
+
+  return function (dispatch) {
+    if (content.gnss != undefined && content.gnss.alignment != undefined && content.gnss.alignment.method != undefined) {
+
+      if (content.gnss.alignment.method == 1) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your GNSS IMU-mount alignment is set to 'Estimate' - note that the device will not record any GPS/IMU data in this mode",
+            autoClear: false,
+          })
+        );
+      }
+
 
     }
   }
@@ -670,8 +779,12 @@ export const saveUpdatedConfiguration = (filename, content) => {
       dispatch(checkConfigTlsPort(content))
       dispatch(checkFileSplitValue(content))
       dispatch(checkMissingAPN(content))
+      dispatch(checkIncorrectAPNSuperSIM(content))
+      dispatch(checkIncorrectAPNTelekom(content))
+      dispatch(checkIncorrectAPNSpaces(content))
+      dispatch(checkGNSSEstimate(content))
+      dispatch(checkIncorrectRoamingSuperSIM(content))
       dispatch(checkConfigControlSignalZeroScalingFactor(content))
-
     }
 
     dispatch(setConfigContent(content));
