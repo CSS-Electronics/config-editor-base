@@ -3,7 +3,7 @@
 
 // Toggle demo mode on/off
 // export const demoMode = false
-export const demoConfig = 'config-01.07.json'
+export const demoConfig = 'config-01.09.json'
 
 export const regexUISchemaPublic = new RegExp(
   /^uischema-\d{2}\.\d{2}\.json/,

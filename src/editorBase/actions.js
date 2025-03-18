@@ -74,7 +74,18 @@ export const publicUiSchemaFiles = (uiSchemaAry, schemaAry, demoMode) => {
     }
     // If demoMode, load the Rule Schema by default for use in the online simple editor
     if (demoMode && schemaAry.length) {
-      dispatch(publicSchemaFiles(demoConfig, schemaAry, {}, uiSchemaAry));
+      schemaAry = schemaAry.filter((e) =>
+      (e.includes("CANedge3")
+      ))
+
+      // pass default CE3 config for demo
+      const demoFileName = "config-01.09.json"
+      const demoContent = {"general":{"device":{"meta":"Demo Config CE3G"},"security":{},"debug":{"syslog":1,"restart_timer":24}},"log":{"file":{"split_size":512,"split_time_period":900,"split_time_offset":0,"cyclic":1},"compression":{"level":0},"encryption":{"state":0},"error_frames":{"state":0}},"rtc":{"sync":2,"timezone":0,"adjustment":0,"tolerance":30},"secondaryport":{"power_schedule":[]},"can_internal":{"general":{"rx_state":1,"tx_state":1},"filter":{"id":[{"name":"Heartbeat","state":0,"type":0,"id_format":0,"method":0,"f1":"2","f2":"2","prescaler_type":0},{"name":"TimeCalendar","state":0,"type":0,"id_format":0,"method":0,"f1":"3","f2":"3","prescaler_type":0},{"name":"TimeExternal","state":0,"type":0,"id_format":0,"method":0,"f1":"5","f2":"5","prescaler_type":0},{"name":"GnssStatus","state":1,"type":0,"id_format":0,"method":0,"f1":"65","f2":"65","prescaler_type":0},{"name":"GnssTime","state":1,"type":0,"id_format":0,"method":0,"f1":"66","f2":"66","prescaler_type":0},{"name":"GnsssPosition","state":1,"type":0,"id_format":0,"method":0,"f1":"67","f2":"67","prescaler_type":0},{"name":"GnssAltitude","state":1,"type":0,"id_format":0,"method":0,"f1":"68","f2":"68","prescaler_type":0},{"name":"GnssAttitude","state":1,"type":0,"id_format":0,"method":0,"f1":"69","f2":"69","prescaler_type":0},{"name":"GnssDistance","state":1,"type":0,"id_format":0,"method":0,"f1":"6A","f2":"6A","prescaler_type":0},{"name":"GnssSpeed","state":1,"type":0,"id_format":0,"method":0,"f1":"6B","f2":"6B","prescaler_type":0},{"name":"GnssGeofence","state":1,"type":0,"id_format":0,"method":0,"f1":"6C","f2":"6C","prescaler_type":0},{"name":"ImuAlign","state":1,"type":0,"id_format":0,"method":0,"f1":"6E","f2":"6E","prescaler_type":0},{"name":"ImuAcc","state":1,"type":0,"id_format":0,"method":0,"f1":"6F","f2":"6F","prescaler_type":0}]},"control":{"control_rx_state":0,"control_tx_state":0,"start":{"message":{"chn":0,"id_format":0,"id":"0","id_mask":"7FF"},"signal":{"type":0,"byteorder":0,"bitpos":0,"length":0,"factor":0,"offset":0},"trigger_high":0,"trigger_low":0},"stop":{"message":{"chn":0,"id_format":0,"id":"0","id_mask":"7FF"},"signal":{"type":0,"byteorder":0,"bitpos":0,"length":0,"factor":0,"offset":0},"trigger_high":0,"trigger_low":0}}},"can_1":{"general":{"rx_state":1,"tx_state":1},"phy":{"mode":0,"retransmission":1,"fd_spec":0,"bit_rate_cfg_mode":0},"filter":{"remote_frames":0,"id":[{"name":"AllStandardID","state":1,"type":0,"id_format":0,"method":0,"f1":"0","f2":"7FF","prescaler_type":0},{"name":"AllExtendedID","state":1,"type":0,"id_format":1,"method":0,"f1":"0","f2":"1FFFFFFF","prescaler_type":0}]},"control":{"control_rx_state":0,"control_tx_state":0,"start":{"message":{"chn":1,"id_format":0,"id":"0","id_mask":"7FF"},"signal":{"type":0,"byteorder":0,"bitpos":0,"length":0,"factor":0,"offset":0},"trigger_high":0,"trigger_low":0},"stop":{"message":{"chn":1,"id_format":0,"id":"0","id_mask":"7FF"},"signal":{"type":0,"byteorder":0,"bitpos":0,"length":0,"factor":0,"offset":0},"trigger_high":0,"trigger_low":0}}},"can_2":{"general":{"rx_state":1,"tx_state":1},"phy":{"mode":0,"retransmission":1,"fd_spec":0,"bit_rate_cfg_mode":0},"filter":{"remote_frames":0,"id":[{"name":"AllStandardID","state":1,"type":0,"id_format":0,"method":0,"f1":"0","f2":"7FF","prescaler_type":0},{"name":"AllExtendedID","state":1,"type":0,"id_format":1,"method":0,"f1":"0","f2":"1FFFFFFF","prescaler_type":0}]},"control":{"control_rx_state":0,"control_tx_state":0,"start":{"message":{"chn":2,"id_format":0,"id":"0","id_mask":"7FF"},"signal":{"type":0,"byteorder":0,"bitpos":0,"length":0,"factor":0,"offset":0},"trigger_high":0,"trigger_low":0},"stop":{"message":{"chn":2,"id_format":0,"id":"0","id_mask":"7FF"},"signal":{"type":0,"byteorder":0,"bitpos":0,"length":0,"factor":0,"offset":0},"trigger_high":0,"trigger_low":0}}},"lin_1":{"phy":{"mode":0,"bit_rate":19200}},"lin_2":{"phy":{"mode":0,"bit_rate":19200}},"routing":[{"name":"CAN9_Pos_To_CAN1","state":1,"log":0,"chn_src":0,"id_format_src":0,"id_src":"67","chn_dst":1,"id_format_dst":0,"id_dst":"42A"},{"name":"LIN1_SoC_To_CAN2","state":1,"log":0,"chn_src":3,"id_format_src":0,"id_src":"22","chn_dst":2,"id_format_dst":0,"id_dst":"321"}],"connect":{"cellular":{"keyformat":0,"pin":"1234","apn":"myapn.net","roaming":1},"protocol":0,"s3":{"sync":{"ota":600,"heartbeat":300,"logfiles":1},"server":{"endpoint":"https://s3.us-east-1.amazonaws.com","port":443,"bucket":"mytestbucket","region":"us-east-1","request_style":1,"accesskey":"AKIASLWXLZB45BCE2X5O","keyformat":0,"secretkey":"DiI12zYEf12312ASDZZZZdasdasihNqr9E34z","signed_payload":0}}},"gnss":{"system":5,"invalid_signals":0,"alignment":{"method":0,"z":0,"y":0,"x":0},"geofence":[],"dyn_model":0}}
+      dispatch(setConfigContent(demoContent));
+      dispatch(setUpdatedFormData(demoContent));
+      dispatch(setConfigFile([demoFileName]));
+
+      dispatch(publicSchemaFiles(demoConfig, schemaAry, demoContent, uiSchemaAry));
     }
   };
 };
@@ -148,8 +159,6 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
       if (contentJSON != null) {
         switch (true) {
           case type == "uischema" && isValidUISchema(file.name):
-            console.log("contentJSON", contentJSON)
-            console.log("fileNameDisplay", fileNameDisplay)
             dispatch(setUISchemaContent(contentJSON));
             dispatch(resetLocalUISchemaList());
             dispatch(setUISchemaFile([fileNameDisplay]));
@@ -166,6 +175,7 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
             const localSchema = getState().editor.editorSchemaFiles[0] && getState().editor.editorSchemaFiles[0].name.includes("(local)") ? true : false;
 
             if (file && file.name && file.name.length && localSchema == false && schemaAry && schemaAry.length) {
+
               dispatch(publicSchemaFiles(file.name, schemaAry, contentJSON, uiSchemaAry));
             }
 
@@ -261,10 +271,12 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         deviceType = "CANedge3 GNSS"
       }
 
+
       // filter schema list based on FW major/minor version
       let schemaAryFiltered = schemaAry.filter((e) =>
       (e.includes(selectedConfig.substr(7, 5))
       ))
+
 
       // filter uischema list based on FW major/minor version
       let uiSchemaAryFiltered = uiSchemaAry.filter((e) =>
@@ -285,11 +297,6 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         );
       }
 
-
-      //if (demoMode) {
-      //  schemaAryFiltered = schemaAry.filter((e) => e.includes("CANedge2"));
-      //}
-
       const loadedSchema = loadFile(schemaAryFiltered[0])
 
       if (schemaAryFiltered[0] && loadedSchema) {
@@ -301,7 +308,6 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
 
       // load uiSchemaFiltered
       if (uiSchemaAryFiltered && uiSchemaAryFiltered.length) {
-        console.log("uiSchemaAryFiltered", uiSchemaAryFiltered)
         dispatch(resetUISchemaList());
         dispatch(setUISchemaFile(uiSchemaAryFiltered));
         dispatch(setUISchemaContent(loadFile(uiSchemaAryFiltered[0])));
@@ -362,6 +368,47 @@ export const checkConfigTransmitPeriodDelay = (content) => {
 }
 
 
+export const checkConfigTransmitExceedLimits = (content) => {
+  return function (dispatch) {
+    let transmitList = [];
+
+    // Collect all transmit messages from can_1 and can_2
+    for (let i = 1; i <= 2; i++) {
+      if (content["can_" + i] && Array.isArray(content["can_" + i].transmit)) {
+        transmitList = transmitList.concat(content["can_" + i].transmit);
+      }
+    }
+
+    // Count the number of messages
+    const messageCount = transmitList.length;
+
+    // Calculate total data bytes across all messages
+    const byteCount = transmitList.reduce((total, message) => {
+      return total + (message.data ? message.data.length / 2 : 0);
+    }, 0);
+
+    // Check if limits are exceeded (FW 01.09.01+)
+    const MAX_MESSAGES = 224;
+    const MAX_BYTES = 4096;
+
+    // console.log("messageCount",messageCount)
+    // console.log("byteCount",byteCount)
+
+    if (messageCount > MAX_MESSAGES || byteCount > MAX_BYTES) {
+      dispatch(
+        alertActions.set({
+          type: "warning",
+          message: `Your CAN transmit list(s) exceed the limits: ${messageCount} messages (max 224) and ${byteCount} bytes (max 4096). This is invalid and will cause the device to reject your Configuration File`,
+          autoClear: false,
+        })
+      );
+    }
+  };
+};
+
+
+
+
 // function for testing for silent mode plus transmit lists
 export const checkConfigTransmitMonitoring = (content) => {
 
@@ -381,6 +428,36 @@ export const checkConfigTransmitMonitoring = (content) => {
     }
   }
 }
+
+
+// Function to check if routing is enabled but CAN channel is not in Normal mode
+export const checkConfigTransmitMonitoringRouting = (content) => {
+  return function (dispatch) {
+    if (content["routing"] && content["routing"].length > 0) {
+
+      // Loop through each entry in the routing section
+      content["routing"].forEach((route) => {
+        if (route.state === 1 && (route.chn_dst === 1 || route.chn_dst === 2)) {
+          const channelKey = `can_${route.chn_dst}`;
+
+          if (
+            content[channelKey] &&
+            content[channelKey].phy &&
+            content[channelKey].phy.mode !== 0
+          ) {
+            dispatch(
+              alertActions.set({
+                type: "warning",
+                message: `You are routing a message onto CAN CH${route.chn_dst}, but the device will not route any messages unless the CAN CH${route.chn_dst} mode is set to Normal.`,
+                autoClear: false,
+              })
+            );
+          }
+        }
+      });
+    }
+  };
+};
 
 // function for testing if all filters are disabled
 export const checkConfigFiltersDisabled = (content) => {
@@ -613,7 +690,6 @@ export const checkMissingAPN = (content) => {
   return function (dispatch) {
     if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined) {
 
-      console.log("content.connect.cellular.apn", content.connect.cellular.apn)
       if (content.connect.s3.server.endpoint != undefined && content.connect.cellular.apn != undefined) {
         if (content.connect.s3.server.endpoint.includes("http") && content.connect.cellular.apn == "") {
           dispatch(
@@ -624,6 +700,50 @@ export const checkMissingAPN = (content) => {
             })
           );
         }
+
+      }
+    }
+  }
+}
+
+// function for testing if missing WiFi details when S3 is added
+export const checkMissingWiFi = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.wifi != undefined && content.connect.wifi.accesspoint != undefined) {
+
+      if (content.connect.s3.server.endpoint != undefined && content.connect.wifi.accesspoint.length == 0 && content.connect.s3.server.endpoint.includes("http")) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your S3 details appear populated, but you have added no WiFi details. Your device will therefore be unable to connect to your server.",
+            autoClear: false,
+          })
+        );
+
+
+      }
+    }
+  }
+}
+
+
+
+// function for testing if missing S3 details when WiFi is added and protocol is S3
+export const checkMissingS3IfWiFi = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.wifi != undefined && content.connect.wifi.accesspoint != undefined) {
+
+      if (content.connect.wifi.accesspoint.length > 0 && content.connect.protocol != undefined && content.connect.protocol == 0 && ((content.connect.s3.server.endpoint != undefined && !content.connect.s3.server.endpoint.includes("http")) || content.connect.s3.server.endpoint == undefined)) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your have added WiFi details, but no S3 endpoint is added. Your device will therefore be unable to connect to your server.",
+            autoClear: false,
+          })
+        );
+
 
       }
     }
@@ -658,17 +778,17 @@ export const checkIncorrectAPNSuperSIM = (content) => {
   return function (dispatch) {
     if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined && content.connect.s3.server.region != undefined) {
 
-        if (content.connect.s3.server.region.includes("eu") && content.connect.cellular.apn == "super") {
-          dispatch(
-            alertActions.set({
-              type: "warning",
-              message: "Your Super SIM APN is set to 'super', but your S3 region appears to be in EU - please set your APN to 'de1.super' for optimal speed",
-              autoClear: false,
-            })
-          );
-        }
+      if (content.connect.s3.server.region.includes("eu") && content.connect.cellular.apn == "super") {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your Super SIM APN is set to 'super', but your S3 region appears to be in EU - please set your APN to 'de1.super' for optimal speed",
+            autoClear: false,
+          })
+        );
+      }
 
-      
+
     }
   }
 }
@@ -680,15 +800,15 @@ export const checkIncorrectRoamingSuperSIM = (content) => {
   return function (dispatch) {
     if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined && content.connect.cellular.roaming != undefined && content.connect.s3.server.endpoint != undefined) {
 
-        if (content.connect.s3.server.endpoint.includes("http") && content.connect.cellular.roaming == 0 && (content.connect.cellular.apn == "super" || content.connect.cellular.apn == "de1.super" || content.connect.cellular.apn == "sg.super")) {
-          dispatch(
-            alertActions.set({
-              type: "warning",
-              message: "Roaming must be enabled when using a Super SIM",
-              autoClear: false,
-            })
-          );
-        }      
+      if (content.connect.s3.server.endpoint.includes("http") && content.connect.cellular.roaming == 0 && (content.connect.cellular.apn == "super" || content.connect.cellular.apn == "de1.super" || content.connect.cellular.apn == "sg.super")) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Roaming must be enabled when using a Super SIM",
+            autoClear: false,
+          })
+        );
+      }
     }
   }
 }
@@ -699,16 +819,16 @@ export const checkIncorrectAPNSpaces = (content) => {
   return function (dispatch) {
     if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.server != undefined && content.connect.cellular != undefined && content.connect.cellular.apn != undefined && content.connect.s3.server.endpoint != undefined) {
 
-        if (content.connect.s3.server.endpoint.includes("http") && (content.connect.cellular.apn.startsWith(" ") || content.connect.cellular.apn.endsWith(" "))) {
-          dispatch(
-            alertActions.set({
-              type: "warning",
-              message: "Your APN starts/ends with spaces - please review, as this is most likely not correct",
-              autoClear: false,
-            })
-          );
-        }
-    
+      if (content.connect.s3.server.endpoint.includes("http") && (content.connect.cellular.apn.startsWith(" ") || content.connect.cellular.apn.endsWith(" "))) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your APN starts/ends with spaces - please review, as this is most likely not correct",
+            autoClear: false,
+          })
+        );
+      }
+
     }
   }
 }
@@ -769,6 +889,8 @@ export const saveUpdatedConfiguration = (filename, content) => {
     if (content.can_2 != undefined) {
       dispatch(checkConfigTransmitPeriodDelay(content))
       dispatch(checkConfigTransmitMonitoring(content))
+      dispatch(checkConfigTransmitMonitoringRouting(content))
+      dispatch(checkConfigTransmitExceedLimits(content))
       dispatch(checkConfigFiltersDisabled(content))
       dispatch(checkConfigTls(content))
       dispatch(checkConfigAwsEndpoint(content))
@@ -779,6 +901,8 @@ export const saveUpdatedConfiguration = (filename, content) => {
       dispatch(checkConfigTlsPort(content))
       dispatch(checkFileSplitValue(content))
       dispatch(checkMissingAPN(content))
+      dispatch(checkMissingWiFi(content))
+      dispatch(checkMissingS3IfWiFi(content))
       dispatch(checkIncorrectAPNSuperSIM(content))
       dispatch(checkIncorrectAPNTelekom(content))
       dispatch(checkIncorrectAPNSpaces(content))
