@@ -272,7 +272,7 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
       }
 
       // Check for CANmod variants
-      if (contentJSON.gnss !== undefined) {
+      if (contentJSON.sensor && contentJSON.sensor.gnss !== undefined) {
         deviceType = "CANmod.gps"
       } 
       if (contentJSON.sensor && contentJSON.sensor.channel_1 && contentJSON.sensor.channel_1.digital_low !== undefined) {
@@ -291,7 +291,7 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
       // )
 
       let schemaAryFiltered = schemaAry.filter((e) =>
-        (e.includes(selectedConfig.substr(7, 5)))
+        (e.includes(selectedConfig.substr(7, 5)) || (deviceType && deviceType.startsWith('CANmod') && e.includes(deviceType)))
       )
 
 

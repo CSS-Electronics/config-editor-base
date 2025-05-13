@@ -13,7 +13,7 @@ import * as actionsAlert from "../alert/actions";
 import AlertContainer from "../alert/AlertContainer";
 
 // define editor title and version
-const TYPE = "CANedge"
+const TYPE = "CANmod"
 const title = TYPE + " config editor"
 const version = "v2.7.4"
 
