@@ -1,0 +1,106 @@
+{
+  "navConf": {
+    "order": [
+      "PHY",
+      "SENSOR",
+      "OUTPUT"
+    ]
+  },
+  "phy": {
+    "nav": "PHY",
+    "can": {
+      "bit_rate_cfg_mode": {},
+      "bit_rate_std": {
+        "classNames": "col-sm-6"
+      },
+      "bit_rate_fd": {
+        "classNames": "col-sm-6"
+      },
+      "brp": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      },
+      "seg1": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      },
+      "seg2": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      },
+      "sjw": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      }
+    }
+  },
+  "sensor": {
+    "nav": "SENSOR",
+    "top_left": {
+      "classNames": "col-sm-3"
+    },
+    "top_right": {
+      "classNames": "col-sm-3"
+    },
+    "bottom_left": {
+      "classNames": "col-sm-3"
+    },
+    "bottom_right": {
+      "classNames": "col-sm-3"
+    }
+  },
+  "output": {
+    "nav": "OUTPUT",
+    "thermocouple": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "thermocouple_hr_top": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "thermocouple_hr_bottom": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    }
+  }
+}

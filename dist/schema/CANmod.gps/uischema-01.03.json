@@ -1,0 +1,250 @@
+{
+  "navConf": {
+    "order": [
+      "PHY",
+      "SENSOR",
+      "OUTPUT"
+    ]
+  },
+  "phy": {
+    "nav": "PHY",
+    "can": {
+      "bit_rate_cfg_mode": {},
+      "bit_rate_std": {
+        "classNames": "col-sm-6"
+      },
+      "bit_rate_fd": {
+        "classNames": "col-sm-6"
+      },
+      "brp": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      },
+      "seg1": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      },
+      "seg2": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      },
+      "sjw": {
+        "ui:widget": "updown",
+        "classNames": "col-sm-3"
+      }
+    }
+  },
+  "sensor": {
+    "nav": "SENSOR",
+    "gnss": {},
+    "imu_mount_alignment": {
+      "z": {
+        "classNames": "col-sm-4"
+      },
+      "y": {
+        "classNames": "col-sm-4"
+      },
+      "x": {
+        "classNames": "col-sm-4"
+      }
+    },
+    "geofence": {
+      "nav": "GEOFENCE",
+      "items": {
+        "lat": {
+          "classNames": "col-sm-4"
+        },
+        "lon": {
+          "classNames": "col-sm-4"
+        },
+        "radius": {
+          "classNames": "col-sm-4"
+        }
+      }
+    },
+    "dyn_model": {},
+    "sensor_fusion": {},
+    "lever_arm": {
+      "vrp_to_ant": {
+        "classNames": "col-sm-6",
+        "leverarm_x": {
+          "classNames": "col-sm-4"
+        },
+        "leverarm_y": {
+          "classNames": "col-sm-4"
+        },
+        "leverarm_z": {
+          "classNames": "col-sm-4"
+        }
+      },
+      "vrp_to_imu": {
+        "classNames": "col-sm-6",
+        "leverarm_x": {
+          "classNames": "col-sm-4"
+        },
+        "leverarm_y": {
+          "classNames": "col-sm-4"
+        },
+        "leverarm_z": {
+          "classNames": "col-sm-4"
+        }
+      }
+    }
+  },
+  "output": {
+    "nav": "OUTPUT",
+    "status": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "time": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "position": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "altitude": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "attitude": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "odo": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "speed": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "geofence": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "imu": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    }
+  }
+}

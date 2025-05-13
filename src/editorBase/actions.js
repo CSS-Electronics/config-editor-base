@@ -285,20 +285,34 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         deviceType = "CANmod.temp"
       }
 
-      // filter schema list based on FW major/minor version
-      // let schemaAryFiltered = schemaAry.filter((e) =>
-      //   (e.includes(selectedConfig.substr(7, 5)) || e.includes(deviceType))
-      // )
+      // Get the version from the selected config
+      const version = selectedConfig.substr(7, 5);
 
-      let schemaAryFiltered = schemaAry.filter((e) =>
-        (e.includes(selectedConfig.substr(7, 5)) || (deviceType && deviceType.startsWith('CANmod') && e.includes(deviceType)))
-      )
+      // Filter schema list based on both version and device type
+      let schemaAryFiltered = schemaAry.filter((e) => {
+        // For all devices, first match the version
+        if (!e.includes(version)) return false;
+        
+        // For CANmod devices, also match the specific device type
+        if (deviceType && deviceType.startsWith('CANmod')) {
+          return e.includes(deviceType);
+        }
+        
+        return true;
+      });
 
-
-      // filter uischema list based on FW major/minor version
-      let uiSchemaAryFiltered = uiSchemaAry.filter((e) =>
-      (e.includes(selectedConfig.substr(7, 5))
-      ))
+      // Filter uischema list based on both version and device type
+      let uiSchemaAryFiltered = uiSchemaAry.filter((e) => {
+        // For all devices, first match the version
+        if (!e.includes(version)) return false;
+        
+        // For CANmod devices, also match the specific device type
+        if (deviceType && deviceType.startsWith('CANmod')) {
+          return e.includes(deviceType);
+        }
+        
+        return true;
+      });
 
       // filter schema list to exclude GNSS variants if no GNSS deviceType is selected
       if (!deviceType.includes("GNSS")) {

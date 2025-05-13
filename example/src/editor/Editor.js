@@ -13,18 +13,21 @@ import * as actionsAlert from "../alert/actions";
 import AlertContainer from "../alert/AlertContainer";
 
 // define editor title and version
-const TYPE = "CANmod"
+const TYPE = "CANedge"
 const title = TYPE + " config editor"
-const version = "v2.7.4"
+const version = "v2.7.9"
 
 // define UIschema and Rule Schema names for auto-loading purposes
 export const uiSchemaAry = {"CANedge": [
   "uischema-01.09.json | Simple",
   "uischema-01.09.json | Advanced"
 ], "CANmod": [
+  "uischema-01.03.json | CANmod.gps",
   "uischema-01.04.json | CANmod.gps",
   "uischema-01.04.json | CANmod.input",
+  "uischema-01.01.json | CANmod.router",
   "uischema-01.02.json | CANmod.router",
+  "uischema-01.04.json | CANmod.temp",
   "uischema-01.05.json | CANmod.temp"
 ]}
 
@@ -47,9 +50,12 @@ export const schemaAry = {"CANedge": [
   "schema-01.09.json | CANedge2 GNSS",
   "schema-01.09.json | CANedge1 GNSS"
 ], "CANmod": [
+  "schema-01.03.json | CANmod.gps",
   "schema-01.04.json | CANmod.gps",
   "schema-01.04.json | CANmod.input",
+  "schema-01.01.json | CANmod.router",
   "schema-01.02.json | CANmod.router",
+  "schema-01.04.json | CANmod.temp",
   "schema-01.05.json | CANmod.temp"
 ]}
 
