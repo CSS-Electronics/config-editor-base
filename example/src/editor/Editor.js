@@ -19,12 +19,12 @@ const version = "v2.7.4"
 
 // define UIschema and Rule Schema names for auto-loading purposes
 export const uiSchemaAry = {"CANedge": [
-  "uischema-01.06.json | Simple",
-  "uischema-01.06.json | Advanced",
-  "uischema-01.07.json | Simple",
-  "uischema-01.07.json | Advanced",
-  "uischema-01.08.json | Simple",
-  "uischema-01.08.json | Advanced",
+  // "uischema-01.06.json | Simple",
+  // "uischema-01.06.json | Advanced",
+  // "uischema-01.07.json | Simple",
+  // "uischema-01.07.json | Advanced",
+  // "uischema-01.08.json | Simple",
+  // "uischema-01.08.json | Advanced",
   "uischema-01.09.json | Simple",
   "uischema-01.09.json | Advanced"
 ], "CANmod": []}
