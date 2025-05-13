@@ -19,15 +19,14 @@ const version = "v2.7.4"
 
 // define UIschema and Rule Schema names for auto-loading purposes
 export const uiSchemaAry = {"CANedge": [
-  // "uischema-01.06.json | Simple",
-  // "uischema-01.06.json | Advanced",
-  // "uischema-01.07.json | Simple",
-  // "uischema-01.07.json | Advanced",
-  // "uischema-01.08.json | Simple",
-  // "uischema-01.08.json | Advanced",
   "uischema-01.09.json | Simple",
   "uischema-01.09.json | Advanced"
-], "CANmod": []}
+], "CANmod": [
+  "uischema-01.04.json | CANmod.gps",
+  "uischema-01.04.json | CANmod.input",
+  "uischema-01.02.json | CANmod.router",
+  "uischema-01.05.json | CANmod.temp"
+]}
 
 export const schemaAry = {"CANedge": [
   "schema-01.06.json | CANedge2",
@@ -47,9 +46,14 @@ export const schemaAry = {"CANedge": [
   "schema-01.09.json | CANedge3 GNSS",
   "schema-01.09.json | CANedge2 GNSS",
   "schema-01.09.json | CANedge1 GNSS"
-], "CANmod":[]}
+], "CANmod": [
+  "schema-01.04.json | CANmod.gps",
+  "schema-01.04.json | CANmod.input",
+  "schema-01.02.json | CANmod.router",
+  "schema-01.05.json | CANmod.temp"
+]}
 
-export const demoMode = true
+export const demoMode = false
 
 class Editor extends React.Component {
   render() {

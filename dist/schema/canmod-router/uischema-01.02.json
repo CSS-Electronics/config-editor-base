@@ -1,0 +1,817 @@
+{
+  "navConf": {
+    "order": [
+      "CAN Primary (P)",
+      "CAN Secondary 1 (S1)",
+      "CAN Secondary 2 (S2)",
+      "CAN Secondary 3 (S3)",
+      "CAN Secondary 4 (S4)"
+    ]
+  },
+  "phy": {
+    "nav": null,
+    "can": {
+      "phy": {
+        "mode": {
+          "classNames": "col-sm-6"
+        },
+        "retransmission": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_cfg_mode": {
+          "classNames": "col-sm-12"
+        },
+        "bit_rate_std": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_fd": {
+          "classNames": "col-sm-6"
+        },
+        "brp": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg1": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg2": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "sjw": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        }
+      },
+      "ui:title": " ",
+      "nav": [
+        "CAN Primary (P)"
+      ],
+      "route": {
+        "mux": {
+          "p2s": {
+            "items": {
+              "id_format": {
+                "classNames": "col-sm-6"
+              },
+              "id": {
+                "classNames": "col-sm-6"
+              }
+            }
+          },
+          "s2p": {
+            "filter": {
+              "classNames": "col-sm-12",
+              "rx_msg": {
+                "classNames": "col-sm-4"
+              },
+              "tx_ack": {
+                "classNames": "col-sm-4"
+              },
+              "err": {
+                "classNames": "col-sm-4"
+              }
+            },
+            "message": {
+              "classNames": "col-sm-12",
+              "id_format": {
+                "classNames": "col-sm-3"
+              },
+              "id": {
+                "classNames": "col-sm-3"
+              },
+              "frame_format": {
+                "classNames": "col-sm-3"
+              },
+              "brs": {
+                "classNames": "col-sm-3"
+              }
+            }
+          }
+        },
+        "direct": {
+          "p2s": {
+            "can_s1": {
+              "filter": {
+                "items": {
+                  "id_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "frame_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "method": {
+                    "classNames": "col-sm-2"
+                  },
+                  "f1": {
+                    "classNames": "col-sm-3"
+                  },
+                  "f2": {
+                    "classNames": "col-sm-3"
+                  }
+                }
+              }
+            },
+            "can_s2": {
+              "filter": {
+                "items": {
+                  "id_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "frame_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "method": {
+                    "classNames": "col-sm-2"
+                  },
+                  "f1": {
+                    "classNames": "col-sm-3"
+                  },
+                  "f2": {
+                    "classNames": "col-sm-3"
+                  }
+                }
+              }
+            },
+            "can_s3": {
+              "filter": {
+                "items": {
+                  "id_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "frame_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "method": {
+                    "classNames": "col-sm-2"
+                  },
+                  "f1": {
+                    "classNames": "col-sm-3"
+                  },
+                  "f2": {
+                    "classNames": "col-sm-3"
+                  }
+                }
+              }
+            },
+            "can_s4": {
+              "filter": {
+                "items": {
+                  "id_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "frame_format": {
+                    "classNames": "col-sm-2"
+                  },
+                  "method": {
+                    "classNames": "col-sm-2"
+                  },
+                  "f1": {
+                    "classNames": "col-sm-3"
+                  },
+                  "f2": {
+                    "classNames": "col-sm-3"
+                  }
+                }
+              }
+            }
+          },
+          "s2p": {
+            "can_s1": {
+              "map": {
+                "items": {
+                  "from": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f2": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    }
+                  },
+                  "to": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    }
+                  }
+                }
+              }
+            },
+            "can_s2": {
+              "map": {
+                "items": {
+                  "from": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f2": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    }
+                  },
+                  "to": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    }
+                  }
+                }
+              }
+            },
+            "can_s3": {
+              "map": {
+                "items": {
+                  "from": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f2": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    }
+                  },
+                  "to": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    }
+                  }
+                }
+              }
+            },
+            "can_s4": {
+              "map": {
+                "items": {
+                  "from": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    },
+                    "f2": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-4"
+                    }
+                  },
+                  "to": {
+                    "classNames": "col-sm-6",
+                    "id_format": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    },
+                    "f1": {
+                      "ui:title": " ",
+                      "classNames": "col-sm-6"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ui:title": " ",
+    "can_s1": {
+      "phy": {
+        "mode": {
+          "classNames": "col-sm-6"
+        },
+        "retransmission": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_cfg_mode": {
+          "classNames": "col-sm-12"
+        },
+        "bit_rate_std": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_fd": {
+          "classNames": "col-sm-6"
+        },
+        "brp": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg1": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg2": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "sjw": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        }
+      },
+      "filter": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-2"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "f1": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "f2": {
+            "ui:title": " ",
+            "ui:placeholder": "Mask (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "prescaler_type": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "prescaler_value": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "transmit": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-1"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "brs": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "period": {
+            "ui:title": " ",
+            "ui:placeholder": "Period",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "delay": {
+            "ui:title": " ",
+            "ui:placeholder": "Delay",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "id": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "data": {
+            "ui:title": " ",
+            "ui:placeholder": "Data (HEX), e.g. 020C",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "ui:title": " ",
+      "nav": [
+        "CAN Secondary 1 (S1)"
+      ]
+    },
+    "can_s2": {
+      "phy": {
+        "mode": {
+          "classNames": "col-sm-6"
+        },
+        "retransmission": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_cfg_mode": {
+          "classNames": "col-sm-12"
+        },
+        "bit_rate_std": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_fd": {
+          "classNames": "col-sm-6"
+        },
+        "brp": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg1": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg2": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "sjw": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        }
+      },
+      "filter": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-2"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "f1": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "f2": {
+            "ui:title": " ",
+            "ui:placeholder": "Mask (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "prescaler_type": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "prescaler_value": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "transmit": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-1"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "brs": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "period": {
+            "ui:title": " ",
+            "ui:placeholder": "Period",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "delay": {
+            "ui:title": " ",
+            "ui:placeholder": "Delay",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "id": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "data": {
+            "ui:title": " ",
+            "ui:placeholder": "Data (HEX), e.g. 020C",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "ui:title": " ",
+      "nav": [
+        "CAN Secondary 2 (S2)"
+      ]
+    },
+    "can_s3": {
+      "phy": {
+        "mode": {
+          "classNames": "col-sm-6"
+        },
+        "retransmission": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_cfg_mode": {
+          "classNames": "col-sm-12"
+        },
+        "bit_rate_std": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_fd": {
+          "classNames": "col-sm-6"
+        },
+        "brp": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg1": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg2": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "sjw": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        }
+      },
+      "filter": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-2"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "f1": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "f2": {
+            "ui:title": " ",
+            "ui:placeholder": "Mask (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "prescaler_type": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "prescaler_value": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "transmit": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-1"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "brs": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "period": {
+            "ui:title": " ",
+            "ui:placeholder": "Period",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "delay": {
+            "ui:title": " ",
+            "ui:placeholder": "Delay",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "id": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "data": {
+            "ui:title": " ",
+            "ui:placeholder": "Data (HEX), e.g. 020C",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "ui:title": " ",
+      "nav": [
+        "CAN Secondary 3 (S3)"
+      ]
+    },
+    "can_s4": {
+      "phy": {
+        "mode": {
+          "classNames": "col-sm-6"
+        },
+        "retransmission": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_cfg_mode": {
+          "classNames": "col-sm-12"
+        },
+        "bit_rate_std": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_fd": {
+          "classNames": "col-sm-6"
+        },
+        "brp": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg1": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg2": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "sjw": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        }
+      },
+      "filter": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-2"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "f1": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "f2": {
+            "ui:title": " ",
+            "ui:placeholder": "Mask (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "prescaler_type": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "prescaler_value": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "transmit": {
+        "items": {
+          "name": {
+            "ui:title": " ",
+            "ui:placeholder": "Name",
+            "classNames": "col-sm-1"
+          },
+          "state": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "id_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-2"
+          },
+          "frame_format": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "brs": {
+            "ui:title": " ",
+            "classNames": "col-sm-1"
+          },
+          "period": {
+            "ui:title": " ",
+            "ui:placeholder": "Period",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "delay": {
+            "ui:title": " ",
+            "ui:placeholder": "Delay",
+            "ui:widget": "updown",
+            "classNames": "col-sm-1"
+          },
+          "id": {
+            "ui:title": " ",
+            "ui:placeholder": "ID (HEX)",
+            "classNames": "col-sm-2"
+          },
+          "data": {
+            "ui:title": " ",
+            "ui:placeholder": "Data (HEX), e.g. 020C",
+            "classNames": "col-sm-2"
+          }
+        }
+      },
+      "ui:title": " ",
+      "nav": [
+        "CAN Secondary 4 (S4)"
+      ]
+    }
+  },
+  "sensor": null,
+  "output": null
+}

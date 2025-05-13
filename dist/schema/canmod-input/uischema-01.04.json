@@ -1,0 +1,411 @@
+{
+  "navConf": {
+    "order": [
+      "PHY",
+      "SENSOR",
+      "OUTPUT"
+    ]
+  },
+  "phy": {
+    "nav": "PHY",
+    "can": {
+      "phy": {
+        "mode": {
+          "classNames": "col-sm-6"
+        },
+        "retransmission": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_cfg_mode": {
+          "classNames": "col-sm-12"
+        },
+        "bit_rate_std": {
+          "classNames": "col-sm-6"
+        },
+        "bit_rate_fd": {
+          "classNames": "col-sm-6"
+        },
+        "brp": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg1": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "seg2": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        },
+        "sjw": {
+          "ui:widget": "updown",
+          "classNames": "col-sm-3"
+        }
+      },
+      "ui:title": " "
+    },
+    "ui:title": " "
+  },
+  "sensor": {
+    "nav": "SENSOR",
+    "channel_1": {
+      "range": {
+        "classNames": "col-sm-2"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_2": {
+      "range": {
+        "classNames": "col-sm-2",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_3": {
+      "range": {
+        "classNames": "col-sm-2"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_4": {
+      "range": {
+        "classNames": "col-sm-2",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_5": {
+      "range": {
+        "classNames": "col-sm-2"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_6": {
+      "range": {
+        "classNames": "col-sm-2",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_7": {
+      "range": {
+        "classNames": "col-sm-2"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "channel_8": {
+      "range": {
+        "classNames": "col-sm-2",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "digital_high": {
+        "classNames": "col-sm-2"
+      },
+      "digital_low": {
+        "classNames": "col-sm-2"
+      },
+      "pulse_mode": {
+        "classNames": "col-sm-3",
+        "ui:disabled": true,
+        "ui:help": "Uses value from primary channel"
+      },
+      "pulse_count": {
+        "classNames": "col-sm-3"
+      }
+    }
+  },
+  "output": {
+    "nav": "OUTPUT",
+    "digital_1_8": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "analog_1_4": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "analog_5_8": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "analog_1_8_fd": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_8bit_1_8": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_16bit_1_4": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_16bit_5_8": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_32bit_1_2": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_32bit_3_4": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_32bit_5_6": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_32bit_7_8": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    },
+    "pulse_32bit_1_8_fd": {
+      "state": {
+        "classNames": "col-sm-2"
+      },
+      "id_format": {
+        "classNames": "col-sm-2"
+      },
+      "id": {
+        "classNames": "col-sm-3"
+      },
+      "trigger": {
+        "classNames": "col-sm-2"
+      },
+      "scaler": {
+        "classNames": "col-sm-3"
+      }
+    }
+  }
+}

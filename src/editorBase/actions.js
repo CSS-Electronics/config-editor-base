@@ -271,11 +271,28 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         deviceType = "CANedge3 GNSS"
       }
 
+      // Check for CANmod variants
+      if (contentJSON.gnss !== undefined) {
+        deviceType = "CANmod.gps"
+      } 
+      if (contentJSON.sensor && contentJSON.sensor.channel_1 && contentJSON.sensor.channel_1.digital_low !== undefined) {
+        deviceType = "CANmod.input"
+      }
+      if (contentJSON.phy && contentJSON.phy.can && contentJSON.phy.can.route) {
+        deviceType = "CANmod.router"
+      }
+      if (contentJSON.sensor && contentJSON.sensor.top_left && contentJSON.sensor.top_left.type !== undefined) {
+        deviceType = "CANmod.temp"
+      }
 
       // filter schema list based on FW major/minor version
+      // let schemaAryFiltered = schemaAry.filter((e) =>
+      //   (e.includes(selectedConfig.substr(7, 5)) || e.includes(deviceType))
+      // )
+
       let schemaAryFiltered = schemaAry.filter((e) =>
-      (e.includes(selectedConfig.substr(7, 5))
-      ))
+        (e.includes(selectedConfig.substr(7, 5)))
+      )
 
 
       // filter uischema list based on FW major/minor version
