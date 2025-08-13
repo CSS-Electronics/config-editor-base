@@ -975,9 +975,6 @@
           "classNames": "col-sm-3"
         }
       }
-    },
-    "protocol": {
-      "ui:disabled": true
     }
   },
   "gnss": {

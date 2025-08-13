@@ -911,6 +911,29 @@ export const checkGNSSEstimate = (content) => {
   }
 }
 
+
+// ------------------------------------------------------------
+
+
+export const checkCANmodMonitoringMode = (content) => {
+  return function (dispatch) {
+    // Check if the CANmod configuration exists and has a mode setting
+    if (content.phy?.can?.phy?.mode !== undefined) {
+      // If mode is not 0 (Normal), show a warning
+      if (content.phy.can.phy.mode !== 0) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your CANmod primary CAN bus mode must be set to 'Normal' if you want the CANmod to output CAN messages",
+            autoClear: false,
+          })
+        );
+      }
+    }
+  };
+}
+
+
 // -------------------------------------------------------
 // CONFIGURATION FILE:
 export const saveUpdatedConfiguration = (filename, content) => {
@@ -941,6 +964,10 @@ export const saveUpdatedConfiguration = (filename, content) => {
       dispatch(checkIncorrectRoamingSuperSIM(content))
       dispatch(checkConfigControlSignalZeroScalingFactor(content))
     }
+
+    // if CANmod, warn if unexpected content in Configuration File 
+    dispatch(checkCANmodMonitoringMode(content))
+
 
     dispatch(setConfigContent(content));
     let blob = new Blob([JSON.stringify(content, null, 2)], {
