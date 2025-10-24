@@ -237,6 +237,9 @@ export class EditorSection extends React.Component {
         )}`
 
         if (this.state.isCompareChanges === false) {
+          // Run all configuration warning checks when Review Changes button is clicked
+          this.props.runConfigurationWarningChecks(formData)
+          
           this.setState({
             isCompareChanges: true,
             revisedConfigFile: {
@@ -497,7 +500,9 @@ const mapDispatchToProps = (dispatch) => {
     publicUiSchemaFiles: (uiSchemaAry, schemaAry, demoMode) =>
       dispatch(
         actionsEditor.publicUiSchemaFiles(uiSchemaAry, schemaAry, demoMode)
-      )
+      ),
+    runConfigurationWarningChecks: (content) =>
+      dispatch(actionsEditor.runConfigurationWarningChecks(content))
   }
 }
 
