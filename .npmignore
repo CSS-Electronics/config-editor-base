@@ -1,0 +1,34 @@
+# dependencies
+node_modules
+
+# source files (not needed in published package)
+src
+example
+test-files
+
+# config files
+.editorconfig
+.eslintignore
+.eslintrc
+.prettierrc
+.travis.yml
+.gitignore
+.git
+
+# build artifacts we don't need
+.rpt2_cache
+
+# misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Keep dist folder with ALL files for npm package
+# (don't exclude dist/index* like .gitignore does)
