@@ -1,0 +1,383 @@
+{
+  "log": {
+    "error_frames": {
+      "state": 1
+    }
+  },
+  "can_1": {
+    "general": {
+      "rx_state": 1,
+      "tx_state": 1
+    },
+    "phy": {
+      "mode": 0,
+      "retransmission": 1,
+      "fd_spec": 0,
+      "bit_rate_cfg_mode": 1,
+      "bit_rate_std": 500000,
+      "bit_rate_fd": 1000000
+    },
+    "transmit": [
+      {
+        "name": "11_OBD_SP_01_20",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 5000,
+        "id": "7DF",
+        "data": "0201005555555555"
+      },
+      {
+        "name": "11_OBD_SP_21_40",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 5500,
+        "id": "7DF",
+        "data": "0201205555555555"
+      },
+      {
+        "name": "11_OBD_SP_41_60",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 6000,
+        "id": "7DF",
+        "data": "0201405555555555"
+      },
+      {
+        "name": "11_OBD_SP_61_80",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 6500,
+        "id": "7DF",
+        "data": "0201605555555555"
+      },
+      {
+        "name": "11_OBD_SP_81_A0",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 7000,
+        "id": "7DF",
+        "data": "0201805555555555"
+      },
+      {
+        "name": "11_OBD_SP_A1_C0",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 7500,
+        "id": "7DF",
+        "data": "0201A05555555555"
+      },
+      {
+        "name": "11_OBD_SP_C1_E0",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 8000,
+        "id": "7DF",
+        "data": "0201C05555555555"
+      },	  
+	  {
+        "name": "29_OBD_SP_01_20",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 15000,
+        "id": "18DB33F1",
+        "data": "0201005555555555"
+      },
+      {
+        "name": "29_OBD_SP_21_40",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 15500,
+        "id": "18DB33F1",
+        "data": "0201205555555555"
+      },
+      {
+        "name": "29_OBD_SP_41_60",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 16000,
+        "id": "18DB33F1",
+        "data": "0201405555555555"
+      },
+      {
+        "name": "29_OBD_SP_61_80",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 16500,
+        "id": "18DB33F1",
+        "data": "0201605555555555"
+      },
+      {
+        "name": "29_OBD_SP_81_A0",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 17000,
+        "id": "18DB33F1",
+        "data": "0201805555555555"
+      },
+      {
+        "name": "29_OBD_SP_A1_C0",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 17500,
+        "id": "18DB33F1",
+        "data": "0201A05555555555"
+      },
+      {
+        "name": "29_OBD_SP_C1_E0",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 18000,
+        "id": "18DB33F1",
+        "data": "0201C05555555555"
+      },
+	  {
+        "name": "11_OBDU_SP_01_20",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 25000,
+        "id": "7DF",
+        "data": "0322F40055555555"
+      },
+      {
+        "name": "11_OBDU_SP_21_40",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 25500,
+        "id": "7DF",
+        "data": "0322F42055555555"
+      },
+      {
+        "name": "11_OBDU_SP_41_60",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 26000,
+        "id": "7DF",
+        "data": "0322F44055555555"
+      },
+      {
+        "name": "11_OBDU_SP_61_80",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 26500,
+        "id": "7DF",
+        "data": "0322F46055555555"
+      },
+      {
+        "name": "11_OBDU_SP_81_A0",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 27000,
+        "id": "7DF",
+        "data": "0322F48055555555"
+      },
+      {
+        "name": "11_OBDU_SP_A1_C0",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 27500,
+        "id": "7DF",
+        "data": "0322F4A055555555"
+      },
+      {
+        "name": "11_OBDU_SP_C1_E0",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 28000,
+        "id": "7DF",
+        "data": "0322F4C055555555"
+      },
+	  {
+        "name": "11_OBDU_PROTOCOL",
+        "state": 1,
+        "id_format": 0,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 28500,
+        "id": "7DF",
+        "data": "0322F81055555555"
+      },
+	  {
+        "name": "29_OBDU_SP_01_20",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 35000,
+        "id": "18DB33F1",
+        "data": "0322F40055555555"
+      },
+      {
+        "name": "29_OBDU_SP_21_40",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 35500,
+        "id": "18DB33F1",
+        "data": "0322F42055555555"
+      },
+      {
+        "name": "29_OBDU_SP_41_60",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 36000,
+        "id": "18DB33F1",
+        "data": "0322F44055555555"
+      },
+      {
+        "name": "29_OBDU_SP_61_80",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 36500,
+        "id": "18DB33F1",
+        "data": "0322F46055555555"
+      },
+      {
+        "name": "29_OBDU_SP_81_A0",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 37000,
+        "id": "18DB33F1",
+        "data": "0322F48055555555"
+      },
+      {
+        "name": "29_OBDU_SP_A1_C0",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 37500,
+        "id": "18DB33F1",
+        "data": "0322F4A055555555"
+      },
+      {
+        "name": "29_OBDU_SP_C1_E0",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 38000,
+        "id": "18DB33F1",
+        "data": "0322F4C055555555"
+      },
+	  {
+        "name": "29_OBDU_PROTOCOL",
+        "state": 1,
+        "id_format": 1,
+        "frame_format": 0,
+        "brs": 0,
+        "log": 1,
+        "period": 0,
+        "delay": 38500,
+        "id": "18DB33F1",
+        "data": "0322F81055555555"
+      }
+    ]
+  }
+}

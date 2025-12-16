@@ -1,0 +1,1437 @@
+[
+  {
+    "service": "01",
+    "pid": "00",
+    "description": "PIDs supported [01 - 20]",
+    "name": "PIDs_01_20",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "01",
+    "description": "Monitor status since DTCs cleared",
+    "name": "MonitorStatus",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "02",
+    "description": "Freeze DTC",
+    "name": "FreezeDTC",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "03",
+    "description": "Fuel system status",
+    "name": "FuelSystemStatus",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "04",
+    "description": "Calculated engine load",
+    "name": "CalcEngineLoad",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "05",
+    "description": "Engine coolant temperature",
+    "name": "EngCooTem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "06",
+    "description": "Short term fuel trim (bank 1)",
+    "name": "ShoFueTriBan1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "07",
+    "description": "Long term fuel trim (bank 1)",
+    "name": "LonFueTriBan1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "08",
+    "description": "Short term fuel trim (bank 2)",
+    "name": "ShoFueTriBan2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "09",
+    "description": "Long term fuel trim (bank 2)",
+    "name": "LonFueTriBan2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0A",
+    "description": "Fuel pressure (gauge pressure)",
+    "name": "FuelPressure",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0B",
+    "description": "Intake manifold absolute pressure",
+    "name": "IntManAbsPre",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0C",
+    "description": "Engine speed",
+    "name": "EngineRPM",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0D",
+    "description": "Vehicle speed",
+    "name": "VehicleSpeed",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0E",
+    "description": "Timing advance",
+    "name": "TimingAdvance",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0F",
+    "description": "Intake air temperature",
+    "name": "IntAirTem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0A",
+    "description": "Mass air flow sensor air flow rate",
+    "name": "MAFAirFlowRate",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0B",
+    "description": "Throttle position",
+    "name": "ThrottlePosition",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0C",
+    "description": "Commanded secondary air status",
+    "name": "CmdSecAirStatus",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0D",
+    "description": "Oxygen sensors present (2 banks)",
+    "name": "OxyS_2Ban",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0E",
+    "description": "Oxygen sensor 1 (voltage)",
+    "name": "OxySensor1_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0E",
+    "description": "Oxygen sensor 1 (short term fuel trim)",
+    "name": "OxySensor1_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0F",
+    "description": "Oxygen sensor 2 (voltage)",
+    "name": "OxySensor2_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "0F",
+    "description": "Oxygen sensor 2 (short term fuel trim)",
+    "name": "OxySensor2_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "10",
+    "description": "Oxygen sensor 3 (voltage)",
+    "name": "OxySensor3_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "10",
+    "description": "Oxygen sensor 3 (short term fuel trim)",
+    "name": "OxySensor3_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "11",
+    "description": "Oxygen sensor 4 (voltage)",
+    "name": "OxySensor4_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "11",
+    "description": "Oxygen sensor 4 (short term fuel trim)",
+    "name": "OxySensor4_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "12",
+    "description": "Oxygen sensor 5 (voltage)",
+    "name": "OxySensor5_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "12",
+    "description": "Oxygen sensor 5 (short term fuel trim)",
+    "name": "OxySensor5_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "13",
+    "description": "Oxygen sensor 6 (voltage)",
+    "name": "OxySensor6_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "13",
+    "description": "Oxygen sensor 6 (short term fuel trim)",
+    "name": "OxySensor6_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1A",
+    "description": "Oxygen sensor 7 (voltage)",
+    "name": "OxySensor7_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1A",
+    "description": "Oxygen sensor 7 (short term fuel trim)",
+    "name": "OxySensor7_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1B",
+    "description": "Oxygen sensor 8 (voltage)",
+    "name": "OxySensor8_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1B",
+    "description": "Oxygen sensor 9 (short term fuel trim)",
+    "name": "OxySensor8_STFT",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1C",
+    "description": "OBD standards the vehicle conforms to",
+    "name": "OBDStandard",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1D",
+    "description": "Oxygen sensors present (4 banks)",
+    "name": "OxyS_4Ban",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1E",
+    "description": "Auxiliary input status",
+    "name": "AuxInpSta",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1F",
+    "description": "Run time since engine start",
+    "name": "TimSinEngSta",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "14",
+    "description": "PIDs supported [21 - 40]",
+    "name": "PIDs_21_40",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "15",
+    "description": "Distance traveled with MIL on",
+    "name": "DistanceMILOn",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "16",
+    "description": "Fuel rail pres. (rel. to manifold vacuum)",
+    "name": "FuelRailPres",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "17",
+    "description": "Fuel rail gauge pres. (diesel, gas inject)",
+    "name": "FuelRailGaug",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "18",
+    "description": "Oxygen sensor 1 (air-fuel equiv. ratio)",
+    "name": "OxySensor1_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "18",
+    "description": "Oxygen sensor 1 (voltage)",
+    "name": "OxySensor1_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "19",
+    "description": "Oxygen sensor 2 (air-fuel equiv. ratio)",
+    "name": "OxySensor2_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "19",
+    "description": "Oxygen sensor 2 (voltage)",
+    "name": "OxySensor2_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1A",
+    "description": "Oxygen sensor 3 (air-fuel equiv. ratio)",
+    "name": "OxySensor3_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1A",
+    "description": "Oxygen sensor 3 (voltage)",
+    "name": "OxySensor3_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1B",
+    "description": "Oxygen sensor 4 (air-fuel equiv. ratio)",
+    "name": "OxySensor4_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1B",
+    "description": "Oxygen sensor 4 (voltage)",
+    "name": "OxySensor4_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1C",
+    "description": "Oxygen sensor 5 (air-fuel equiv. ratio)",
+    "name": "OxySensor5_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1C",
+    "description": "Oxygen sensor 5 (voltage)",
+    "name": "OxySensor5_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1D",
+    "description": "Oxygen sensor 6 (air-fuel equiv. ratio)",
+    "name": "OxySensor6_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1D",
+    "description": "Oxygen sensor 6 (voltage)",
+    "name": "OxySensor6_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2A",
+    "description": "Oxygen sensor 7 (air-fuel equiv. ratio)",
+    "name": "OxySensor7_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2A",
+    "description": "Oxygen sensor 7 (voltage)",
+    "name": "OxySensor7_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2B",
+    "description": "Oxygen sensor 8 (air-fuel equiv. ratio)",
+    "name": "OxySensor8_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2B",
+    "description": "Oxygen sensor 8 (voltage)",
+    "name": "OxySensor8_Volt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2C",
+    "description": "Commanded EGR",
+    "name": "CmdEGR",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2D",
+    "description": "EGR Error",
+    "name": "EGRError",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2E",
+    "description": "Commanded evaporative purge",
+    "name": "CmdEvapPurge",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2F",
+    "description": "Fuel tank level input",
+    "name": "FuelTankLevel",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1E",
+    "description": "Warmups since DTCs cleared",
+    "name": "WarUpsSinCodCle",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "1F",
+    "description": "Distance traveled since DTCs cleared",
+    "name": "DisSinCodCle",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "20",
+    "description": "Evap. system vapor pressure",
+    "name": "EvapSysVaporPres",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "21",
+    "description": "Absolute barometric pressure",
+    "name": "AbsBaroPres",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "22",
+    "description": "Oxygen sensor 1 (air-fuel equiv. ratio)",
+    "name": "OxySensor1_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "22",
+    "description": "Oxygen sensor 1 (current)",
+    "name": "OxySensor1_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "23",
+    "description": "Oxygen sensor 2 (air-fuel equiv. ratio)",
+    "name": "OxySensor2_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "23",
+    "description": "Oxygen sensor 2 (current)",
+    "name": "OxySensor2_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "24",
+    "description": "Oxygen sensor 3 (air-fuel equiv. ratio)",
+    "name": "OxySensor3_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "24",
+    "description": "Oxygen sensor 3 (current)",
+    "name": "OxySensor3_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "25",
+    "description": "Oxygen sensor 4 (air-fuel equiv. ratio)",
+    "name": "OxySensor4_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "25",
+    "description": "Oxygen sensor 4 (current)",
+    "name": "OxySensor4_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "26",
+    "description": "Oxygen sensor 5 (air-fuel equiv. ratio)",
+    "name": "OxySensor5_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "26",
+    "description": "Oxygen sensor 5 (current)",
+    "name": "OxySensor5_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "27",
+    "description": "Oxygen sensor 6 (air-fuel equiv. ratio)",
+    "name": "OxySensor6_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "27",
+    "description": "Oxygen sensor 6 (current)",
+    "name": "OxySensor6_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3A",
+    "description": "Oxygen sensor 7 (air-fuel equiv. ratio)",
+    "name": "OxySensor7_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3A",
+    "description": "Oxygen sensor 7 (current)",
+    "name": "OxySensor7_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3B",
+    "description": "Oxygen sensor 8 (air-fuel equiv. ratio)",
+    "name": "OxySensor8_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3B",
+    "description": "Oxygen sensor 8 (current)",
+    "name": "OxySensor8_Crnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3C",
+    "description": "Catalyst temperature (bank 1, sensor 1)",
+    "name": "CatTemBan1Sen1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3D",
+    "description": "Catalyst temperature (bank 2, sensor 1)",
+    "name": "CatTemBan2Sen1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3E",
+    "description": "Catalyst temperature (bank 1, sensor 2)",
+    "name": "CatTemBan1Sen2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3F",
+    "description": "Catalyst temperature (bank 2, sensor 2)",
+    "name": "CatTemBan2Sen2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "28",
+    "description": "PIDs supported [41 - 60]",
+    "name": "PIDs_41_60",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "29",
+    "description": "Monitor status this drive cycle",
+    "name": "MonStaDriCyc",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2A",
+    "description": "Control module voltage",
+    "name": "ConModVol",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2B",
+    "description": "Absolute load value",
+    "name": "AbsLoadValue",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2C",
+    "description": "Commanded air-fuel equiv. ratio",
+    "name": "FuelAirCmdEquiv",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2D",
+    "description": "Relative throttle position",
+    "name": "RelThrottlePos",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2E",
+    "description": "Ambient air temperature",
+    "name": "AmbientAirTemp",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "2F",
+    "description": "Absolute throttle position B",
+    "name": "AbsThrottlePosB",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "30",
+    "description": "Absolute throttle position C",
+    "name": "AbsThrottlePosC",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "31",
+    "description": "Accelerator pedal position D",
+    "name": "AbsThrottlePosD",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4A",
+    "description": "Accelerator pedal position E",
+    "name": "AbsThrottlePosE",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4B",
+    "description": "Accelerator pedal position F",
+    "name": "AbsThrottlePosF",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4C",
+    "description": "Commanded throttle actuator",
+    "name": "CmdThrottleAct",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4D",
+    "description": "Time run with MIL on",
+    "name": "TimeRunMILOn",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4E",
+    "description": "Time since DTCs cleared",
+    "name": "TimSinCodCle",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4F",
+    "description": "Max fuel-air equiv. ratio",
+    "name": "Max_FAER",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4F",
+    "description": "Max oxygen sensor voltage",
+    "name": "Max_OxySensVol",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4F",
+    "description": "Max oxygen sensor current",
+    "name": "Max_OxySensCrnt",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4F",
+    "description": "Max intake manifold absolute pressure",
+    "name": "Max_IntM",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "32",
+    "description": "Max air flow rate from MAF sensor",
+    "name": "Max_AirFlowMAF",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "33",
+    "description": "Fuel type",
+    "name": "FuelType",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "34",
+    "description": "Ethanol fuel percentage",
+    "name": "EthanolFuelPct",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "35",
+    "description": "Absolute evap system vapor pressure",
+    "name": "AbsEvaSysVapPre",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "36",
+    "description": "Evap system vapor pressure",
+    "name": "EvapSysVapPres",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "37",
+    "description": "Short term sec. oxygen trim (bank 1)",
+    "name": "ShoSecOxyTriBan1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "37",
+    "description": "Short term sec. oxygen trim (bank 3)",
+    "name": "ShoSecOxyTriBan3",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "38",
+    "description": "Long term sec. oxygen trim (bank 1)",
+    "name": "LonSecOxyTriBan1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "38",
+    "description": "Long term sec. oxygen trim (bank 3)",
+    "name": "LonSecOxyTriBan3",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "39",
+    "description": "Short term sec. oxygen trim (bank 2)",
+    "name": "ShoSecOxyTriBan2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "39",
+    "description": "Short term sec. oxygen trim (bank 4)",
+    "name": "ShoSecOxyTriBan4",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3A",
+    "description": "Long term sec. oxygen trim (bank 2)",
+    "name": "LonSecOxyTriBan2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3A",
+    "description": "Long term sec. oxygen trim (bank 4)",
+    "name": "LonSecOxyTriBan4",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3B",
+    "description": "Fuel rail absolute pressure",
+    "name": "FuelRailAbsPres",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5A",
+    "description": "Relative accelerator pedal position",
+    "name": "RelAccelPedalPos",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5B",
+    "description": "Hybrid battery pack remaining life",
+    "name": "HybBatPacRemLif",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5C",
+    "description": "Engine oil temperature",
+    "name": "EngineOilTemp",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5D",
+    "description": "Fuel injection timing",
+    "name": "FueInjTim",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5E",
+    "description": "Engine fuel rate",
+    "name": "EngineFuelRate",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5F",
+    "description": "Emission requirements",
+    "name": "EmissionReq",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3C",
+    "description": "PIDs supported [61 - 80]",
+    "name": "PIDs_61_80",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3D",
+    "description": "Demanded engine percent torque",
+    "name": "DemandEngTorqPct",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3E",
+    "description": "Actual engine percent torque",
+    "name": "ActualEngTorqPct",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "3F",
+    "description": "Engine reference torque",
+    "name": "EngRefTorq",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "40",
+    "description": "Engine pct. torque (idle)",
+    "name": "EngPctTorq_Idle",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "40",
+    "description": "Engine pct. torque (engine point 1)",
+    "name": "EngPctTorq_EP1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "40",
+    "description": "Engine pct. torque (engine point 2)",
+    "name": "EngPctTorq_EP2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "40",
+    "description": "Engine pct. torque (engine point 3)",
+    "name": "EngPctTorq_EP3",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "40",
+    "description": "Engine pct. torque (engine point 4)",
+    "name": "EngPctTorq_EP4",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "41",
+    "description": "Auxiliary input/output supported",
+    "name": "AuxInputOutput",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "42",
+    "description": "Mass air flow sensor (A)",
+    "name": "MAFSensorA",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "42",
+    "description": "Mass air flow sensor (B)",
+    "name": "MAFSensorB",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "43",
+    "description": "Engine coolant temperature (sensor 1)",
+    "name": "EngCooTem1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "43",
+    "description": "Engine coolant temperature (sensor 2)",
+    "name": "EngCooTem2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "44",
+    "description": "Intake air temperature (sensor 1)",
+    "name": "IntAirTemSen1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "44",
+    "description": "Intake air temperature (sensor 2)",
+    "name": "IntAirTemSen2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "45",
+    "description": "Commanded EGR and EGR error",
+    "name": "CmdEGR_EGRError",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "6A",
+    "description": "Com. diesel intake air flow ctr/position",
+    "name": "CmdDieselIntAir",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "6B",
+    "description": "Exhaust gas recirculation temperature",
+    "name": "ExhaustGasTemp",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "6C",
+    "description": "Com. throttle actuator ctr./position",
+    "name": "CmdThrActRel",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "6D",
+    "description": "Fuel pressure control system",
+    "name": "FuelPresContrSys",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "6E",
+    "description": "Injection pressure control system",
+    "name": "InjPresContrSys",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "6F",
+    "description": "Turbocharger compressor inlet pres.",
+    "name": "TurboComprPres",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "46",
+    "description": "Boost pressure control",
+    "name": "BoostPresCntrl",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "47",
+    "description": "Variable geometry turbo control",
+    "name": "VarGeoTurVGTCtr",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "48",
+    "description": "Wastegate control",
+    "name": "WastegateControl",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "49",
+    "description": "Exhaust pressure",
+    "name": "ExhaustPressure",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4A",
+    "description": "Turbocharger RPM",
+    "name": "TurbochargerRpm",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4B",
+    "description": "Turbocharger temperature",
+    "name": "TurTem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4C",
+    "description": "Turbocharger temperature",
+    "name": "TurTem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4D",
+    "description": "Charge air cooler temperature",
+    "name": "ChaAirCooTem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4E",
+    "description": "EGT (bank 1)",
+    "name": "EGT_Bank1",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "4F",
+    "description": "EGT (bank 2)",
+    "name": "EGT_Bank2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "7A",
+    "description": "Diesel particulate filter - diff. pressure",
+    "name": "DPF_Diff",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "7B",
+    "description": "Diesel particulate filter",
+    "name": "DPF",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "7C",
+    "description": "Diesel particulate filter - temperature",
+    "name": "DPF_Temperature",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "7D",
+    "description": "NOx NTE control area status",
+    "name": "NOx_NTE_Cont",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "7E",
+    "description": "PM NTE control area status",
+    "name": "PM_NTE_Cont",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "7F",
+    "description": "Engine run time",
+    "name": "EngineRunTime",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "50",
+    "description": "PIDs supported [81 - A0]",
+    "name": "PIDs_81_A0",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "51",
+    "description": "Engine run time for AECD",
+    "name": "Engi_AECD",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "52",
+    "description": "Engine run time for AECD",
+    "name": "Engi_AECD",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "53",
+    "description": "NOx sensor",
+    "name": "NOxSensor",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "54",
+    "description": "Manifold surface temperature",
+    "name": "ManSurTem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "55",
+    "description": "NOx reagent system",
+    "name": "NOxReagentSystem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "56",
+    "description": "Particulate matter sensor",
+    "name": "PM_Sensor",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "57",
+    "description": "Intake manifold absolute pressure",
+    "name": "IntManAbsPre",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "58",
+    "description": "SCR induce system",
+    "name": "SCR_InduceSystem",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "59",
+    "description": "Run time for AECD #11-#15",
+    "name": "RunT_11_15",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "8A",
+    "description": "Run time for AECD #16-#20",
+    "name": "RunT_16_20",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "8B",
+    "description": "Diesel aftertreatment",
+    "name": "DieAft",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "8C",
+    "description": "O2 sensor (wide range)",
+    "name": "O2Se_Wide",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "8D",
+    "description": "Throttle position G",
+    "name": "ThrPosG",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "8E",
+    "description": "Engine friction percent torque",
+    "name": "EngFriPerTor",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "8F",
+    "description": "Particulate matter sensor (bank 1 & 2)",
+    "name": "PMSensorBank1_2",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5A",
+    "description": "WWH-OBD vehicle OBD system Info",
+    "name": "WWH_OBD_SysInfo",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5B",
+    "description": "WWH-OBD vehicle OBD system Info",
+    "name": "WWH_OBD_SysInfo",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5C",
+    "description": "Fuel system control",
+    "name": "FueSysCon",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5D",
+    "description": "WWH-OBD counters support",
+    "name": "WWH_OBD_CtrS",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "5E",
+    "description": "NOx warning and inducement system",
+    "name": "NOxWarIndSys",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "62",
+    "description": "EGT sensor",
+    "name": "EGT_Sensor",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "63",
+    "description": "EGT sensor",
+    "name": "EGT_Sensor",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "9A",
+    "description": "Hybrid/EV sys. data, battery, voltage",
+    "name": "Hybrid_EV_System",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "9B",
+    "description": "Diesel exhaust fluid sensor data",
+    "name": "DieExhFluSenDat",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "9C",
+    "description": "O2 sensor data",
+    "name": "O2SensorData",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "9D",
+    "description": "Engine fuel rate",
+    "name": "EngineFuelRate",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "9E",
+    "description": "Engine exhaust flow rate",
+    "name": "EngExhFloRat",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "9F",
+    "description": "Fuel system percentage use",
+    "name": "FueSysPerUse",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A0",
+    "description": "PIDs supported [A1 - C0]",
+    "name": "PIDs_A1_C0",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A1",
+    "description": "NOx sensor corrected data",
+    "name": "NOxSenCorDat",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A2",
+    "description": "Cylinder fuel rate",
+    "name": "CylinderFuelRate",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A3",
+    "description": "Evap system vapor pressure",
+    "name": "EvaSysVapPre",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A4",
+    "description": "Transmission actual gear",
+    "name": "TraActGea",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A5",
+    "description": "Cmd. diesel exhaust fluid dosing",
+    "name": "ComDieExhFluDos",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A6",
+    "description": "Odometer",
+    "name": "Odometer",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A7",
+    "description": "NOx concentration 3, 4",
+    "name": "NOxSensorConc3_4",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "A8",
+    "description": "NOx corrected concentration (3, 4)",
+    "name": "NOxS_4",
+    "isotp": false
+  },
+  {
+    "service": "01",
+    "pid": "C0",
+    "description": "PIDs supported [C1 - E0]",
+    "name": "PIDs_C1_E0",
+	"isotp": false
+  }
+]

@@ -34,13 +34,8 @@
       "classNames": "col-sm-12"
     },
     "manual_date_time": {
-      "ui:widget": "alt-datetime",
-      "ui:options": {
-        "yearsRange": [
-          1980,
-          2030
-        ]
-      }
+      "ui:widget": "text",
+      "ui:placeholder": "YYYY-MM-DDTHH:mm.000Z (e.g. 2025-12-11T14:02:21.000Z)"
     },
     "ntp_server": {
       "classNames": "col-sm-12"

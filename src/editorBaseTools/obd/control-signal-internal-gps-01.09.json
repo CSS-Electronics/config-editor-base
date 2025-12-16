@@ -1,0 +1,140 @@
+{
+  "can_internal": {
+    "general": {
+      "rx_state": 0,
+      "tx_state": 1
+    },
+    "control": {
+      "control_rx_state": 1,
+      "control_tx_state": 0,
+      "start": {
+        "message": {
+          "chn": 0,
+          "id_format": 0,
+          "id": "6B",
+          "id_mask": "7FF"
+        },
+        "signal": {
+          "type": 0,
+          "byteorder": 1,
+          "bitpos": 1,
+          "length": 20,
+          "factor": 0.001,
+          "offset": 0
+        },
+        "trigger_high": 1000,
+        "trigger_low": 0.2
+      },
+      "stop": {
+        "message": {
+          "chn": 0,
+          "id_format": 0,
+          "id": "6B",
+          "id_mask": "7FF"
+        },
+        "signal": {
+          "type": 0,
+          "byteorder": 1,
+          "bitpos": 1,
+          "length": 20,
+          "factor": 0.001,
+          "offset": 0
+        },
+        "trigger_high": 0.19,
+        "trigger_low": 0
+      }
+    }
+  },
+  "can_1": {
+    "general": {
+      "rx_state": 0,
+      "tx_state": 0
+    },
+    "control": {
+      "control_rx_state": 1,
+      "control_tx_state": 1,
+      "start": {
+        "message": {
+          "chn": 0,
+          "id_format": 0,
+          "id": "6B",
+          "id_mask": "7FF"
+        },
+        "signal": {
+          "type": 0,
+          "byteorder": 1,
+          "bitpos": 1,
+          "length": 20,
+          "factor": 0.001,
+          "offset": 0
+        },
+        "trigger_high": 1000,
+        "trigger_low": 0.2
+      },
+      "stop": {
+        "message": {
+          "chn": 0,
+          "id_format": 0,
+          "id": "6B",
+          "id_mask": "7FF"
+        },
+        "signal": {
+          "type": 0,
+          "byteorder": 1,
+          "bitpos": 1,
+          "length": 20,
+          "factor": 0.001,
+          "offset": 0
+        },
+        "trigger_high": 0.19,
+        "trigger_low": 0
+      }
+    }
+  },
+  "can_2": {
+    "general": {
+      "rx_state": 0,
+      "tx_state": 0
+    },
+    "control": {
+      "control_rx_state": 1,
+      "control_tx_state": 1,
+      "start": {
+        "message": {
+          "chn": 0,
+          "id_format": 0,
+          "id": "6B",
+          "id_mask": "7FF"
+        },
+        "signal": {
+          "type": 0,
+          "byteorder": 1,
+          "bitpos": 1,
+          "length": 20,
+          "factor": 0.001,
+          "offset": 0
+        },
+        "trigger_high": 1000,
+        "trigger_low": 0.2
+      },
+      "stop": {
+        "message": {
+          "chn": 0,
+          "id_format": 0,
+          "id": "6B",
+          "id_mask": "7FF"
+        },
+        "signal": {
+          "type": 0,
+          "byteorder": 1,
+          "bitpos": 1,
+          "length": 20,
+          "factor": 0.001,
+          "offset": 0
+        },
+        "trigger_high": 0.19,
+        "trigger_low": 0
+      }
+    }
+  }
+}

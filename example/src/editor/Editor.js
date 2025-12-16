@@ -7,7 +7,7 @@ import {
   BitRateModal,
 } from "config-editor-tools";
 
-import {EditorSection} from "config-editor-base";
+import {EditorSection, OBDTool} from "config-editor-base";
 
 import * as actionsAlert from "../alert/actions";
 import AlertContainer from "../alert/AlertContainer";
@@ -64,6 +64,12 @@ export const demoMode = false
 class Editor extends React.Component {
   render() {
     let editorTools = {"CANedge": [
+      {
+        name: "obd-modal",
+        comment: "OBD tool",
+        class: "fa fa-car",
+        modal: <OBDTool showAlert={this.props.showAlert} />,
+      },
       {
         name: "encryption-modal",
         comment: "Encryption tool",
