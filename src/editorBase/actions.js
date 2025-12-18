@@ -513,6 +513,50 @@ export const checkConfigFiltersDisabled = (content) => {
   }
 }
 
+// function for testing if filter count exceeds hardware limits (128 x 11-bit, 64 x 29-bit per channel)
+export const checkConfigFilterLimits = (content) => {
+  const MAX_11BIT_FILTERS = 128;
+  const MAX_29BIT_FILTERS = 64;
+
+  return function (dispatch) {
+    for (let i = 1; i < 3; i++) {
+      if (content["can_" + i] && content["can_" + i].filter && content["can_" + i].filter.id) {
+        let count11Bit = 0;
+        let count29Bit = 0;
+
+        for (const filter of content["can_" + i].filter.id) {
+          if (filter.id_format === 1) {
+            count29Bit++;
+          } else {
+            count11Bit++;
+          }
+        }
+
+        console.log("count11Bit", count11Bit)
+        console.log("count29Bit", count29Bit)
+        if (count11Bit > MAX_11BIT_FILTERS) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your CAN CH" + i + " has " + count11Bit + " 11-bit filters - the max is " + MAX_11BIT_FILTERS + ". This is invalid and will cause the device to reject your Configuration File",
+              autoClear: false,
+            })
+          );
+        }
+
+        if (count29Bit > MAX_29BIT_FILTERS) {
+          dispatch(
+            alertActions.set({
+              type: "warning",
+              message: "Your CAN CH" + i + " has " + count29Bit + " 29-bit filters - the max is " + MAX_29BIT_FILTERS + ". This is invalid and will cause the device to reject your Configuration File",
+              autoClear: false,
+            })
+          );
+        }
+      }
+    }
+  }
+}
 
 // function for testing if control signal scaling factor is 0 despite being enabled
 export const checkConfigControlSignalZeroScalingFactor = (content) => {
@@ -924,6 +968,7 @@ export const runConfigurationWarningChecks = (content) => {
       dispatch(checkConfigTransmitMonitoringRouting(content))
       dispatch(checkConfigTransmitExceedLimits(content))
       dispatch(checkConfigFiltersDisabled(content))
+      dispatch(checkConfigFilterLimits(content))
       dispatch(checkConfigTls(content))
       dispatch(checkConfigAwsEndpoint(content))
       dispatch(checkS3EncryptedPasswordsNoKpub(content))

@@ -7,7 +7,7 @@ import {
   BitRateModal,
 } from "config-editor-tools";
 
-import {EditorSection, OBDTool} from "config-editor-base";
+import {EditorSection, OBDTool, FilterBuilderTool} from "config-editor-base";
 
 import * as actionsAlert from "../alert/actions";
 import AlertContainer from "../alert/AlertContainer";
@@ -69,6 +69,12 @@ class Editor extends React.Component {
         comment: "OBD tool",
         class: "fa fa-car",
         modal: <OBDTool showAlert={this.props.showAlert} />,
+      },
+      {
+        name: "filter-builder-modal",
+        comment: "Filter builder",
+        class: "fa fa-sliders",
+        modal: <FilterBuilderTool showAlert={this.props.showAlert} />,
       },
       {
         name: "encryption-modal",

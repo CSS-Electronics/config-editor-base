@@ -85,6 +85,7 @@ class OBDTool extends React.Component {
       
       // Generated config
       generatedConfig: {},
+      combinedConfig: {},
       mergedConfig: {},
       mergedConfigValid: "Unknown",
       
@@ -96,7 +97,10 @@ class OBDTool extends React.Component {
       showPreview: false,
       
       // Control signal option
-      enableControlSignal: false
+      enableControlSignal: false,
+      
+      // OBD filter option
+      enableOBDFilter: false
     };
 
     this.fileReader = new FileReader();
@@ -338,7 +342,7 @@ class OBDTool extends React.Component {
   }
 
   testMergedFile() {
-    const { generatedConfig, enableControlSignal } = this.state;
+    const { generatedConfig, enableControlSignal, enableOBDFilter, channel, canId } = this.state;
     const { formData } = this.props;
 
     if (!formData || Object.keys(generatedConfig).length === 0) {
@@ -354,6 +358,59 @@ class OBDTool extends React.Component {
         arrayMerge: overwriteMerge,
       });
     }
+    
+    // Add OBD filter config if enabled
+    if (enableOBDFilter) {
+      const is29Bit = canId !== "7DF";
+      let filterConfig;
+      
+      if (is29Bit) {
+        // 29-bit: ID 18DAF115, Mask type with PDU1 mask 3FF0000
+        filterConfig = {
+          [channel]: {
+            filter: {
+              id: [{
+                name: "OBD_Response",
+                state: 1,
+                type: 0, // Acceptance
+                id_format: 1, // 29-bit
+                method: 1, // Mask
+                f1: "18DAF115",
+                f2: "3FF0000",
+                prescaler_type: 0,
+                prescaler_value: 0
+              }]
+            }
+          }
+        };
+      } else {
+        // 11-bit: ID 7E8, Range type with f1=f2=7E8
+        filterConfig = {
+          [channel]: {
+            filter: {
+              id: [{
+                name: "OBD_Response",
+                state: 1,
+                type: 0, // Acceptance
+                id_format: 0, // 11-bit
+                method: 0, // Range
+                f1: "7E8",
+                f2: "7E8",
+                prescaler_type: 0,
+                prescaler_value: 0
+              }]
+            }
+          }
+        };
+      }
+      
+      combinedConfig = merge(combinedConfig, filterConfig, {
+        arrayMerge: overwriteMerge,
+      });
+    }
+    
+    // Store combinedConfig for preview
+    this.setState({ combinedConfig });
     
     let mergedConfigTemp = merge(formData, combinedConfig, {
       arrayMerge: overwriteMerge,
@@ -375,7 +432,14 @@ class OBDTool extends React.Component {
   }
 
   onMerge() {
-    const { mergedConfig } = this.state;
+    const { mergedConfig, mergedConfigValid } = this.state;
+    
+    // Check schema validation first
+    if (mergedConfigValid !== true) {
+      console.log("Merged config that failed validation:", mergedConfig);
+      this.props.showAlert("warning", "Cannot merge - the combined configuration is invalid. Check console for details.");
+      return;
+    }
     
     this.props.setConfigContent(mergedConfig);
     this.props.setUpdatedFormData(mergedConfig);
@@ -412,7 +476,9 @@ class OBDTool extends React.Component {
       csvFileName,
       mixedWarning,
       showPreview,
-      enableControlSignal
+      enableControlSignal,
+      enableOBDFilter,
+      combinedConfig
     } = this.state;
     
     const { formData, schemaContent, editorConfigFiles } = this.props;
@@ -504,6 +570,7 @@ class OBDTool extends React.Component {
               options={channelOptions}
               value={channel}
               onChange={(opt) => this.handleSettingChange("channel", opt)}
+              comment="Select which CAN channel should be used to transmit the OBD requests."
             />
           </div>
           <div className="col-xs-6">
@@ -512,6 +579,7 @@ class OBDTool extends React.Component {
               options={bitRateOptions}
               value={bitRate}
               onChange={(opt) => this.handleSettingChange("bitRate", opt)}
+              comment="Cars typically use 500K, trucks/buses may use 250K or 500K."
             />
           </div>
         </div>
@@ -525,6 +593,7 @@ class OBDTool extends React.Component {
                 options={canIdOptions}
                 value={canId}
                 onChange={(opt) => this.handleSettingChange("canId", opt)}
+                comment="Cars typically use 7DF, trucks/buses typically use 18DB33F1."
               />
             </div>
             <div className="col-xs-6">
@@ -533,6 +602,7 @@ class OBDTool extends React.Component {
                 options={obdModeOptions}
                 value={obdMode}
                 onChange={(opt) => this.handleSettingChange("obdMode", opt)}
+                comment="Cars use OBD2, trucks/buses may use OBD2 or WWH-OBD."
               />
             </div>
           </div>
@@ -562,7 +632,7 @@ class OBDTool extends React.Component {
               }}
             />
             <span className="field-description field-description-shift">
-              Time between each PID request (100-10000 ms)
+              Time between each PID request (100-10000 ms). Highly frequent requests (below 500 ms spacing) may result in response errors.
             </span>
             {spacing < 250 && (
               <span style={{ color: "orange", fontSize: "12px", display: "block", marginTop: "4px" }}>
@@ -576,6 +646,9 @@ class OBDTool extends React.Component {
         {toolMode !== "test" && (
           <div className="form-group pl0 field-string">
             PIDs to record
+            <span className="field-description field-description-shift">
+              Select PIDs to request from the vehicle. Adding more PIDs will result in a longer cycle time (period) between each observation of a single PID.
+            </span>
             <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
               <label className="checkbox-design" style={{ marginLeft: "4px" }}>
                 <input
@@ -604,25 +677,27 @@ class OBDTool extends React.Component {
                   style={{ 
                     display: "flex", 
                     alignItems: "center", 
-                    padding: "4px 5px",
+                    padding: "0px 5px",
                     borderBottom: "1px solid #eee",
                     opacity: pid.disabled ? 0.4 : 1,
-                    cursor: pid.disabled ? "not-allowed" : "pointer"
+                    cursor: pid.disabled ? "not-allowed" : "pointer",
+                    backgroundColor: pid.selected ? "#e8f4fc" : "#fff"
                   }}
                 >
-                  <label className="checkbox-design" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={pid.selected}
-                      disabled={pid.disabled}
-                      onChange={() => !pid.disabled && this.handlePidToggle(pid.uniqueId)}
-                    />
-                    <span></span>
-                  </label>
+                  <span style={{ width: "24px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                    <label className="checkbox-design">
+                      <input
+                        type="checkbox"
+                        checked={pid.selected}
+                        disabled={pid.disabled}
+                        onChange={() => !pid.disabled && this.handlePidToggle(pid.uniqueId)}
+                      />
+                      <span></span>
+                    </label>
+                  </span>
                   <span 
                     className="binary-text-alt-2" 
                     style={{ 
-                      marginLeft: "8px", 
                       marginRight: "8px", 
                       minWidth: "24px", 
                       flexShrink: 0 
@@ -659,19 +734,41 @@ class OBDTool extends React.Component {
           </div>
         )}
 
-        {/* Validation error */}
-        {mergedConfigValid === false && (
-          <p className="red-text">
-            <i className="fa fa-times" /> Merged Configuration File is invalid
-          </p>
+        {/* OBD filter option - hidden in test mode */}
+        {toolMode !== "test" && (
+          <div className="form-group pl0 field-string">
+            <label 
+              style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                cursor: "pointer",
+                fontSize: "12px",
+                marginTop: "8px"
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={enableOBDFilter}
+                onChange={() => {
+                  this.setState({ enableOBDFilter: !enableOBDFilter }, () => {
+                    if (this.getSelectedPids().length > 0) {
+                      this.generateTransmitList();
+                    }
+                  });
+                }}
+                style={{ marginRight: "6px", marginBottom: "4px" }}
+              />
+              Add filter to only log OBD data on {channel === "can_1" ? "CAN-1" : "CAN-2"}
+            </label>
+            <p className="field-description field-description-shift">
+              Add a filter to only log OBD response data on the selected CAN channel. This replaces any existing filters on the channel. For 11-bit: Range filter for ID 7E8. For 29-bit: Mask filter for ID 18DAF115 with PDU1 PGN mask.
+            </p>
+          </div>
         )}
 
         {/* Control transmission/logging - hidden in test mode */}
         {toolMode !== "test" && (
-          <div 
-            className="form-group pl0 field-string" 
-            title="If the device is powered continuously (even when the vehicle ignition is off), transmitting requests may drain the vehicle battery quickly. To avoid this you can add a control signal that starts/stops logging on all CAN channels and starts/stops transmission on CAN1/CAN2 depending on whether the vehicle speed is above a certain threshold. Requires a CANedge incl. internal GPS/IMU."
-          >
+          <div className="form-group pl0 field-string">
             <label 
               style={{ 
                 display: "flex", 
@@ -697,6 +794,9 @@ class OBDTool extends React.Component {
               />
               Add GPS-based speed control signal
             </label>
+            <p className="field-description field-description-shift">
+              If the device is powered continuously (even when the vehicle ignition is off), transmitting requests may drain the vehicle battery quickly. To avoid this you can add a control signal that starts/stops logging on all CAN channels and starts/stops transmission on CAN1/CAN2 depending on whether the vehicle speed is above a certain threshold. Requires a CANedge incl. internal GPS/IMU.
+            </p>
           </div>
         )}
 
@@ -705,6 +805,13 @@ class OBDTool extends React.Component {
           <div style={{ color: "orange", fontSize: "12px", marginBottom: "15px", marginTop: "10px" }}>
             When testing supported PIDs, make sure the ignition is on for 2 minutes before you connect the device. Let the device be connected for 5 minutes to perform the test.
           </div>
+        )}
+
+        {/* Validation error */}
+        {mergedConfigValid === false && (
+          <p className="red-text">
+            <i className="fa fa-times" /> Merged Configuration File is invalid
+          </p>
         )}
 
         {/* Action Buttons */}
@@ -744,7 +851,7 @@ class OBDTool extends React.Component {
             {showPreview && (
               <div style={{ marginTop: "10px" }}>
                 <pre className="browse-file-preview">
-                  {JSON.stringify(generatedConfig, null, 2)}
+                  {JSON.stringify(combinedConfig, null, 2)}
                 </pre>
               </div>
             )}

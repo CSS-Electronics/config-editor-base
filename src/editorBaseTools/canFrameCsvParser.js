@@ -6,16 +6,45 @@
  * TimestampEpoch;BusChannel;ID;IDE;DLC;DataLength;Dir;EDL;BRS;ESI;RTR;DataBytes
  */
 
+// Required columns for valid CSV
+const REQUIRED_COLUMNS = [
+  'TimestampEpoch', 'BusChannel', 'ID', 'IDE', 'DLC', 
+  'DataLength', 'Dir', 'EDL', 'BRS', 'ESI', 'RTR', 'DataBytes'
+];
+
+/**
+ * Validate CSV header structure
+ * @param {string} headerLine - The first line of the CSV
+ * @returns {Object} { valid: boolean, missingColumns: string[] }
+ */
+export function validateCsvHeader(headerLine) {
+  const columns = headerLine.split(';').map(col => col.trim());
+  const missingColumns = REQUIRED_COLUMNS.filter(req => !columns.includes(req));
+  return {
+    valid: missingColumns.length === 0,
+    missingColumns
+  };
+}
+
 /**
  * Parse a CSV string containing CAN frame data into an array of frame objects
  * @param {string} csvContent - The raw CSV content
- * @returns {Array} Array of parsed CAN frame objects
+ * @returns {Object} { frames: Array, error: string|null }
  */
 export function parseCanFrameCsv(csvContent) {
   const lines = csvContent.trim().split('\n');
   
   if (lines.length < 2) {
-    return [];
+    return { frames: [], error: null };
+  }
+  
+  // Validate header
+  const headerValidation = validateCsvHeader(lines[0]);
+  if (!headerValidation.valid) {
+    return { 
+      frames: [], 
+      error: `Invalid CSV format. Missing columns: ${headerValidation.missingColumns.join(', ')}`
+    };
   }
   
   // Parse header to get column indices
@@ -51,7 +80,7 @@ export function parseCanFrameCsv(csvContent) {
     frames.push(frame);
   }
   
-  return frames;
+  return { frames, error: null };
 }
 
 /**
