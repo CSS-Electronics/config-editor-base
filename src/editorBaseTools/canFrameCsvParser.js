@@ -55,6 +55,7 @@ export function parseCanFrameCsv(csvContent) {
   });
   
   const frames = [];
+  const expectedColumnCount = header.length;
   
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -62,10 +63,25 @@ export function parseCanFrameCsv(csvContent) {
     
     const values = line.split(';');
     
+    // Reject lines that don't have the expected number of columns
+    if (values.length < expectedColumnCount) {
+      continue;
+    }
+    
+    // Validate required fields have valid values
+    const timestamp = parseFloat(values[columnIndex['TimestampEpoch']]);
+    const busChannel = parseInt(values[columnIndex['BusChannel']]);
+    const id = values[columnIndex['ID']];
+    
+    // Reject lines with invalid timestamp, busChannel, or empty ID
+    if (isNaN(timestamp) || isNaN(busChannel) || !id || !/^[0-9A-Fa-f]+$/.test(id)) {
+      continue;
+    }
+    
     const frame = {
-      timestamp: parseFloat(values[columnIndex['TimestampEpoch']] || 0),
-      busChannel: parseInt(values[columnIndex['BusChannel']] || 0),
-      id: values[columnIndex['ID']] || '',
+      timestamp: timestamp,
+      busChannel: busChannel,
+      id: id,
       ide: parseInt(values[columnIndex['IDE']] || 0), // 0 = 11-bit, 1 = 29-bit
       dlc: parseInt(values[columnIndex['DLC']] || 0),
       dataLength: parseInt(values[columnIndex['DataLength']] || 0),

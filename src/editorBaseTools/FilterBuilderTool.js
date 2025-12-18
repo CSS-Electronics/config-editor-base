@@ -34,6 +34,8 @@ class FilterBuilderTool extends React.Component {
     this.parseCsvFile = this.parseCsvFile.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.handleEntryToggle = this.handleEntryToggle.bind(this);
+    this.selectTop = this.selectTop.bind(this);
+    this.selectMatched = this.selectMatched.bind(this);
     this.handleMasterToggle = this.handleMasterToggle.bind(this);
     this.mergeData = this.mergeData.bind(this);
     this.generateFilterConfig = this.generateFilterConfig.bind(this);
@@ -221,8 +223,23 @@ class FilterBuilderTool extends React.Component {
 
   handleCsvUpload(file) {
     if (file && file.length > 0) {
+      const maxSizeMB = 50;
+      const maxSizeBytes = maxSizeMB * 1024 * 1024;
+      if (file[0].size > maxSizeBytes) {
+        this.props.showAlert("warning", `CSV file exceeds ${maxSizeMB} MB limit`);
+        return;
+      }
+      // Clear previous CSV data before loading new file
+      this.rawFrames = [];
       this.csvFileSize = file[0].size;
-      this.setState({ csvFileName: file[0].name, showFilteredSummary: false });
+      this.setState({ 
+        csvFileName: file[0].name, 
+        showFilteredSummary: false,
+        csvData: null,
+        filteredCsvData: null,
+        filterReductionPercent: 0,
+        mergedEntries: []
+      });
       this.csvFileReader.readAsText(file[0]);
     }
   }
@@ -581,6 +598,52 @@ class FilterBuilderTool extends React.Component {
       return { mergedEntries };
     }, () => {
       // Regenerate filter config if any entries are selected
+      if (this.state.mergedEntries.some(e => e.selected)) {
+        this.generateFilterConfig();
+      } else {
+        this.setState({ generatedFilterConfig: {}, mergedConfig: {}, mergedConfigValid: "Unknown" });
+      }
+    });
+  }
+
+  selectTop(count) {
+    const filteredEntries = this.getFilteredEntries();
+    // Get top N entries by percentage, excluding NO_DATA entries (fromDbcOnly)
+    // Only select from entries with MATCH_TRUE or MATCH_FALSE
+    const dataEntries = filteredEntries.filter(e => !e.fromDbcOnly);
+    const topIds = new Set(dataEntries.slice(0, count).map(e => e.uniqueId));
+    
+    this.setState(prevState => {
+      const mergedEntries = prevState.mergedEntries.map(entry =>
+        ({ ...entry, selected: topIds.has(entry.uniqueId) })
+      );
+      return { mergedEntries };
+    }, () => {
+      if (this.state.mergedEntries.some(e => e.selected)) {
+        this.generateFilterConfig();
+      } else {
+        this.setState({ generatedFilterConfig: {}, mergedConfig: {}, mergedConfigValid: "Unknown" });
+      }
+    });
+  }
+
+  selectMatched(matched) {
+    const filteredEntries = this.getFilteredEntries();
+    // Select entries based on match status
+    // Matched = has messageName AND not fromDbcOnly (MATCH_TRUE)
+    // Unmatched = no messageName AND not fromDbcOnly (MATCH_FALSE)
+    const matchedIds = new Set(
+      filteredEntries
+        .filter(e => !e.fromDbcOnly && (matched ? e.messageName : !e.messageName))
+        .map(e => e.uniqueId)
+    );
+    
+    this.setState(prevState => {
+      const mergedEntries = prevState.mergedEntries.map(entry =>
+        ({ ...entry, selected: matchedIds.has(entry.uniqueId) })
+      );
+      return { mergedEntries };
+    }, () => {
       if (this.state.mergedEntries.some(e => e.selected)) {
         this.generateFilterConfig();
       } else {
@@ -1173,7 +1236,7 @@ class FilterBuilderTool extends React.Component {
               >
                 <span style={{ width: "24px", flexShrink: 0 }}></span>
                 <span style={{ width: "95px", flexShrink: 0 }}>ID</span>
-                <span style={{ width: "48px", flexShrink: 0 }}>Name</span>
+                <span style={{ width: "58px", flexShrink: 0 }}>Name</span>
                 <span style={{ width: "62px", flexShrink: 0, paddingRight: "8px" }}>Size %</span>
                 <span style={{ width: "55px", flexShrink: 0, textAlign: "right" }}>Frames</span>
                 <span style={{ width: "40px", flexShrink: 0, textAlign: "right", marginLeft: "8px" }}>Len</span>
@@ -1222,15 +1285,15 @@ class FilterBuilderTool extends React.Component {
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap"
                     }}
-                    title={`${entry.channel} ${entry.id}${entry.isGroup ? ` (+${entry.groupedIds.length - 1} more)` : ''}`}
+                    title={`${entry.channel} ${parseInt(entry.id, 16).toString(16).toUpperCase()}${entry.isGroup ? ` (+${entry.groupedIds.length - 1} more)` : ''}`}
                   >
-                    {entry.channel} {entry.id}
+                    {entry.channel} {parseInt(entry.id, 16).toString(16).toUpperCase()}
                   </span>
 
                   {/* Message Name */}
                   <span
                     style={{
-                      width: "48px",
+                      width: "58px",
                       flexShrink: 0,
                       fontSize: "11px",
                       overflow: "hidden",
@@ -1346,6 +1409,30 @@ class FilterBuilderTool extends React.Component {
                   No entries found
                 </div>
               )}
+            </div>
+
+            {/* Select buttons */}
+            <div style={{ fontSize: "12px", marginTop: "4px", marginBottom: "6px" }}>
+              <span style={{ color: "#666" }}>Select: </span>
+              <span
+                style={{ color: "#337ab7", cursor: "pointer", marginLeft: "4px" }}
+                onClick={() => this.selectTop(30)}
+              >Top 30</span>
+              <span style={{ color: "#666", margin: "0 4px" }}>|</span>
+              <span
+                style={{ color: "#337ab7", cursor: "pointer" }}
+                onClick={() => this.selectTop(50)}
+              >Top 50</span>
+              <span style={{ color: "#666", margin: "0 4px" }}>|</span>
+              <span
+                style={{ color: "#337ab7", cursor: "pointer" }}
+                onClick={() => this.selectMatched(true)}
+              >Matched</span>
+              <span style={{ color: "#666", margin: "0 4px" }}>|</span>
+              <span
+                style={{ color: "#337ab7", cursor: "pointer" }}
+                onClick={() => this.selectMatched(false)}
+              >Unmatched</span>
             </div>
 
             {/* Summary statistics */}
@@ -1524,7 +1611,8 @@ class FilterBuilderTool extends React.Component {
                       const selected = mergedEntries.filter(e => e.selected);
                       const count11Bit = selected.filter(e => !e.isGroup && e.idInt <= 0x7FF).length;
                       const count29Bit = selected.filter(e => e.isGroup || e.idInt > 0x7FF).length;
-                      return ` (${count11Bit} 11-bit, ${count29Bit} 29-bit)`;
+                      const sizePercent = selected.reduce((sum, e) => sum + (e.isGroup ? (e.groupedPercentage || 0) : (e.percentage || 0)), 0);
+                      return ` (${count11Bit} 11-bit, ${count29Bit} 29-bit) | ${sizePercent.toFixed(1)}%`;
                     })()}
                   </div>
 

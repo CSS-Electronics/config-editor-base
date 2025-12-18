@@ -255,8 +255,11 @@ export function findDbcMatch(channel, idHex, dbcMessages, channelJ1939Map) {
   const canId = parseInt(idHex, 16);
   const is29Bit = canId > 0x7FF;
   
-  // Direct match first
-  const directKey = `${channel}_${idHex}`;
+  // Normalize the ID to uppercase hex without leading zeros for matching
+  const normalizedIdHex = canId.toString(16).toUpperCase();
+  
+  // Direct match first (using normalized ID to handle leading zeros like "004" vs "4")
+  const directKey = `${channel}_${normalizedIdHex}`;
   if (dbcMessages.has(directKey)) {
     return dbcMessages.get(directKey);
   }
