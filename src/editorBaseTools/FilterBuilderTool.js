@@ -1308,10 +1308,12 @@ class FilterBuilderTool extends React.Component {
     // Determine which default filter config to use
     let defaultFilters;
     const isCanmodRouter = this.isCanmodRouter();
+    // Detect GNSS devices by checking if formData has a 'gnss' section
+    const isGnssDevice = formData && formData.gnss !== undefined;
 
     if (deviceType === "CANmod" && isCanmodRouter) {
       defaultFilters = canmodRouterDefaultFilters;
-    } else if (deviceType && deviceType.includes("GNSS")) {
+    } else if (isGnssDevice) {
       defaultFilters = canedgeDefaultFiltersGps;
     } else {
       defaultFilters = canedgeDefaultFilters;
@@ -1372,7 +1374,7 @@ class FilterBuilderTool extends React.Component {
 
         {/* Evaluate log file section */}
         <div className="form-group pl0 field-string">
-          <div style={{ display: "flex", gap: "10px", alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             {/* CSV Upload */}
             <div className="file-dropzone">
               <Files

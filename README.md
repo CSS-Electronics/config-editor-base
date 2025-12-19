@@ -145,7 +145,86 @@ The config editor also supports various S3 calls, e.g. for loading Rule Schema a
 
 The config editor relies on styling from the parent application. For examples of styling, see the CANedge configuration editor.
 
---- 
+---
+
+## Editor Base Tools
+
+The module includes built-in tools for OBD configuration and filter building. These are exported as `OBDTool` and `FilterBuilderTool`.
+
+### OBD Tool
+
+Generates OBD-II transmit lists for CANedge devices. Key features:
+- **PID Selection**: Select standard OBD-II PIDs from a built-in database
+- **Supported PIDs Parser**: Parse response data to identify vehicle-supported PIDs
+- **Control Signal**: Optional GPS-based speed control signal to prevent battery drain when vehicle is off
+- **Transmit List Generation**: Outputs partial JSON for merging with device configuration
+
+```jsx
+import { OBDTool } from "config-editor-base";
+
+// In editorTools array:
+{
+  name: "obd-modal",
+  comment: "OBD tool",
+  class: "fa fa-car",
+  modal: <OBDTool showAlert={this.props.showAlert} />
+}
+```
+
+### Filter Builder Tool
+
+Analyzes CSV log files to help users create optimized CAN filters. Key features:
+- **CSV Analysis**: Load mdf2csv output to see CAN ID distribution by size contribution
+- **DBC Matching**: Match CAN IDs to DBC message names and signals
+- **J1939 PGN Grouping**: Group 29-bit IDs by PGN for J1939/ISOBUS protocols
+- **Filter Generation**: Generate acceptance filters with optional prescalers
+- **Reset Filters**: Reset CAN channel filters to defaults (record everything)
+
+```jsx
+import { FilterBuilderTool } from "config-editor-base";
+
+// In editorTools array:
+{
+  name: "filter-builder-modal",
+  comment: "Filter builder",
+  class: "fa fa-sliders",
+  modal: <FilterBuilderTool showAlert={this.props.showAlert} deviceType="CANedge" />
+}
+```
+
+The `deviceType` prop controls device-specific behavior:
+- `"CANedge"` or `"CANedge2 GNSS"`: Standard CANedge filter structure
+- `"CANmod"`: CANmod.router filter structure (requires `frame_format` field)
+
+### Updating for New Firmware Revisions
+
+When a new firmware revision is released (e.g., CANedge 01.10.XX), update these files:
+
+#### 1. Supported Firmware Versions (`FilterBuilderTool.js`)
+```javascript
+// Add new version to the supported arrays at top of file:
+const SUPPORTED_FIRMWARE_CANEDGE = ["01.08", "01.09", "01.10"];  // Add here
+const SUPPORTED_FIRMWARE_CANMOD_ROUTER = ["01.02"];
+```
+
+#### 2. Default Filter Configs (`src/editorBaseTools/filterBuilder/`)
+If the filter schema changes, create new default filter JSON files:
+- `canedge-default-filters-XX.YY.json`
+- `canedge-default-filters-gps-XX.YY.json`
+- `canmod-router-default-filters-XX.YY.json`
+
+Then update imports in `FilterBuilderTool.js` if structure changes.
+
+#### 3. Control Signal Config (`src/editorBaseTools/obd/`)
+If the control signal schema changes:
+- Create `control-signal-internal-gps-XX.YY.json`
+- Update import in `OBDTool.js`
+
+#### 4. Schema Files (`dist/schema/`)
+Add new schema and uischema files to the appropriate folders and update `schemaAry`/`uiSchemaAry` in `Editor.js`.
+
+---
+
 ## Regarding JSON Schema files 
 
 The module expects to find JSON Schema files in the structure below to facilitate auto-loading of these:

@@ -438,7 +438,7 @@ class OBDTool extends React.Component {
   }
 
   onMerge() {
-    const { combinedConfig, mergedConfigValid } = this.state;
+    const { combinedConfig, mergedConfigValid, enableControlSignal } = this.state;
     const { formData } = this.props;
     
     // Check schema validation first
@@ -460,11 +460,22 @@ class OBDTool extends React.Component {
     
     this.props.setConfigContent(freshMergedConfig);
     this.props.setUpdatedFormData(freshMergedConfig);
-    this.props.showAlert("success", "Merged OBD transmit list with Configuration File");
+    
+    // Show warning with success message included, or just success
+    if (!enableControlSignal) {
+      this.props.showAlert("warning", "Merged OBD transmit list with Configuration File. Important: If your CANedge transmits data while the vehicle ignition is off it can drain the vehicle battery. Use a control signal to start/stop transmission or ensure the device powers off with the ignition (e.g. by changing the installation setup or manually disconnecting the device).");
+    } else {
+      this.props.showAlert("success", "Merged OBD transmit list with Configuration File");
+    }
   }
 
   onDownload() {
-    const { generatedConfig } = this.state;
+    const { generatedConfig, enableControlSignal } = this.state;
+    
+    // Warn user if control signal is not enabled
+    if (!enableControlSignal) {
+      this.props.showAlert("warning", "Important: If your CANedge transmits data while the vehicle ignition is off it can drain the vehicle battery. Use a control signal to start/stop transmission or ensure the device powers off with the ignition (e.g. by changing the installation setup or manually disconnecting the device).");
+    }
     
     const dataStr = JSON.stringify(generatedConfig, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
