@@ -48,8 +48,14 @@ export class EditorSection extends React.Component {
       isSubmitting: false,
       isDownloadConfig: false,
       isCompareChanges: false,
-      activeSideBar: 'schema-modal'
+      activeSideBar: 'schema-modal',
+      showNewToolsHighlight: true
     }
+
+    // Fade out new tools highlight after 10 seconds
+    setTimeout(() => {
+      this.setState({ showNewToolsHighlight: false });
+    }, 10000);
 
     this.input = ''
     this.s3 = this.props.fetchFileContentExt ? true : false
@@ -452,7 +458,7 @@ export class EditorSection extends React.Component {
                       Review changes{' '}
                     </button>
                   </div>
-                  <div className='col-xs-7' style={{ float: 'left' }}>
+                  <div className='col-xs-7' style={{ float: 'left', display: 'flex', alignItems: 'center' }}>
                     {editorToolsFull.map((modal, idx) => (
                       <EditorToolButton
                         key={idx}
@@ -461,6 +467,19 @@ export class EditorSection extends React.Component {
                         className={modal.class}
                       />
                     ))}
+                    {this.state.showNewToolsHighlight && (
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          color: '#337ab7',
+                          marginLeft: '10px',
+                          transition: 'opacity 1s ease-out',
+                          opacity: this.state.showNewToolsHighlight ? 1 : 0
+                        }}
+                      >
+                        New: OBD &amp; filter builder tools
+                      </span>
+                    )}
                   </div>
                 </div>
               </FormWithNav>

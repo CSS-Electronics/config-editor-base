@@ -240,8 +240,8 @@ function applyPrescaler(frame, filter, prescalerState) {
       return true;
     }
     
-    // Parse the mask - each bit represents a byte position
-    const maskValue = prescalerValue ? parseInt(prescalerValue, 16) : 0xFFFFFFFFFFFFFFFFn;
+    // Parse the mask - each bit represents a byte position (max 64-bit mask = FFFFFFFFFFFFFFFF)
+    const maskValue = prescalerValue ? BigInt("0x" + prescalerValue) : BigInt("0xFFFFFFFFFFFFFFFF");
     
     // Compare data bytes based on mask
     const prevBytes = parseDataBytes(state.lastData);
@@ -251,7 +251,7 @@ function applyPrescaler(frame, filter, prescalerState) {
     for (let i = 0; i < Math.max(prevBytes.length, currBytes.length); i++) {
       // Check if this byte position is masked (bit is set)
       const byteMask = BigInt(1) << BigInt(i);
-      if ((BigInt(maskValue) & byteMask) !== BigInt(0)) {
+      if ((maskValue & byteMask) !== BigInt(0)) {
         const prevByte = prevBytes[i] || 0;
         const currByte = currBytes[i] || 0;
         if (prevByte !== currByte) {
