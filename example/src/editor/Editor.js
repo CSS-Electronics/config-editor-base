@@ -15,7 +15,7 @@ import AlertContainer from "../alert/AlertContainer";
 // define editor title and version
 const TYPE = "CANedge"
 const title = TYPE + " config editor"
-const version = "v2.9.1"
+const version = "v2.9.5"
 
 // define UIschema and Rule Schema names for auto-loading purposes
 export const uiSchemaAry = {"CANedge": [

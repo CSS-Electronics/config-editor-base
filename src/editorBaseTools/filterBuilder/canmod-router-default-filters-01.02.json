@@ -1,0 +1,92 @@
+{
+  "phy": {
+    "can_s1": {
+      "filter": [
+        {
+          "name": "AllStandardID",
+          "state": 1,
+          "id_format": 0,
+          "frame_format": 2,
+          "f1": "7FF",
+          "f2": "0",
+          "prescaler_type": 0
+        },
+        {
+          "name": "AllExtendedID",
+          "state": 1,
+          "id_format": 1,
+          "frame_format": 2,
+          "f1": "1FFFFFFF",
+          "f2": "0",
+          "prescaler_type": 0
+        }
+      ]
+    },
+    "can_s2": {
+      "filter": [
+        {
+          "name": "AllStandardID",
+          "state": 1,
+          "id_format": 0,
+          "frame_format": 2,
+          "f1": "7FF",
+          "f2": "0",
+          "prescaler_type": 0
+        },
+        {
+          "name": "AllExtendedID",
+          "state": 1,
+          "id_format": 1,
+          "frame_format": 2,
+          "f1": "1FFFFFFF",
+          "f2": "0",
+          "prescaler_type": 0
+        }
+      ]
+    },
+    "can_s3": {
+      "filter": [
+        {
+          "name": "AllStandardID",
+          "state": 1,
+          "id_format": 0,
+          "frame_format": 2,
+          "f1": "7FF",
+          "f2": "0",
+          "prescaler_type": 0
+        },
+        {
+          "name": "AllExtendedID",
+          "state": 1,
+          "id_format": 1,
+          "frame_format": 2,
+          "f1": "1FFFFFFF",
+          "f2": "0",
+          "prescaler_type": 0
+        }
+      ]
+    },
+    "can_s4": {
+      "filter": [
+        {
+          "name": "AllStandardID",
+          "state": 1,
+          "id_format": 0,
+          "frame_format": 2,
+          "f1": "7FF",
+          "f2": "0",
+          "prescaler_type": 0
+        },
+        {
+          "name": "AllExtendedID",
+          "state": 1,
+          "id_format": 1,
+          "frame_format": 2,
+          "f1": "1FFFFFFF",
+          "f2": "0",
+          "prescaler_type": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "can_internal": {
+    "filter": {
+      "id": [
+        {
+          "name": "Heartbeat",
+          "state": 0,
+          "type": 0,
+          "id_format": 0,
+          "method": 0,
+          "f1": "2",
+          "f2": "2",
+          "prescaler_type": 0
+        },
+        {
+          "name": "TimeCalendar",
+          "state": 0,
+          "type": 0,
+          "id_format": 0,
+          "method": 0,
+          "f1": "3",
+          "f2": "3",
+          "prescaler_type": 0
+        },
+        {
+          "name": "TimeExternal",
+          "state": 0,
+          "type": 0,
+          "id_format": 0,
+          "method": 0,
+          "f1": "5",
+          "f2": "5",
+          "prescaler_type": 0
+        }
+      ]
+    }
+  },
+  "can_1": {
+    "filter": {
+      "remote_frames": 0,
+      "id": [
+        {
+          "name": "AllStandardID",
+          "state": 1,
+          "type": 0,
+          "id_format": 0,
+          "method": 0,
+          "f1": "0",
+          "f2": "7FF",
+          "prescaler_type": 0
+        },
+        {
+          "name": "AllExtendedID",
+          "state": 1,
+          "type": 0,
+          "id_format": 1,
+          "method": 0,
+          "f1": "0",
+          "f2": "1FFFFFFF",
+          "prescaler_type": 0
+        }
+      ]
+    }
+  },
+  "can_2": {
+    "filter": {
+      "remote_frames": 0,
+      "id": [
+        {
+          "name": "AllStandardID",
+          "state": 1,
+          "type": 0,
+          "id_format": 0,
+          "method": 0,
+          "f1": "0",
+          "f2": "7FF",
+          "prescaler_type": 0
+        },
+        {
+          "name": "AllExtendedID",
+          "state": 1,
+          "type": 0,
+          "id_format": 1,
+          "method": 0,
+          "f1": "0",
+          "f2": "1FFFFFFF",
+          "prescaler_type": 0
+        }
+      ]
+    }
+  }
+}

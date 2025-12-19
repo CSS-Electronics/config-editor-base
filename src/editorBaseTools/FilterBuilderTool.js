@@ -8,6 +8,11 @@ import { parseDbcFiles, findDbcMatch, extractPgn } from "./dbcParser";
 import { evaluateFilters } from "./filterEvaluator";
 import SimpleDropdown from "./SimpleDropdown";
 
+// Default filter configurations
+import canedgeDefaultFilters from "./filterBuilder/canedge-default-filters-01.09.json";
+import canedgeDefaultFiltersGps from "./filterBuilder/canedge-default-filters-gps-01.09.json";
+import canmodRouterDefaultFilters from "./filterBuilder/canmod-router-default-filters-01.02.json";
+
 const merge = require("deepmerge");
 
 // Prescaler options
@@ -28,9 +33,13 @@ const MAX_FILTERS_CANMOD_ROUTER = 32;
 // Valid CAN channels for CANedge
 const CANEDGE_CHANNELS = ["CAN1", "CAN2", "CAN9"];
 
-// Minimum firmware versions for merge support
-const MIN_FIRMWARE_CANEDGE = "01.09";
-const MIN_FIRMWARE_CANMOD_ROUTER = "01.02";
+// Supported firmware versions for merge/reset (add new versions to these arrays)
+const SUPPORTED_FIRMWARE_CANEDGE = ["01.08", "01.09"];
+const SUPPORTED_FIRMWARE_CANMOD_ROUTER = ["01.02"];
+
+// Minimum firmware version for display purposes
+const MIN_FIRMWARE_CANEDGE = SUPPORTED_FIRMWARE_CANEDGE[0];
+const MIN_FIRMWARE_CANMOD_ROUTER = SUPPORTED_FIRMWARE_CANMOD_ROUTER[0];
 
 class FilterBuilderTool extends React.Component {
   constructor(props) {
@@ -49,6 +58,7 @@ class FilterBuilderTool extends React.Component {
     this.testMergedFile = this.testMergedFile.bind(this);
     this.onMerge = this.onMerge.bind(this);
     this.onDownload = this.onDownload.bind(this);
+    this.onReset = this.onReset.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onValidationError = this.onValidationError.bind(this);
 
@@ -153,16 +163,16 @@ class FilterBuilderTool extends React.Component {
   }
 
   /**
-   * Check if firmware version meets minimum requirement
+   * Check if firmware version is in supported list
    */
   isFirmwareVersionSupported() {
     const version = this.getConfigVersion();
     if (!version) return false;
-    
+
     if (this.props.deviceType === "CANmod") {
-      return version >= MIN_FIRMWARE_CANMOD_ROUTER;
+      return SUPPORTED_FIRMWARE_CANMOD_ROUTER.includes(version);
     }
-    return version >= MIN_FIRMWARE_CANEDGE;
+    return SUPPORTED_FIRMWARE_CANEDGE.includes(version);
   }
 
   /**
@@ -178,7 +188,7 @@ class FilterBuilderTool extends React.Component {
     // Anchor points based on MF4 measurements (relative to 8 bytes = 1.0)
     // 8B -> 1.0, 12B -> 1.75, 16B -> 2.12, 64B -> 4.16
     const baseWeight = 4; // Scale factor to keep weights in similar range
-    
+
     if (dataLength <= 8) {
       return baseWeight * 1.0;
     } else if (dataLength <= 12) {
@@ -319,8 +329,8 @@ class FilterBuilderTool extends React.Component {
         // Clear previous CSV data before loading new file
         this.rawFrames = [];
         this.csvFileSize = file[0].size;
-        this.setState({ 
-          csvFileName: file[0].name, 
+        this.setState({
+          csvFileName: file[0].name,
           showFilteredSummary: false,
           csvData: null,
           filteredCsvData: null,
@@ -520,7 +530,7 @@ class FilterBuilderTool extends React.Component {
         reader.onerror = (event) => {
           this.dbcFilesErrored++;
           this.props.showAlert("warning", `Failed to read DBC file '${file.name}': ${event.target.error?.message || "Unknown error"}`);
-          
+
           if (this.dbcFilesLoaded + this.dbcFilesErrored === files.length) {
             if (this.pendingDbcFiles.length > 0) {
               this.processDbcFiles();
@@ -720,12 +730,12 @@ class FilterBuilderTool extends React.Component {
     // Get top N entries by percentage, excluding NO_DATA entries (fromDbcOnly)
     // Only select from entries with MATCH_TRUE or MATCH_FALSE
     // For CANmod, also exclude entries from invalid channels
-    const dataEntries = filteredEntries.filter(e => 
-      !e.fromDbcOnly && 
+    const dataEntries = filteredEntries.filter(e =>
+      !e.fromDbcOnly &&
       (this.props.deviceType !== "CANmod" || this.isChannelValid(e.channel))
     );
     const topIds = new Set(dataEntries.slice(0, count).map(e => e.uniqueId));
-    
+
     this.setState(prevState => {
       const mergedEntries = prevState.mergedEntries.map(entry =>
         ({ ...entry, selected: topIds.has(entry.uniqueId) })
@@ -748,12 +758,12 @@ class FilterBuilderTool extends React.Component {
     // For CANmod, also exclude entries from invalid channels
     const matchedIds = new Set(
       filteredEntries
-        .filter(e => !e.fromDbcOnly && 
+        .filter(e => !e.fromDbcOnly &&
           (matched ? e.messageName : !e.messageName) &&
           (this.props.deviceType !== "CANmod" || this.isChannelValid(e.channel)))
         .map(e => e.uniqueId)
     );
-    
+
     this.setState(prevState => {
       const mergedEntries = prevState.mergedEntries.map(entry =>
         ({ ...entry, selected: matchedIds.has(entry.uniqueId) })
@@ -771,7 +781,7 @@ class FilterBuilderTool extends React.Component {
   handleMasterToggle() {
     const filteredEntries = this.getFilteredEntries();
     // For CANmod, only consider entries from valid channels
-    const selectableEntries = this.props.deviceType === "CANmod" 
+    const selectableEntries = this.props.deviceType === "CANmod"
       ? filteredEntries.filter(e => this.isChannelValid(e.channel))
       : filteredEntries;
     const allSelected = selectableEntries.length > 0 && selectableEntries.every(e => e.selected);
@@ -919,16 +929,31 @@ class FilterBuilderTool extends React.Component {
             ? ((pgn & 0x3FF00) << 8).toString(16).toUpperCase()
             : (pgn << 8).toString(16).toUpperCase();
 
-          const filter = {
-            name: (entry.messageName || `PGN ${pgn.toString(16).toUpperCase()}`).substring(0, 16),
-            state: 1,
-            type: filterTypeValue,
-            id_format: 1, // Extended (29-bit)
-            method: 1, // Mask
-            f1: filterId,
-            f2: mask,
-            prescaler_type: prescaler_type
-          };
+          let filter;
+          if (isCanmodRouter) {
+            // CANmod.router: different filter structure with frame_format
+            filter = {
+              name: (entry.messageName || `PGN ${pgn.toString(16).toUpperCase()}`).substring(0, 16),
+              state: 1,
+              id_format: 1, // Extended (29-bit)
+              frame_format: 2, // 2 = Both (CAN + CAN FD)
+              f1: filterId,
+              f2: mask,
+              prescaler_type: prescaler_type
+            };
+          } else {
+            // CANedge: uses type and method fields
+            filter = {
+              name: (entry.messageName || `PGN ${pgn.toString(16).toUpperCase()}`).substring(0, 16),
+              state: 1,
+              type: filterTypeValue,
+              id_format: 1, // Extended (29-bit)
+              method: 1, // Mask
+              f1: filterId,
+              f2: mask,
+              prescaler_type: prescaler_type
+            };
+          }
 
           if (prescaler_value !== undefined) {
             filter.prescaler_value = prescaler_value;
@@ -1047,8 +1072,12 @@ class FilterBuilderTool extends React.Component {
           const ajv = new Ajv({ allErrors: true, strict: false, logger: false });
           const validate = ajv.compile(schemaContent);
           const valid = validate(mergedConfigTemp);
+          if (!valid && validate.errors) {
+            console.log("AJV validation errors:", validate.errors);
+          }
           this.setState({ mergedConfigValid: valid });
         } catch (e) {
+          console.log("AJV compilation/validation exception:", e);
           this.setState({ mergedConfigValid: false });
         }
       }
@@ -1086,7 +1115,7 @@ class FilterBuilderTool extends React.Component {
       // CANmod.router: filters are in phy.can_sX.filter (direct array)
       // 32 total filters per channel regardless of bit type
       const channelMapping = this.getChannelMapping();
-      
+
       for (const [csvChannel, configKey] of Object.entries(channelMapping)) {
         // Count existing filters
         let existingCount = 0;
@@ -1268,6 +1297,37 @@ class FilterBuilderTool extends React.Component {
     linkElement.click();
   }
 
+  onReset() {
+    const { formData, deviceType } = this.props;
+
+    if (!formData || Object.keys(formData).length === 0) {
+      this.props.showAlert("warning", "No configuration file loaded");
+      return;
+    }
+
+    // Determine which default filter config to use
+    let defaultFilters;
+    const isCanmodRouter = this.isCanmodRouter();
+
+    if (deviceType === "CANmod" && isCanmodRouter) {
+      defaultFilters = canmodRouterDefaultFilters;
+    } else if (deviceType && deviceType.includes("GNSS")) {
+      defaultFilters = canedgeDefaultFiltersGps;
+    } else {
+      defaultFilters = canedgeDefaultFilters;
+    }
+
+    // Deep merge the default filters into the current config
+    const overwriteMerge = (destinationArray, sourceArray, options) => sourceArray;
+    const resetConfig = merge(formData, defaultFilters, {
+      arrayMerge: overwriteMerge,
+    });
+
+    this.props.setConfigContent(resetConfig);
+    this.props.setUpdatedFormData(resetConfig);
+    this.props.showAlert("success", "CAN channel filters reset to defaults (record everything)");
+  }
+
   renderBarChart(percentage, maxPercentage) {
     // Simple vanilla bar chart using div with background
     // Scale relative to maxPercentage so the highest bar fills the width
@@ -1342,13 +1402,37 @@ class FilterBuilderTool extends React.Component {
                 <button className="btn btn-primary">Load DBC(s)</button>
               </Files>
             </div>
+
+            {/* Reset filters button */}
+            {(() => {
+              const isFirmwareSupported = this.isFirmwareVersionSupported();
+              const isCanmod = this.props.deviceType === "CANmod";
+              const isCanmodRouter = isCanmod && this.isCanmodRouter();
+              const isDeviceSupported = !isCanmod || isCanmodRouter;
+              const hasConfig = this.props.formData && Object.keys(this.props.formData).length > 0;
+
+              return (
+                <button
+                  className="btn"
+                  onClick={this.onReset}
+                  disabled={!hasConfig || !isFirmwareSupported || !isDeviceSupported}
+                  style={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #ccc",
+                    color: "#333"
+                  }}
+                >
+                  Reset filters
+                </button>
+              );
+            })()}
           </div>
-          <p className="field-description field-description-shift">
-            {this.props.deviceType === "CANmod" 
-              ? "Load a CSV log file output from the MF4 converter 'mdf2csv' which reflects a realistic log session with the default filters applied. The MF4 should be recorded with a CANedge with one or two CANmod.router(s) on CAN2. The CSV should be created by first demuxing the MF4 via the 'mdf2mdf' converter using the argument '--muxtp-can2=010#11:12:13:14'. If you are analyzing a second router, use --muxtp-can2=012#15:16:17:18. Recommended CSV file size is 1-10 MB. Optionally load DBC file(s) to add further details or enable filter selection based on DBC messages. DBC files must have a CAN channel prefix (e.g. can11-abc.dbc)."
-              : "Load a CSV log file output from the MF4 converter 'mdf2csv' which reflects a realistic log session with the default filters applied. Recommended CSV file size is 1-10 MB. Optionally load DBC file(s) to add further details or enable filter selection based on DBC messages. DBC files must have a CAN channel prefix (e.g. can1-abc.dbc)."
+          <span className="field-description field-description-shift">
+            {this.props.deviceType === "CANmod"
+              ? "Load CSV: Load a log file recorded with CANedge + CANmod.router(s), demuxed via 'mdf2mdf' and converted to CSV via 'mdf2csv'. Load DBC(s): Add DBC files with channel prefix (e.g. can11-abc.dbc). Reset filters: Reset all CAN channel filters to defaults (record everything)."
+              : "Load CSV: Load a CSV from 'mdf2csv' reflecting a realistic log session. Load DBC(s): Add DBC files with channel prefix (e.g. can1-abc.dbc). Reset filters: Reset all CAN channel filters to defaults (record everything)."
             }
-          </p>
+          </span>
 
           {/* Loaded file names */}
           {(csvFileName || dbcFileNames.length > 0) && (
@@ -1387,7 +1471,7 @@ class FilterBuilderTool extends React.Component {
           const isEnabled = this.props.formData && this.isFirmwareVersionSupported();
           return (
             <div className="form-group pl0 field-string" style={{ marginTop: "6px", marginBottom: "0px" }}>
-              <label 
+              <label
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1426,7 +1510,7 @@ class FilterBuilderTool extends React.Component {
             {this.props.deviceType === "CANmod" && this.isCanmodRouter() && (
               <div className="form-group pl0 field-string" style={{ marginTop: "15px", marginBottom: "10px" }}>
                 <div style={{ marginBottom: "4px" }}>Channel mapping</div>
-                <div 
+                <div
                   style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}
                   title="Control how the demuxed CSV CAN channels map from/to the Configuration File CAN channels."
                 >
@@ -1516,164 +1600,164 @@ class FilterBuilderTool extends React.Component {
               {filteredEntries.map((entry) => {
                 const isChannelValid = this.props.deviceType === "CANmod" ? this.isChannelValid(entry.channel) : true;
                 return (
-                <div
-                  key={entry.uniqueId}
-                  onClick={() => isChannelValid && this.handleEntryToggle(entry.uniqueId)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0px 8px",
-                    borderBottom: "1px solid #eee",
-                    fontSize: "12px",
-                    cursor: isChannelValid ? "pointer" : "not-allowed",
-                    backgroundColor: entry.selected ? "#e8f4fc" : (entry.fromDbcOnly ? "#f9f9f9" : "#fff"),
-                    minWidth: "fit-content",
-                    opacity: isChannelValid ? 1 : 0.4
-                  }}
-                >
-                  {/* Checkbox */}
-                  <span style={{ width: "24px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-                    <label className="checkbox-design">
-                      <input
-                        type="checkbox"
-                        checked={entry.selected}
-                        disabled={!isChannelValid}
-                        onChange={() => isChannelValid && this.handleEntryToggle(entry.uniqueId)}
-                      />
-                      <span></span>
-                    </label>
-                  </span>
-
-                  {/* Channel & ID */}
-                  <span
-                    className="binary-text-alt-2"
+                  <div
+                    key={entry.uniqueId}
+                    onClick={() => isChannelValid && this.handleEntryToggle(entry.uniqueId)}
                     style={{
-                      width: "95px",
-                      flexShrink: 0,
-                      fontFamily: "monospace",
-                      fontSize: "11px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap"
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "0px 8px",
+                      borderBottom: "1px solid #eee",
+                      fontSize: "12px",
+                      cursor: isChannelValid ? "pointer" : "not-allowed",
+                      backgroundColor: entry.selected ? "#e8f4fc" : (entry.fromDbcOnly ? "#f9f9f9" : "#fff"),
+                      minWidth: "fit-content",
+                      opacity: isChannelValid ? 1 : 0.4
                     }}
-                    title={`${entry.channel} ${parseInt(entry.id, 16).toString(16).toUpperCase()}${entry.isGroup ? ` (+${entry.groupedIds.length - 1} more)` : ''}`}
                   >
-                    {entry.channel} {parseInt(entry.id, 16).toString(16).toUpperCase()}
-                  </span>
+                    {/* Checkbox */}
+                    <span style={{ width: "24px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                      <label className="checkbox-design">
+                        <input
+                          type="checkbox"
+                          checked={entry.selected}
+                          disabled={!isChannelValid}
+                          onChange={() => isChannelValid && this.handleEntryToggle(entry.uniqueId)}
+                        />
+                        <span></span>
+                      </label>
+                    </span>
 
-                  {/* Message Name */}
-                  <span
-                    style={{
-                      width: "58px",
-                      flexShrink: 0,
-                      fontSize: "11px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap"
-                    }}
-                    title={entry.messageName || ''}
-                  >
-                    {entry.messageName || ''}
-                  </span>
+                    {/* Channel & ID */}
+                    <span
+                      className="binary-text-alt-2"
+                      style={{
+                        width: "95px",
+                        flexShrink: 0,
+                        fontFamily: "monospace",
+                        fontSize: "11px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap"
+                      }}
+                      title={`${entry.channel} ${parseInt(entry.id, 16).toString(16).toUpperCase()}${entry.isGroup ? ` (+${entry.groupedIds.length - 1} more)` : ''}`}
+                    >
+                      {entry.channel} {parseInt(entry.id, 16).toString(16).toUpperCase()}
+                    </span>
 
-                  {/* Size % with bar */}
-                  <span style={{ width: "62px", flexShrink: 0, display: "flex", alignItems: "center", paddingRight: "8px" }}>
-                    {entry.percentage !== null || entry.isGroup ? (
-                      <span style={{ display: "flex", alignItems: "center" }}>
-                        {this.renderBarChart(entry.isGroup ? entry.groupedPercentage : entry.percentage, maxPercentage)}
-                        <span style={{ marginLeft: "4px", fontFamily: "monospace", fontSize: "11px" }}>
-                          {(entry.isGroup ? entry.groupedPercentage : entry.percentage).toFixed(1)}%
+                    {/* Message Name */}
+                    <span
+                      style={{
+                        width: "58px",
+                        flexShrink: 0,
+                        fontSize: "11px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap"
+                      }}
+                      title={entry.messageName || ''}
+                    >
+                      {entry.messageName || ''}
+                    </span>
+
+                    {/* Size % with bar */}
+                    <span style={{ width: "62px", flexShrink: 0, display: "flex", alignItems: "center", paddingRight: "8px" }}>
+                      {entry.percentage !== null || entry.isGroup ? (
+                        <span style={{ display: "flex", alignItems: "center" }}>
+                          {this.renderBarChart(entry.isGroup ? entry.groupedPercentage : entry.percentage, maxPercentage)}
+                          <span style={{ marginLeft: "4px", fontFamily: "monospace", fontSize: "11px" }}>
+                            {(entry.isGroup ? entry.groupedPercentage : entry.percentage).toFixed(1)}%
+                          </span>
                         </span>
-                      </span>
-                    ) : (
-                      <span style={{ color: "#999", fontSize: "11px" }}>N/A</span>
-                    )}
-                  </span>
+                      ) : (
+                        <span style={{ color: "#999", fontSize: "11px" }}>N/A</span>
+                      )}
+                    </span>
 
-                  {/* Frame count */}
-                  <span style={{
-                    width: "55px",
-                    flexShrink: 0,
-                    textAlign: "right",
-                    color: "#666",
-                    fontSize: "11px"
-                  }}>
-                    {(() => {
-                      const count = entry.isGroup ? entry.groupedCount : entry.count;
-                      if (count >= 1000) {
-                        return (count / 1000).toFixed(count >= 10000 ? 0 : 1) + 'K';
-                      }
-                      return count;
-                    })()}
-                  </span>
-
-                  {/* Length */}
-                  <span style={{
-                    width: "40px",
-                    flexShrink: 0,
-                    textAlign: "right",
-                    marginLeft: "8px",
-                    fontSize: "11px",
-                    color: entry.lengthMismatch ? "#d9534f" : "#666"
-                  }}>
-                    {entry.lengthMismatch
-                      ? `${entry.dataLength}/${entry.dbcLength}`
-                      : (entry.dataLength !== null && entry.dataLength !== undefined
-                        ? entry.dataLength
-                        : (entry.dbcLength !== null && entry.dbcLength !== undefined
-                          ? entry.dbcLength
-                          : ''))}
-                  </span>
-
-                  {/* Comment */}
-                  <span
-                    style={{
-                      width: "85px",
+                    {/* Frame count */}
+                    <span style={{
+                      width: "55px",
                       flexShrink: 0,
+                      textAlign: "right",
+                      color: "#666",
+                      fontSize: "11px"
+                    }}>
+                      {(() => {
+                        const count = entry.isGroup ? entry.groupedCount : entry.count;
+                        if (count >= 1000) {
+                          return (count / 1000).toFixed(count >= 10000 ? 0 : 1) + 'K';
+                        }
+                        return count;
+                      })()}
+                    </span>
+
+                    {/* Length */}
+                    <span style={{
+                      width: "40px",
+                      flexShrink: 0,
+                      textAlign: "right",
                       marginLeft: "8px",
                       fontSize: "11px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      color: "#666"
-                    }}
-                    title={entry.messageComment || ''}
-                  >
-                    {entry.messageComment || ''}
-                  </span>
+                      color: entry.lengthMismatch ? "#d9534f" : "#666"
+                    }}>
+                      {entry.lengthMismatch
+                        ? `${entry.dataLength}/${entry.dbcLength}`
+                        : (entry.dataLength !== null && entry.dataLength !== undefined
+                          ? entry.dataLength
+                          : (entry.dbcLength !== null && entry.dbcLength !== undefined
+                            ? entry.dbcLength
+                            : ''))}
+                    </span>
 
-                  {/* Match */}
-                  <span
-                    style={{
-                      width: "70px",
-                      flexShrink: 0,
-                      marginLeft: "8px",
-                      fontSize: "10px",
-                      fontFamily: "monospace",
-                      color: entry.fromDbcOnly ? "#f0ad4e" : (entry.messageName ? "#5cb85c" : "#999")
-                    }}
-                  >
-                    {entry.fromDbcOnly ? "NO_DATA" : (entry.messageName ? "MATCH_TRUE" : "MATCH_FALSE")}
-                  </span>
+                    {/* Comment */}
+                    <span
+                      style={{
+                        width: "85px",
+                        flexShrink: 0,
+                        marginLeft: "8px",
+                        fontSize: "11px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        color: "#666"
+                      }}
+                      title={entry.messageComment || ''}
+                    >
+                      {entry.messageComment || ''}
+                    </span>
 
-                  {/* Signals */}
-                  <span
-                    style={{
-                      width: "255px",
-                      flexShrink: 0,
-                      marginLeft: "8px",
-                      fontSize: "11px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      color: "#666"
-                    }}
-                    title={entry.signals ? entry.signals.join(', ') : ''}
-                  >
-                    {entry.signals ? entry.signals.join(', ') : ''}
-                  </span>
-                </div>
-              );
+                    {/* Match */}
+                    <span
+                      style={{
+                        width: "70px",
+                        flexShrink: 0,
+                        marginLeft: "8px",
+                        fontSize: "10px",
+                        fontFamily: "monospace",
+                        color: entry.fromDbcOnly ? "#f0ad4e" : (entry.messageName ? "#5cb85c" : "#999")
+                      }}
+                    >
+                      {entry.fromDbcOnly ? "NO_DATA" : (entry.messageName ? "MATCH_TRUE" : "MATCH_FALSE")}
+                    </span>
+
+                    {/* Signals */}
+                    <span
+                      style={{
+                        width: "255px",
+                        flexShrink: 0,
+                        marginLeft: "8px",
+                        fontSize: "11px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        color: "#666"
+                      }}
+                      title={entry.signals ? entry.signals.join(', ') : ''}
+                    >
+                      {entry.signals ? entry.signals.join(', ') : ''}
+                    </span>
+                  </div>
+                );
               })}
 
               {filteredEntries.length === 0 && (
@@ -1774,7 +1858,11 @@ class FilterBuilderTool extends React.Component {
 
                   {/* Type and Prescaler dropdowns - same row */}
                   <div className="row">
-                    <div className="col-xs-6" style={{ opacity: this.props.deviceType === "CANmod" ? 0.5 : 1, pointerEvents: this.props.deviceType === "CANmod" ? "none" : "auto" }}>
+                    <div
+                      className="col-xs-6"
+                      style={{ opacity: this.props.deviceType === "CANmod" ? 0.5 : 1, pointerEvents: this.props.deviceType === "CANmod" ? "none" : "auto" }}
+                      title={this.props.deviceType === "CANmod" ? "CANmod only supports acceptance filters" : ""}
+                    >
                       <SimpleDropdown
                         name="Type"
                         options={[
@@ -1784,9 +1872,6 @@ class FilterBuilderTool extends React.Component {
                         value={this.state.filterType}
                         onChange={(opt) => this.setState({ filterType: opt.value }, () => this.generateFilterConfig())}
                       />
-                      {this.props.deviceType === "CANmod" && (
-                        <span className="field-description" style={{ fontSize: "11px", color: "#999" }}>CANmod only supports acceptance filters</span>
-                      )}
                     </div>
                     {this.state.filterType === "acceptance" && (
                       <div className="col-xs-6">
@@ -1841,43 +1926,45 @@ class FilterBuilderTool extends React.Component {
                   )}
 
                   {/* Merge mode radio buttons - single line with reduced gap */}
-                  <div 
-                    style={{ display: "flex", alignItems: "center", marginBottom: "15px", gap: "10px" }}
-                    title="The new filters can either replace existing filters on the affected channel(s) or be appended at the top/bottom of the existing filters."
-                  >
-                    <label style={{ display: "flex", alignItems: "center", fontSize: "12px", cursor: "pointer", marginBottom: "0px" }}>
-                      <input
-                        type="radio"
-                        name="filterMergeMode"
-                        value="replace"
-                        checked={this.state.filterMergeMode === "replace"}
-                        onChange={(e) => this.setState({ filterMergeMode: e.target.value }, () => this.generateFilterConfig())}
-                        style={{ marginRight: "4px" }}
-                      />
-                      <span style={{ position: "relative", top: "1px" }}>Replace</span>
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", fontSize: "12px", cursor: "pointer", marginBottom: "0px" }}>
-                      <input
-                        type="radio"
-                        name="filterMergeMode"
-                        value="append_top"
-                        checked={this.state.filterMergeMode === "append_top"}
-                        onChange={(e) => this.setState({ filterMergeMode: e.target.value }, () => this.generateFilterConfig())}
-                        style={{ marginRight: "4px" }}
-                      />
-                      <span style={{ position: "relative", top: "1px" }}>Append (top)</span>
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", fontSize: "12px", cursor: "pointer", marginBottom: "0px" }}>
-                      <input
-                        type="radio"
-                        name="filterMergeMode"
-                        value="append_bottom"
-                        checked={this.state.filterMergeMode === "append_bottom"}
-                        onChange={(e) => this.setState({ filterMergeMode: e.target.value }, () => this.generateFilterConfig())}
-                        style={{ marginRight: "4px" }}
-                      />
-                      <span style={{ position: "relative", top: "1px" }}>Append (bottom)</span>
-                    </label>
+                  <div className="form-group pl0 field-string" style={{ marginBottom: "10px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <label style={{ display: "flex", alignItems: "center", fontSize: "12px", cursor: "pointer", marginBottom: "0px" }}>
+                        <input
+                          type="radio"
+                          name="filterMergeMode"
+                          value="replace"
+                          checked={this.state.filterMergeMode === "replace"}
+                          onChange={(e) => this.setState({ filterMergeMode: e.target.value }, () => this.generateFilterConfig())}
+                          style={{ marginRight: "4px" }}
+                        />
+                        <span style={{ position: "relative", top: "1px" }}>Replace</span>
+                      </label>
+                      <label style={{ display: "flex", alignItems: "center", fontSize: "12px", cursor: "pointer", marginBottom: "0px" }}>
+                        <input
+                          type="radio"
+                          name="filterMergeMode"
+                          value="append_top"
+                          checked={this.state.filterMergeMode === "append_top"}
+                          onChange={(e) => this.setState({ filterMergeMode: e.target.value }, () => this.generateFilterConfig())}
+                          style={{ marginRight: "4px" }}
+                        />
+                        <span style={{ position: "relative", top: "1px" }}>Append (top)</span>
+                      </label>
+                      <label style={{ display: "flex", alignItems: "center", fontSize: "12px", cursor: "pointer", marginBottom: "0px" }}>
+                        <input
+                          type="radio"
+                          name="filterMergeMode"
+                          value="append_bottom"
+                          checked={this.state.filterMergeMode === "append_bottom"}
+                          onChange={(e) => this.setState({ filterMergeMode: e.target.value }, () => this.generateFilterConfig())}
+                          style={{ marginRight: "4px" }}
+                        />
+                        <span style={{ position: "relative", top: "1px" }}>Append (bottom)</span>
+                      </label>
+                    </div>
+                    <span className="field-description field-description-shift">
+                      The new filters can either replace existing filters on the affected channel(s) or be appended at the top/bottom of the existing filters. If you e.g. wish to prescale 5 specific IDs and then log everything else as-is, you can append the 5 ID filters at the top of the default filters.
+                    </span>
                   </div>
 
                   {/* Selection summary */}
@@ -1898,10 +1985,10 @@ class FilterBuilderTool extends React.Component {
                     const isCanmod = this.props.deviceType === "CANmod";
                     const isCanmodRouter = isCanmod && this.isCanmodRouter();
                     const minFirmware = isCanmod ? MIN_FIRMWARE_CANMOD_ROUTER : MIN_FIRMWARE_CANEDGE;
-                    
+
                     // For CANmod, only CANmod.router is supported
                     const isDeviceSupported = !isCanmod || isCanmodRouter;
-                    
+
                     return (
                       <React.Fragment>
                         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -1920,11 +2007,30 @@ class FilterBuilderTool extends React.Component {
                             Download JSON
                           </button>
                         </div>
-                        {this.props.formData && Object.keys(this.props.formData).length > 0 && isDeviceSupported && !isFirmwareSupported && (
-                          <div style={{ fontSize: "12px", color: "#666", marginTop: "8px" }}>
-                            Merging requires firmware {minFirmware}.XX+ - please update your device
-                          </div>
-                        )}
+                        {/* Show reason why merge is disabled */}
+                        {(() => {
+                          const mergeDisabled = !this.props.formData || Object.keys(this.props.formData).length === 0 || this.state.mergedConfigValid !== true || !isFirmwareSupported || !isDeviceSupported;
+                          if (!mergeDisabled) return null;
+
+                          let reason = "";
+                          if (!this.props.formData || Object.keys(this.props.formData).length === 0) {
+                            reason = "No configuration file loaded";
+                          } else if (!isDeviceSupported) {
+                            reason = "Only CANmod.router is supported for CANmod devices";
+                          } else if (!isFirmwareSupported) {
+                            reason = `Merging requires firmware ${minFirmware}.XX+ - please update your device`;
+                          } else if (this.state.mergedConfigValid === "Unknown") {
+                            reason = "No filters selected";
+                          } else if (this.state.mergedConfigValid === false) {
+                            reason = "Generated filter configuration is invalid";
+                          }
+
+                          return reason ? (
+                            <div style={{ fontSize: "12px", color: "#d9534f", marginTop: "8px" }}>
+                              {reason}
+                            </div>
+                          ) : null;
+                        })()}
                       </React.Fragment>
                     );
                   })()}
