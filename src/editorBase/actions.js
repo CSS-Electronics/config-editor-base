@@ -20,6 +20,7 @@ export const SET_ACTIVE_NAV = "editor/SET_ACTIVE_NAV";
 export const SET_UISCHEMA_SOURCE = "editor/SET_UISCHEMA_SOURCE";
 export const SET_CONFIG_DATA_LOCAL = "SET_CONFIG_DATA_LOCAL";
 export const SET_CRC32_EDITOR_LIVE = "SET_CRC32_EDITOR_LIVE";
+export const SET_DETECTED_DEVICE_TYPE = "SET_DETECTED_DEVICE_TYPE";
 
 import * as alertActions from "../alert/actions";
 
@@ -286,7 +287,9 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
       }
 
       // Get the version from the selected config
-      const version = selectedConfig.substr(7, 5);
+      // Extract version from config filename - handle prefixed filenames like "XYZ_config-01.09.json"
+      const configMatch = selectedConfig.match(/config-(\d{2}\.\d{2})/);
+      const version = configMatch ? configMatch[1] : selectedConfig.substr(7, 5);
 
       // Filter schema list based on both version and device type
       let schemaAryFiltered = schemaAry.filter((e) => {
@@ -328,6 +331,9 @@ export const publicSchemaFiles = (selectedConfig, schemaAry, contentJSON, uiSche
         );
       }
 
+      // Store detected device type in Redux state
+      dispatch(setDetectedDeviceType(deviceType));
+
       const loadedSchema = loadFile(schemaAryFiltered[0])
 
       if (schemaAryFiltered[0] && loadedSchema) {
@@ -359,6 +365,11 @@ export const setSchemaFile = (schemaFiles) => ({
 export const resetSchemaFiles = () => ({
   type: RESET_SCHEMA_LIST,
   schemaFiles: [],
+});
+
+export const setDetectedDeviceType = (detectedDeviceType) => ({
+  type: SET_DETECTED_DEVICE_TYPE,
+  detectedDeviceType,
 });
 
 export const setSchemaContent = (schemaContent) => ({

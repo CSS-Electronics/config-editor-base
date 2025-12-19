@@ -9,7 +9,8 @@ export default (
     configContentPreChange: "",
     configContentLocal: {},
     formData: {},
-    crc32EditorLive: ""
+    crc32EditorLive: "",
+    detectedDeviceType: null
   },
   action
 ) => {
@@ -115,6 +116,11 @@ export default (
       return {
         ...state,
         formData: action.formData
+      };
+    case actionsEditor.SET_DETECTED_DEVICE_TYPE:
+      return {
+        ...state,
+        detectedDeviceType: action.detectedDeviceType
       };
     default:
       return state;

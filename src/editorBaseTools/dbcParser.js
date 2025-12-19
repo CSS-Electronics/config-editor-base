@@ -84,7 +84,8 @@ export function parseDbcFile(dbcContent, filename) {
     }
     
     // Check for signal definition (SG_ typically indented under message)
-    const sigMatch = trimmedLine.match(/^SG_\s+(\w+)\s+:/);
+    // Handle multiplexed signals: SG_ <name> M : ... (multiplexer) or SG_ <name> m<N> : ... (multiplexed)
+    const sigMatch = trimmedLine.match(/^SG_\s+(\w+)\s+(?:M\s+|m\d+\s+)?:/);
     if (sigMatch && currentMessageRawId !== null && messages.has(currentMessageRawId)) {
       messages.get(currentMessageRawId).signals.push(sigMatch[1]);
       continue;

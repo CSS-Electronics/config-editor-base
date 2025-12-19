@@ -21,9 +21,19 @@ const prescalerOptions = [
   { value: "data", label: "Data" }
 ];
 
-// Filter limits per channel
-const MAX_11BIT_FILTERS = 128;
-const MAX_29BIT_FILTERS = 64;
+// Filter limits per channel - CANedge
+const MAX_11BIT_FILTERS_CANEDGE = 128;
+const MAX_29BIT_FILTERS_CANEDGE = 64;
+
+// Filter limits per channel - CANmod.router (32 total per channel, regardless of bit type)
+const MAX_FILTERS_CANMOD_ROUTER = 32;
+
+// Valid CAN channels for CANedge
+const CANEDGE_CHANNELS = ["CAN1", "CAN2", "CAN9"];
+
+// Minimum firmware versions for merge support
+const MIN_FIRMWARE_CANEDGE = "01.09";
+const MIN_FIRMWARE_CANMOD_ROUTER = "01.02";
 
 class FilterBuilderTool extends React.Component {
   constructor(props) {
@@ -66,17 +76,96 @@ class FilterBuilderTool extends React.Component {
       generatedFilterConfig: {},
       mergedConfig: {},
       mergedConfigValid: "Unknown",
-      showFilterPreview: false
+      showFilterPreview: false,
+      // CANmod.router channel mapping (CSV channel numbers for S1-S4)
+      channelMapS1: "11",
+      channelMapS2: "12",
+      channelMapS3: "13",
+      channelMapS4: "14"
     };
 
     this.csvFileReader = new FileReader();
     this.csvFileReader.onload = (event) => {
       this.parseCsvFile(event.target.result);
     };
+    this.csvFileReader.onerror = (event) => {
+      this.props.showAlert("danger", "Failed to read CSV file: " + (event.target.error?.message || "Unknown error"));
+      this.setState({ isLoading: false });
+    };
 
     this.pendingDbcFiles = [];
     this.dbcFilesLoaded = 0;
     this.rawFrames = []; // Store raw frames for filter evaluation
+  }
+
+  /**
+   * Check if the loaded config is a CANmod.router
+   * Uses detectedDeviceType from Redux state (set by actions.js)
+   */
+  isCanmodRouter() {
+    return this.props.detectedDeviceType === "CANmod.router";
+  }
+
+  /**
+   * Get valid channels for current device type based on channel mapping
+   */
+  getValidChannels() {
+    if (this.props.deviceType === "CANmod") {
+      if (!this.isCanmodRouter()) {
+        return [];
+      }
+      const { channelMapS1, channelMapS2, channelMapS3, channelMapS4 } = this.state;
+      return [`CAN${channelMapS1}`, `CAN${channelMapS2}`, `CAN${channelMapS3}`, `CAN${channelMapS4}`];
+    }
+    return CANEDGE_CHANNELS;
+  }
+
+  /**
+   * Get the channel mapping for CANmod.router based on user-defined channel numbers
+   */
+  getChannelMapping() {
+    const { channelMapS1, channelMapS2, channelMapS3, channelMapS4 } = this.state;
+    return {
+      [`CAN${channelMapS1}`]: "can_s1",
+      [`CAN${channelMapS2}`]: "can_s2",
+      [`CAN${channelMapS3}`]: "can_s3",
+      [`CAN${channelMapS4}`]: "can_s4"
+    };
+  }
+
+  /**
+   * Check if a channel is valid for the current device configuration
+   */
+  isChannelValid(channel) {
+    const validChannels = this.getValidChannels();
+    return validChannels.includes(channel);
+  }
+
+  /**
+   * Get firmware version from config filename
+   */
+  getConfigVersion() {
+    const { editorConfigFiles } = this.props;
+    if (editorConfigFiles && editorConfigFiles.length > 0) {
+      const configFileName = editorConfigFiles[0].name;
+      // Extract version like "01.09" from "config-01.09.json"
+      const match = configFileName.match(/(\d{2}\.\d{2})/);
+      return match ? match[1] : null;
+    }
+    return null;
+  }
+
+  /**
+   * Check if firmware version meets minimum requirement
+   */
+  isFirmwareVersionSupported() {
+    const version = this.getConfigVersion();
+    if (!version) return false;
+    
+    if (this.props.deviceType === "CANmod") {
+      return version >= MIN_FIRMWARE_CANMOD_ROUTER;
+    }
+    return version >= MIN_FIRMWARE_CANEDGE;
   }
 
   /**
@@ -222,25 +311,30 @@ class FilterBuilderTool extends React.Component {
   }
 
   handleCsvUpload(file) {
-    if (file && file.length > 0) {
-      const maxSizeMB = 50;
-      const maxSizeBytes = maxSizeMB * 1024 * 1024;
-      if (file[0].size > maxSizeBytes) {
-        this.props.showAlert("warning", `CSV file exceeds ${maxSizeMB} MB limit`);
-        return;
+    try {
+      if (file && file.length > 0) {
+        const maxSizeMB = 50;
+        const maxSizeBytes = maxSizeMB * 1024 * 1024;
+        if (file[0].size > maxSizeBytes) {
+          this.props.showAlert("warning", `CSV file exceeds ${maxSizeMB} MB limit`);
+          return;
+        }
+        // Clear previous CSV data before loading new file
+        this.rawFrames = [];
+        this.csvFileSize = file[0].size;
+        this.setState({ 
+          csvFileName: file[0].name, 
+          showFilteredSummary: false,
+          csvData: null,
+          filteredCsvData: null,
+          filterReductionPercent: 0,
+          mergedEntries: []
+        });
+        this.csvFileReader.readAsText(file[0]);
       }
-      // Clear previous CSV data before loading new file
-      this.rawFrames = [];
-      this.csvFileSize = file[0].size;
-      this.setState({ 
-        csvFileName: file[0].name, 
-        showFilteredSummary: false,
-        csvData: null,
-        filteredCsvData: null,
-        filterReductionPercent: 0,
-        mergedEntries: []
-      });
-      this.csvFileReader.readAsText(file[0]);
+    } catch (e) {
+      this.props.showAlert("danger", "Failed to load CSV file: " + e.message);
+      this.setState({ isLoading: false });
     }
   }
 
@@ -261,7 +355,7 @@ class FilterBuilderTool extends React.Component {
     }
 
     try {
-      const { filteredFrames, stats, reductionPercent } = evaluateFilters(this.rawFrames, configData);
+      const { filteredFrames, stats, reductionPercent } = evaluateFilters(this.rawFrames, configData, this.props.detectedDeviceType);
 
       if (filteredFrames.length === 0) {
         // All frames filtered out
@@ -402,29 +496,47 @@ class FilterBuilderTool extends React.Component {
   }
 
   handleDbcUpload(files) {
-    if (!files || files.length === 0) return;
+    try {
+      if (!files || files.length === 0) return;
 
-    this.pendingDbcFiles = [];
-    this.dbcFilesLoaded = 0;
-    const fileNames = files.map(f => f.name);
+      this.pendingDbcFiles = [];
+      this.dbcFilesLoaded = 0;
+      this.dbcFilesErrored = 0;
+      const fileNames = files.map(f => f.name);
 
-    this.setState({ dbcFileNames: fileNames, isLoading: true });
+      this.setState({ dbcFileNames: fileNames, isLoading: true });
 
-    // Read all DBC files
-    for (const file of files) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        this.pendingDbcFiles.push({
-          name: file.name,
-          content: event.target.result
-        });
-        this.dbcFilesLoaded++;
+      // Read all DBC files
+      for (const file of files) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          this.pendingDbcFiles.push({
+            name: file.name,
+            content: event.target.result
+          });
+          this.dbcFilesLoaded++;
 
-        if (this.dbcFilesLoaded === files.length) {
-          this.processDbcFiles();
-        }
-      };
-      reader.readAsText(file);
+          if (this.dbcFilesLoaded + this.dbcFilesErrored === files.length) {
+            this.processDbcFiles();
+          }
+        };
+        reader.onerror = (event) => {
+          this.dbcFilesErrored++;
+          this.props.showAlert("warning", `Failed to read DBC file '${file.name}': ${event.target.error?.message || "Unknown error"}`);
+          
+          if (this.dbcFilesLoaded + this.dbcFilesErrored === files.length) {
+            if (this.pendingDbcFiles.length > 0) {
+              this.processDbcFiles();
+            } else {
+              this.setState({ isLoading: false });
+            }
+          }
+        };
+        reader.readAsText(file);
+      }
+    } catch (e) {
+      this.props.showAlert("danger", "Failed to load DBC file(s): " + e.message);
+      this.setState({ isLoading: false });
     }
   }
 
@@ -610,7 +722,11 @@ class FilterBuilderTool extends React.Component {
     const filteredEntries = this.getFilteredEntries();
     // Get top N entries by percentage, excluding NO_DATA entries (fromDbcOnly)
     // Only select from entries with MATCH_TRUE or MATCH_FALSE
-    const dataEntries = filteredEntries.filter(e => !e.fromDbcOnly);
+    // For CANmod, also exclude entries from invalid channels
+    const dataEntries = filteredEntries.filter(e => 
+      !e.fromDbcOnly && 
+      (this.props.deviceType !== "CANmod" || this.isChannelValid(e.channel))
+    );
     const topIds = new Set(dataEntries.slice(0, count).map(e => e.uniqueId));
     
     this.setState(prevState => {
@@ -632,9 +748,12 @@ class FilterBuilderTool extends React.Component {
     // Select entries based on match status
     // Matched = has messageName AND not fromDbcOnly (MATCH_TRUE)
     // Unmatched = no messageName AND not fromDbcOnly (MATCH_FALSE)
+    // For CANmod, also exclude entries from invalid channels
     const matchedIds = new Set(
       filteredEntries
-        .filter(e => !e.fromDbcOnly && (matched ? e.messageName : !e.messageName))
+        .filter(e => !e.fromDbcOnly && 
+          (matched ? e.messageName : !e.messageName) &&
+          (this.props.deviceType !== "CANmod" || this.isChannelValid(e.channel)))
         .map(e => e.uniqueId)
     );
     
@@ -654,12 +773,16 @@ class FilterBuilderTool extends React.Component {
 
   handleMasterToggle() {
     const filteredEntries = this.getFilteredEntries();
-    const allSelected = filteredEntries.length > 0 && filteredEntries.every(e => e.selected);
+    // For CANmod, only consider entries from valid channels
+    const selectableEntries = this.props.deviceType === "CANmod" 
+      ? filteredEntries.filter(e => this.isChannelValid(e.channel))
+      : filteredEntries;
+    const allSelected = selectableEntries.length > 0 && selectableEntries.every(e => e.selected);
 
     this.setState(prevState => {
-      const filteredIds = new Set(filteredEntries.map(e => e.uniqueId));
+      const selectableIds = new Set(selectableEntries.map(e => e.uniqueId));
       const mergedEntries = prevState.mergedEntries.map(entry =>
-        filteredIds.has(entry.uniqueId) ? { ...entry, selected: !allSelected } : entry
+        selectableIds.has(entry.uniqueId) ? { ...entry, selected: !allSelected } : entry
       );
       return { mergedEntries };
     }, () => {
@@ -703,41 +826,63 @@ class FilterBuilderTool extends React.Component {
       channelGroups[channel].push(entry);
     }
 
+    const isCanmodRouter = this.props.deviceType === "CANmod" && this.isCanmodRouter();
+
     // Validate filter limits per channel
     for (const [channel, entries] of Object.entries(channelGroups)) {
-      let count11Bit = 0;
-      let count29Bit = 0;
-
-      for (const entry of entries) {
-        if (entry.isGroup && entry.groupedIds) {
-          // For J1939 PGN groups, count as one 29-bit filter (mask method)
-          count29Bit += 1;
-        } else if (entry.idInt > 0x7FF) {
-          count29Bit += 1;
-        } else {
-          count11Bit += 1;
+      if (isCanmodRouter) {
+        // CANmod.router: 32 total filters per channel (regardless of bit type)
+        const totalFilters = entries.length;
+        if (totalFilters > MAX_FILTERS_CANMOD_ROUTER) {
+          this.props.showAlert("warning", `${channel}: Too many filters (${totalFilters}). Maximum is ${MAX_FILTERS_CANMOD_ROUTER} per channel.`);
+          return null;
         }
-      }
+        // Validate channel is valid for current channel mapping
+        if (!this.isChannelValid(channel)) {
+          const validChannels = this.getValidChannels().join(", ");
+          this.props.showAlert("warning", `${channel} is not valid for this CANmod.router configuration. Valid channels: ${validChannels}`);
+          return null;
+        }
+      } else {
+        // CANedge: separate limits for 11-bit and 29-bit
+        let count11Bit = 0;
+        let count29Bit = 0;
 
-      if (count11Bit > MAX_11BIT_FILTERS) {
-        this.props.showAlert("warning", `${channel}: Too many 11-bit filters (${count11Bit}). Maximum is ${MAX_11BIT_FILTERS}.`);
-        return null;
-      }
-      if (count29Bit > MAX_29BIT_FILTERS) {
-        this.props.showAlert("warning", `${channel}: Too many 29-bit filters (${count29Bit}). Maximum is ${MAX_29BIT_FILTERS}.`);
-        return null;
+        for (const entry of entries) {
+          if (entry.isGroup && entry.groupedIds) {
+            count29Bit += 1;
+          } else if (entry.idInt > 0x7FF) {
+            count29Bit += 1;
+          } else {
+            count11Bit += 1;
+          }
+        }
+
+        if (count11Bit > MAX_11BIT_FILTERS_CANEDGE) {
+          this.props.showAlert("warning", `${channel}: Too many 11-bit filters (${count11Bit}). Maximum is ${MAX_11BIT_FILTERS_CANEDGE}.`);
+          return null;
+        }
+        if (count29Bit > MAX_29BIT_FILTERS_CANEDGE) {
+          this.props.showAlert("warning", `${channel}: Too many 29-bit filters (${count29Bit}). Maximum is ${MAX_29BIT_FILTERS_CANEDGE}.`);
+          return null;
+        }
       }
     }
 
     // Build filter config
     const filterConfig = {};
 
-    // Map channel names to config keys
-    const channelToConfigKey = {
-      "CAN1": "can_1",
-      "CAN2": "can_2",
-      "CAN9": "can_internal"
-    };
+    // Get channel mapping based on device type
+    let channelToConfigKey;
+    if (isCanmodRouter) {
+      channelToConfigKey = this.getChannelMapping();
+    } else {
+      channelToConfigKey = {
+        "CAN1": "can_1",
+        "CAN2": "can_2",
+        "CAN9": "can_internal"
+      };
+    }
 
     for (const [channel, entries] of Object.entries(channelGroups)) {
       const configKey = channelToConfigKey[channel];
@@ -766,7 +911,6 @@ class FilterBuilderTool extends React.Component {
 
         if (entry.isGroup && groupJ1939Pgns && entry.groupedIds) {
           // J1939 PGN group - use mask method
-          // Extract PGN from the entry's ID
           const pgn = entry.pgn || extractPgn(entry.idInt);
           const isPdu1 = (pgn & 0xFF00) < 0xF000;
 
@@ -794,8 +938,30 @@ class FilterBuilderTool extends React.Component {
           }
 
           filters.push(filter);
+        } else if (isCanmodRouter) {
+          // CANmod.router: use mask method only (no range support)
+          // For exact ID match: f1 = ID, f2 = 7FF (11-bit) or 1FFFFFFF (29-bit)
+          // CANmod.router uses different filter structure: frame_format instead of method/type
+          const isExtended = entry.idInt > 0x7FF;
+          const idHex = parseInt(entry.id, 16).toString(16).toUpperCase(); // Normalize ID
+
+          const filter = {
+            name: (entry.messageName || idHex).substring(0, 16),
+            state: 1,
+            id_format: isExtended ? 1 : 0,
+            frame_format: 2, // 2 = Both (CAN + CAN FD)
+            f1: idHex,
+            f2: isExtended ? "1FFFFFFF" : "7FF", // Full mask for exact match
+            prescaler_type: prescaler_type
+          };
+
+          if (prescaler_value !== undefined) {
+            filter.prescaler_value = prescaler_value;
+          }
+
+          filters.push(filter);
         } else {
-          // Individual ID - use range method
+          // CANedge: Individual ID - use range method
           const isExtended = entry.idInt > 0x7FF;
           const idHex = entry.id.toUpperCase();
 
@@ -818,11 +984,22 @@ class FilterBuilderTool extends React.Component {
         }
       }
 
-      filterConfig[configKey] = {
-        filter: {
-          id: filters
+      if (isCanmodRouter) {
+        // CANmod.router: filter is a direct array under phy.can_sX.filter
+        if (!filterConfig.phy) {
+          filterConfig.phy = {};
         }
-      };
+        filterConfig.phy[configKey] = {
+          filter: filters
+        };
+      } else {
+        // CANedge: filter.id is an array under can_X.filter.id
+        filterConfig[configKey] = {
+          filter: {
+            id: filters
+          }
+        };
+      }
     }
 
     this.setState({ generatedFilterConfig: filterConfig }, () => {
@@ -886,6 +1063,7 @@ class FilterBuilderTool extends React.Component {
   validateCombinedFilterLimits() {
     const { generatedFilterConfig, filterMergeMode } = this.state;
     const { formData } = this.props;
+    const isCanmodRouter = this.isCanmodRouter();
 
     if (!formData || Object.keys(generatedFilterConfig).length === 0) {
       return { valid: true };
@@ -896,52 +1074,77 @@ class FilterBuilderTool extends React.Component {
       return { valid: true };
     }
 
-    // For append modes, we need to check existing + new
-    const channelToConfigKey = {
-      "CAN1": "can_1",
-      "CAN2": "can_2",
-      "CAN9": "can_internal"
-    };
-
     const errors = [];
 
-    for (const [channel, configKey] of Object.entries(channelToConfigKey)) {
-      // Count existing filters in formData
-      let existing11Bit = 0;
-      let existing29Bit = 0;
+    if (isCanmodRouter) {
+      // CANmod.router: filters are in phy.can_sX.filter (direct array)
+      // 32 total filters per channel regardless of bit type
+      const channelMapping = this.getChannelMapping();
+      
+      for (const [csvChannel, configKey] of Object.entries(channelMapping)) {
+        // Count existing filters
+        let existingCount = 0;
+        if (formData.phy?.[configKey]?.filter && Array.isArray(formData.phy[configKey].filter)) {
+          existingCount = formData.phy[configKey].filter.length;
+        }
 
-      if (formData[configKey] && formData[configKey].filter && formData[configKey].filter.id) {
-        for (const filter of formData[configKey].filter.id) {
-          if (filter.id_format === 1) {
-            existing29Bit++;
-          } else {
-            existing11Bit++;
-          }
+        // Count new filters
+        let newCount = 0;
+        if (generatedFilterConfig.phy?.[configKey]?.filter && Array.isArray(generatedFilterConfig.phy[configKey].filter)) {
+          newCount = generatedFilterConfig.phy[configKey].filter.length;
+        }
+
+        const totalCount = existingCount + newCount;
+        if (totalCount > MAX_FILTERS_CANMOD_ROUTER) {
+          errors.push(`${csvChannel}: Combined filters (${existingCount} existing + ${newCount} new = ${totalCount}) exceeds limit of ${MAX_FILTERS_CANMOD_ROUTER}`);
         }
       }
+    } else {
+      // CANedge: filters are in can_X.filter.id
+      const channelToConfigKey = {
+        "CAN1": "can_1",
+        "CAN2": "can_2",
+        "CAN9": "can_internal"
+      };
 
-      // Count new filters in generatedFilterConfig
-      let new11Bit = 0;
-      let new29Bit = 0;
+      for (const [channel, configKey] of Object.entries(channelToConfigKey)) {
+        // Count existing filters in formData
+        let existing11Bit = 0;
+        let existing29Bit = 0;
 
-      if (generatedFilterConfig[configKey] && generatedFilterConfig[configKey].filter && generatedFilterConfig[configKey].filter.id) {
-        for (const filter of generatedFilterConfig[configKey].filter.id) {
-          if (filter.id_format === 1) {
-            new29Bit++;
-          } else {
-            new11Bit++;
+        if (formData[configKey] && formData[configKey].filter && formData[configKey].filter.id) {
+          for (const filter of formData[configKey].filter.id) {
+            if (filter.id_format === 1) {
+              existing29Bit++;
+            } else {
+              existing11Bit++;
+            }
           }
         }
-      }
 
-      const total11Bit = existing11Bit + new11Bit;
-      const total29Bit = existing29Bit + new29Bit;
+        // Count new filters in generatedFilterConfig
+        let new11Bit = 0;
+        let new29Bit = 0;
 
-      if (total11Bit > MAX_11BIT_FILTERS) {
-        errors.push(`${channel}: Combined 11-bit filters (${existing11Bit} existing + ${new11Bit} new = ${total11Bit}) exceeds limit of ${MAX_11BIT_FILTERS}`);
-      }
-      if (total29Bit > MAX_29BIT_FILTERS) {
-        errors.push(`${channel}: Combined 29-bit filters (${existing29Bit} existing + ${new29Bit} new = ${total29Bit}) exceeds limit of ${MAX_29BIT_FILTERS}`);
+        if (generatedFilterConfig[configKey] && generatedFilterConfig[configKey].filter && generatedFilterConfig[configKey].filter.id) {
+          for (const filter of generatedFilterConfig[configKey].filter.id) {
+            if (filter.id_format === 1) {
+              new29Bit++;
+            } else {
+              new11Bit++;
+            }
+          }
+        }
+
+        const total11Bit = existing11Bit + new11Bit;
+        const total29Bit = existing29Bit + new29Bit;
+
+        if (total11Bit > MAX_11BIT_FILTERS_CANEDGE) {
+          errors.push(`${channel}: Combined 11-bit filters (${existing11Bit} existing + ${new11Bit} new = ${total11Bit}) exceeds limit of ${MAX_11BIT_FILTERS_CANEDGE}`);
+        }
+        if (total29Bit > MAX_29BIT_FILTERS_CANEDGE) {
+          errors.push(`${channel}: Combined 29-bit filters (${existing29Bit} existing + ${new29Bit} new = ${total29Bit}) exceeds limit of ${MAX_29BIT_FILTERS_CANEDGE}`);
+        }
       }
     }
 
@@ -958,28 +1161,57 @@ class FilterBuilderTool extends React.Component {
    */
   removeDuplicateFilters(config) {
     let totalDuplicatesRemoved = 0;
-    const channels = ["can_1", "can_2", "can_internal"];
+    const isCanmodRouter = this.isCanmodRouter();
 
-    for (const channel of channels) {
-      if (config[channel] && config[channel].filter && config[channel].filter.id) {
-        const filters = config[channel].filter.id;
-        const seen = new Set();
-        const uniqueFilters = [];
+    if (isCanmodRouter) {
+      // CANmod.router: filters are in phy.can_sX.filter (direct array)
+      const channels = ["can_s1", "can_s2", "can_s3", "can_s4"];
 
-        for (const filter of filters) {
-          // Create a key from all fields except 'name'
-          const { name, ...fieldsWithoutName } = filter;
-          const key = JSON.stringify(fieldsWithoutName);
+      for (const channel of channels) {
+        if (config.phy?.[channel]?.filter && Array.isArray(config.phy[channel].filter)) {
+          const filters = config.phy[channel].filter;
+          const seen = new Set();
+          const uniqueFilters = [];
 
-          if (!seen.has(key)) {
-            seen.add(key);
-            uniqueFilters.push(filter);
-          } else {
-            totalDuplicatesRemoved++;
+          for (const filter of filters) {
+            const { name, ...fieldsWithoutName } = filter;
+            const key = JSON.stringify(fieldsWithoutName);
+
+            if (!seen.has(key)) {
+              seen.add(key);
+              uniqueFilters.push(filter);
+            } else {
+              totalDuplicatesRemoved++;
+            }
           }
-        }
 
-        config[channel].filter.id = uniqueFilters;
+          config.phy[channel].filter = uniqueFilters;
+        }
+      }
+    } else {
+      // CANedge: filters are in can_X.filter.id
+      const channels = ["can_1", "can_2", "can_internal"];
+
+      for (const channel of channels) {
+        if (config[channel] && config[channel].filter && config[channel].filter.id) {
+          const filters = config[channel].filter.id;
+          const seen = new Set();
+          const uniqueFilters = [];
+
+          for (const filter of filters) {
+            const { name, ...fieldsWithoutName } = filter;
+            const key = JSON.stringify(fieldsWithoutName);
+
+            if (!seen.has(key)) {
+              seen.add(key);
+              uniqueFilters.push(filter);
+            } else {
+              totalDuplicatesRemoved++;
+            }
+          }
+
+          config[channel].filter.id = uniqueFilters;
+        }
       }
     }
 
@@ -1005,9 +1237,6 @@ class FilterBuilderTool extends React.Component {
 
     // Remove duplicate filter entries
     const { config: dedupedConfig, duplicatesRemoved } = this.removeDuplicateFilters(JSON.parse(JSON.stringify(mergedConfig)));
-
-    // Log the final config for troubleshooting
-    console.log("Merged filter configuration:", dedupedConfig);
 
     this.props.setConfigContent(dedupedConfig);
     this.props.setUpdatedFormData(dedupedConfig);
@@ -1058,16 +1287,22 @@ class FilterBuilderTool extends React.Component {
     const filteredEntries = this.getFilteredEntries();
     const allFilteredSelected = filteredEntries.length > 0 && filteredEntries.every(e => e.selected);
 
-    // Calculate max percentage for bar scaling (excluding N/A entries)
-    const entriesWithPercentage = filteredEntries.filter(e => e.percentage !== null && !e.isGroup);
-    const groupedEntries = filteredEntries.filter(e => e.isGroup);
-    const maxPercentage = entriesWithPercentage.length > 0
-      ? Math.max(...entriesWithPercentage.map(e => e.percentage))
-      : (groupedEntries.length > 0 ? Math.max(...groupedEntries.map(e => e.groupedPercentage)) : 100);
+    // Calculate max percentage for bar scaling - consider both individual and grouped entries
+    const allPercentages = filteredEntries
+      .map(e => e.isGroup ? e.groupedPercentage : e.percentage)
+      .filter(p => p !== null && p !== undefined);
+    const maxPercentage = allPercentages.length > 0 ? Math.max(...allPercentages) : 100;
 
     return (
       <div>
         <h4>Filter builder</h4>
+
+        {/* Warning for non-router CANmod devices */}
+        {this.props.deviceType === "CANmod" && this.props.formData && Object.keys(this.props.formData).length > 0 && !this.isCanmodRouter() && (
+          <div style={{ fontSize: "12px", color: "#d9534f", marginBottom: "10px" }}>
+            Only supported for CANmod.router
+          </div>
+        )}
 
         {/* Evaluate log file section */}
         <div className="form-group pl0 field-string">
@@ -1103,7 +1338,10 @@ class FilterBuilderTool extends React.Component {
             </div>
           </div>
           <p className="field-description field-description-shift">
-            Load a CSV output from the MF4 converter 'mdf2csv' which reflects a realistic log session with the default filters applied. Recommended CSV file size is 1-10 MB. Optionally load DBC file(s) to add further details or enable filter selection based on DBC messages. DBC files must have a CAN channel prefix (e.g. can1-abc.dbc).
+            {this.props.deviceType === "CANmod" 
+              ? "Load a CSV log file output from the MF4 converter 'mdf2csv' which reflects a realistic log session with the default filters applied. The MF4 should be recorded with a CANedge with one or two CANmod.router(s) on CAN2. The CSV should be created by first demuxing the MF4 via the 'mdf2mdf' converter using the argument '--muxtp-can2=010#11:12:13:14'. If you are analyzing a second router, use --muxtp-can2=012#15:16:17:18. Recommended CSV file size is 1-10 MB. Optionally load DBC file(s) to add further details or enable filter selection based on DBC messages. DBC files must have a CAN channel prefix (e.g. can11-abc.dbc)."
+              : "Load a CSV log file output from the MF4 converter 'mdf2csv' which reflects a realistic log session with the default filters applied. Recommended CSV file size is 1-10 MB. Optionally load DBC file(s) to add further details or enable filter selection based on DBC messages. DBC files must have a CAN channel prefix (e.g. can1-abc.dbc)."
+            }
           </p>
 
           {/* Loaded file names */}
@@ -1138,13 +1376,9 @@ class FilterBuilderTool extends React.Component {
           </div>
         )}
 
-        {/* Show filtered summary checkbox - only show when CSV is loaded, disabled if no config or not 01.09 */}
+        {/* Show filtered summary checkbox - only show when CSV is loaded, disabled if no config or unsupported firmware */}
         {csvData && (() => {
-          const configFileName = this.props.editorConfigFiles && this.props.editorConfigFiles.length > 0 
-            ? this.props.editorConfigFiles[0].name 
-            : "";
-          const isVersion0109 = configFileName.includes("01.09");
-          const isEnabled = this.props.formData && isVersion0109;
+          const isEnabled = this.props.formData && this.isFirmwareVersionSupported();
           return (
             <div className="form-group pl0 field-string" style={{ marginTop: "6px", marginBottom: "0px" }}>
               <label 
@@ -1182,6 +1416,33 @@ class FilterBuilderTool extends React.Component {
         {/* Analysis results */}
         {(csvData || this.state.dbcData) && !isLoading && (
           <div>
+            {/* Channel mapping for CANmod.router */}
+            {this.props.deviceType === "CANmod" && this.isCanmodRouter() && (
+              <div className="form-group pl0 field-string" style={{ marginTop: "15px", marginBottom: "10px" }}>
+                <div style={{ marginBottom: "4px" }}>Channel mapping</div>
+                <div 
+                  style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}
+                  title="Control how the demuxed CSV CAN channels map from/to the Configuration File CAN channels."
+                >
+                  {["S1", "S2", "S3", "S4"].map((label, idx) => (
+                    <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      <span style={{ fontSize: "12px" }}>{label}:</span>
+                      <input
+                        type="text"
+                        className="form-control encryption-input"
+                        value={this.state[`channelMap${label}`]}
+                        onChange={(e) => this.setState({ [`channelMap${label}`]: e.target.value })}
+                        style={{ width: "36px", padding: "1px 4px", fontSize: "12px", height: "22px" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <span className="field-description field-description-shift">
+                  Control how the demuxed CSV CAN channels map from/to the Configuration File CAN channels.
+                </span>
+              </div>
+            )}
+
             {/* Summary statistics label */}
             <div className="form-group pl0 field-string" style={{ marginTop: "15px", marginBottom: "5px" }}>
               Summary statistics
@@ -1246,19 +1507,22 @@ class FilterBuilderTool extends React.Component {
               </div>
 
               {/* Entries */}
-              {filteredEntries.map((entry) => (
+              {filteredEntries.map((entry) => {
+                const isChannelValid = this.props.deviceType === "CANmod" ? this.isChannelValid(entry.channel) : true;
+                return (
                 <div
                   key={entry.uniqueId}
-                  onClick={() => this.handleEntryToggle(entry.uniqueId)}
+                  onClick={() => isChannelValid && this.handleEntryToggle(entry.uniqueId)}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     padding: "0px 8px",
                     borderBottom: "1px solid #eee",
                     fontSize: "12px",
-                    cursor: "pointer",
+                    cursor: isChannelValid ? "pointer" : "not-allowed",
                     backgroundColor: entry.selected ? "#e8f4fc" : (entry.fromDbcOnly ? "#f9f9f9" : "#fff"),
-                    minWidth: "fit-content"
+                    minWidth: "fit-content",
+                    opacity: isChannelValid ? 1 : 0.4
                   }}
                 >
                   {/* Checkbox */}
@@ -1267,7 +1531,8 @@ class FilterBuilderTool extends React.Component {
                       <input
                         type="checkbox"
                         checked={entry.selected}
-                        onChange={() => this.handleEntryToggle(entry.uniqueId)}
+                        disabled={!isChannelValid}
+                        onChange={() => isChannelValid && this.handleEntryToggle(entry.uniqueId)}
                       />
                       <span></span>
                     </label>
@@ -1402,7 +1667,8 @@ class FilterBuilderTool extends React.Component {
                     {entry.signals ? entry.signals.join(', ') : ''}
                   </span>
                 </div>
-              ))}
+              );
+              })}
 
               {filteredEntries.length === 0 && (
                 <div style={{ padding: "10px", textAlign: "center", color: "#999" }}>
@@ -1480,6 +1746,7 @@ class FilterBuilderTool extends React.Component {
                       Showing filtered summary (reduction: <strong>{this.state.filterReductionPercent.toFixed(1)}%</strong>)
                     </div>
                   )}
+
                 </div>
               );
             })()}
@@ -1501,7 +1768,7 @@ class FilterBuilderTool extends React.Component {
 
                   {/* Type and Prescaler dropdowns - same row */}
                   <div className="row">
-                    <div className="col-xs-6">
+                    <div className="col-xs-6" style={{ opacity: this.props.deviceType === "CANmod" ? 0.5 : 1, pointerEvents: this.props.deviceType === "CANmod" ? "none" : "auto" }}>
                       <SimpleDropdown
                         name="Type"
                         options={[
@@ -1511,6 +1778,9 @@ class FilterBuilderTool extends React.Component {
                         value={this.state.filterType}
                         onChange={(opt) => this.setState({ filterType: opt.value }, () => this.generateFilterConfig())}
                       />
+                      {this.props.deviceType === "CANmod" && (
+                        <span className="field-description" style={{ fontSize: "11px", color: "#999" }}>CANmod only supports acceptance filters</span>
+                      )}
                     </div>
                     {this.state.filterType === "acceptance" && (
                       <div className="col-xs-6">
@@ -1618,17 +1888,21 @@ class FilterBuilderTool extends React.Component {
 
                   {/* Action buttons */}
                   {(() => {
-                    const configFileName = this.props.editorConfigFiles && this.props.editorConfigFiles.length > 0 
-                      ? this.props.editorConfigFiles[0].name 
-                      : "";
-                    const isVersion0109 = configFileName.includes("01.09");
+                    const isFirmwareSupported = this.isFirmwareVersionSupported();
+                    const isCanmod = this.props.deviceType === "CANmod";
+                    const isCanmodRouter = isCanmod && this.isCanmodRouter();
+                    const minFirmware = isCanmod ? MIN_FIRMWARE_CANMOD_ROUTER : MIN_FIRMWARE_CANEDGE;
+                    
+                    // For CANmod, only CANmod.router is supported
+                    const isDeviceSupported = !isCanmod || isCanmodRouter;
+                    
                     return (
                       <React.Fragment>
                         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                           <button
                             className="btn btn-primary"
                             onClick={this.onMerge}
-                            disabled={!this.props.formData || Object.keys(this.props.formData).length === 0 || this.state.mergedConfigValid !== true || !isVersion0109}
+                            disabled={!this.props.formData || Object.keys(this.props.formData).length === 0 || this.state.mergedConfigValid !== true || !isFirmwareSupported || !isDeviceSupported}
                           >
                             Merge files
                           </button>
@@ -1640,9 +1914,9 @@ class FilterBuilderTool extends React.Component {
                             Download JSON
                           </button>
                         </div>
-                        {this.props.formData && Object.keys(this.props.formData).length > 0 && !isVersion0109 && (
+                        {this.props.formData && Object.keys(this.props.formData).length > 0 && isDeviceSupported && !isFirmwareSupported && (
                           <div style={{ fontSize: "12px", color: "#666", marginTop: "8px" }}>
-                            Merging requires firmware 01.09.XX+ - please update your device
+                            Merging requires firmware {minFirmware}.XX+ - please update your device
                           </div>
                         )}
                       </React.Fragment>
@@ -1701,6 +1975,7 @@ const mapStateToProps = (state) => {
     formData: state.editor.formData,
     schemaContent: state.editor.schemaContent,
     editorConfigFiles: state.editor.editorConfigFiles,
+    detectedDeviceType: state.editor.detectedDeviceType,
   };
 };
 

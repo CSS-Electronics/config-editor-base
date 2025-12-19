@@ -15,7 +15,7 @@ import AlertContainer from "../alert/AlertContainer";
 // define editor title and version
 const TYPE = "CANedge"
 const title = TYPE + " config editor"
-const version = "v2.7.9"
+const version = "v2.9.0"
 
 // define UIschema and Rule Schema names for auto-loading purposes
 export const uiSchemaAry = {"CANedge": [
@@ -74,7 +74,7 @@ class Editor extends React.Component {
         name: "filter-builder-modal",
         comment: "Filter builder",
         class: "fa fa-sliders",
-        modal: <FilterBuilderTool showAlert={this.props.showAlert} />,
+        modal: <FilterBuilderTool showAlert={this.props.showAlert} deviceType={TYPE} />,
       },
       {
         name: "encryption-modal",
@@ -94,7 +94,14 @@ class Editor extends React.Component {
         class: "fa fa-calculator",
         modal: <BitRateModal showAlert={this.props.showAlert} />,
       },
-    ], "CANmod": []};
+    ], "CANmod": [
+      {
+        name: "filter-builder-modal",
+        comment: "Filter builder",
+        class: "fa fa-sliders",
+        modal: <FilterBuilderTool showAlert={this.props.showAlert} deviceType={TYPE} />,
+      },
+    ]};
 
     return (
        <div className="file-explorer">

@@ -432,17 +432,28 @@ class OBDTool extends React.Component {
   }
 
   onMerge() {
-    const { mergedConfig, mergedConfigValid } = this.state;
+    const { combinedConfig, mergedConfigValid } = this.state;
+    const { formData } = this.props;
     
     // Check schema validation first
     if (mergedConfigValid !== true) {
-      console.log("Merged config that failed validation:", mergedConfig);
       this.props.showAlert("warning", "Cannot merge - the combined configuration is invalid. Check console for details.");
       return;
     }
+
+    if (!formData || !combinedConfig || Object.keys(combinedConfig).length === 0) {
+      this.props.showAlert("warning", "No OBD configuration to merge.");
+      return;
+    }
     
-    this.props.setConfigContent(mergedConfig);
-    this.props.setUpdatedFormData(mergedConfig);
+    // Always regenerate merged config using current formData to ensure we use latest config state
+    const overwriteMerge = (destinationArray, sourceArray, options) => sourceArray;
+    const freshMergedConfig = merge(formData, combinedConfig, {
+      arrayMerge: overwriteMerge,
+    });
+    
+    this.props.setConfigContent(freshMergedConfig);
+    this.props.setUpdatedFormData(freshMergedConfig);
     this.props.showAlert("success", "Merged OBD transmit list with Configuration File");
   }
 

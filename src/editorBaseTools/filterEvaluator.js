@@ -19,27 +19,76 @@
  */
 
 /**
+ * Get the mux ID from CANmod.router config
+ * @param {Object} configData - The parsed Configuration File JSON
+ * @returns {number} Mux ID (10 or 12)
+ */
+function getMuxIdFromConfig(configData) {
+  if (configData?.phy?.can?.route?.mux?.s2p?.message?.id !== undefined) {
+    // The id is stored as a string in the config (e.g., "10" or "12")
+    return parseInt(configData.phy.can.route.mux.s2p.message.id, 10);
+  }
+  return 10; // Default to first router
+}
+
+/**
  * Extract filter configuration from the Configuration File for all CAN channels
  * @param {Object} configData - The parsed Configuration File JSON
+ * @param {string} detectedDeviceType - Device type from Redux state (e.g., "CANmod.router")
  * @returns {Object} Map of channel number to filter config
  */
-export function extractFilters(configData) {
+export function extractFilters(configData, detectedDeviceType) {
   const filters = {};
   
-  // Map BusChannel numbers to config keys
-  const channelMap = {
-    1: 'can_1',
-    2: 'can_2',
-    9: 'can_internal'
-  };
-  
-  for (const [busChannel, configKey] of Object.entries(channelMap)) {
-    const channelConfig = configData[configKey];
-    if (channelConfig && channelConfig.filter && channelConfig.filter.id) {
-      filters[busChannel] = {
-        remoteFrames: channelConfig.filter.remote_frames || 0,
-        idFilters: channelConfig.filter.id.filter(f => f.state === 1) // Only enabled filters
-      };
+  // Check if this is a CANmod.router config using the detected device type
+  if (detectedDeviceType === "CANmod.router") {
+    // CANmod.router: filters are in phy.can_sX.filter (direct array)
+    // Reverse map: can_s1-s4 → CAN11-14 (mux 10) or CAN15-18 (mux 12)
+    const muxId = getMuxIdFromConfig(configData);
+    const baseChannel = muxId === 12 ? 15 : 11;
+    
+    const canmodChannelMap = {
+      'can_s1': baseChannel,
+      'can_s2': baseChannel + 1,
+      'can_s3': baseChannel + 2,
+      'can_s4': baseChannel + 3
+    };
+    
+    for (const [configKey, busChannel] of Object.entries(canmodChannelMap)) {
+      const channelConfig = configData.phy?.[configKey];
+      if (channelConfig && channelConfig.filter && Array.isArray(channelConfig.filter)) {
+        // CANmod.router uses frame_format instead of type/method
+        // Convert to CANedge-compatible format for processing
+        const convertedFilters = channelConfig.filter
+          .filter(f => f.state === 1)
+          .map(f => ({
+            ...f,
+            type: 0, // CANmod.router only has acceptance filters
+            method: 1 // CANmod.router always uses mask method
+          }));
+        
+        filters[busChannel] = {
+          remoteFrames: 0,
+          idFilters: convertedFilters
+        };
+      }
+    }
+  } else {
+    // CANedge: Map BusChannel numbers to config keys
+    const channelMap = {
+      1: 'can_1',
+      2: 'can_2',
+      9: 'can_internal'
+    };
+    
+    for (const [busChannel, configKey] of Object.entries(channelMap)) {
+      const channelConfig = configData[configKey];
+      if (channelConfig && channelConfig.filter && channelConfig.filter.id) {
+        filters[busChannel] = {
+          remoteFrames: channelConfig.filter.remote_frames || 0,
+          idFilters: channelConfig.filter.id.filter(f => f.state === 1) // Only enabled filters
+        };
+      }
     }
   }
   
@@ -340,10 +389,11 @@ export function calculateReduction(originalCount, filteredCount) {
  * Main function to evaluate CSV data with filter settings
  * @param {Array} frames - Array of parsed CAN frame objects from CSV
  * @param {Object} configData - The parsed Configuration File JSON
+ * @param {string} detectedDeviceType - Device type from Redux state (e.g., "CANmod.router")
  * @returns {Object} { filteredFrames, stats, reductionPercent }
  */
-export function evaluateFilters(frames, configData) {
-  const filterConfig = extractFilters(configData);
+export function evaluateFilters(frames, configData, detectedDeviceType) {
+  const filterConfig = extractFilters(configData, detectedDeviceType);
   const { filteredFrames, stats } = applyFilters(frames, filterConfig);
   const reductionPercent = calculateReduction(frames.length, filteredFrames.length);
   
