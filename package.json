@@ -1,6 +1,6 @@
 {
   "name": "config-editor-base",
-  "version": "2.9.1",
+  "version": "2.9.3",
   "description": "React-based JSON Schema editor base-tool",
   "author": "CSS Electronics",
   "license": "MIT",
@@ -60,6 +60,7 @@
     "@rjsf/core": "5.0.0-beta.10",
     "@rjsf/utils": "5.0.0-beta.10",
     "@rjsf/validator-ajv6": "5.0.0-beta.10",
+    "ajv": "^6.12.6",
     "deepmerge": "^4.1.1",
     "react-gh-like-diff": "^2.0.2",
     "rjsf-tabs": "^0.0.1"

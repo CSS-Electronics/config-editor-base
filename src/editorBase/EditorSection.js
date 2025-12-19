@@ -477,7 +477,7 @@ export class EditorSection extends React.Component {
                           opacity: this.state.showNewToolsHighlight ? 1 : 0
                         }}
                       >
-                        New: OBD &amp; filter builder tools
+                        Tip: New editor tools added
                       </span>
                     )}
                   </div>

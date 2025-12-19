@@ -2,8 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import Files from "react-files";
 import * as actionsEditor from "../editorBase/actions";
-import validator from "@rjsf/validator-ajv6";
-import Form from "@rjsf/core";
+import Ajv from "ajv";
 import SimpleDropdown from "./SimpleDropdown";
 
 // Import PID data, control signal config, and identify supported PIDs config
@@ -13,8 +12,6 @@ import identifySupportedPidsConfig from "../editorBaseTools/obd/identify-support
 import { parseSupportedPids } from "../editorBaseTools/obd/supportedPidsParser";
 
 const merge = require("deepmerge");
-
-let yourForm;
 
 // Options for dropdowns
 const modeOptions = [
@@ -417,8 +414,17 @@ class OBDTool extends React.Component {
     });
 
     this.setState({ mergedConfig: mergedConfigTemp }, () => {
-      if (yourForm) {
-        yourForm.submit();
+      // Validate merged config against schema using AJV directly
+      const { schemaContent } = this.props;
+      if (schemaContent && mergedConfigTemp) {
+        try {
+          const ajv = new Ajv({ allErrors: true, strict: false, logger: false });
+          const validate = ajv.compile(schemaContent);
+          const valid = validate(mergedConfigTemp);
+          this.setState({ mergedConfigValid: valid });
+        } catch (e) {
+          this.setState({ mergedConfigValid: false });
+        }
       }
     });
   }
@@ -874,17 +880,6 @@ class OBDTool extends React.Component {
         {/* Spacer - always visible */}
         <div><br /><br /><br /><br /><br /><br /></div>
 
-        {/* Hidden form for validation */}
-        <div style={{ display: "none" }}>
-          <Form
-            validator={validator}
-            onError={this.onValidationError}
-            schema={schemaContent ? schemaContent : {}}
-            formData={mergedConfig ? mergedConfig : {}}
-            onSubmit={this.onSubmit}
-            ref={(form) => { yourForm = form; }}
-          />
-        </div>
       </div>
     );
   }

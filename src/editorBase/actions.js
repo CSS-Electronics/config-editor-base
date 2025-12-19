@@ -543,8 +543,6 @@ export const checkConfigFilterLimits = (content) => {
           }
         }
 
-        console.log("count11Bit", count11Bit)
-        console.log("count29Bit", count29Bit)
         if (count11Bit > MAX_11BIT_FILTERS) {
           dispatch(
             alertActions.set({

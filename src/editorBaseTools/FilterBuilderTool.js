@@ -2,16 +2,13 @@ import React from "react";
 import { connect } from "react-redux";
 import Files from "react-files";
 import * as actionsEditor from "../editorBase/actions";
-import validator from "@rjsf/validator-ajv6";
-import Form from "@rjsf/core";
+import Ajv from "ajv";
 import { parseCanFrameCsv } from "./canFrameCsvParser";
 import { parseDbcFiles, findDbcMatch, extractPgn } from "./dbcParser";
 import { evaluateFilters } from "./filterEvaluator";
 import SimpleDropdown from "./SimpleDropdown";
 
 const merge = require("deepmerge");
-
-let yourForm;
 
 // Prescaler options
 const prescalerOptions = [
@@ -1043,8 +1040,17 @@ class FilterBuilderTool extends React.Component {
     }
 
     this.setState({ mergedConfig: mergedConfigTemp }, () => {
-      if (yourForm) {
-        yourForm.submit();
+      // Validate merged config against schema using AJV directly
+      const { schemaContent } = this.props;
+      if (schemaContent && mergedConfigTemp) {
+        try {
+          const ajv = new Ajv({ allErrors: true, strict: false, logger: false });
+          const validate = ajv.compile(schemaContent);
+          const valid = validate(mergedConfigTemp);
+          this.setState({ mergedConfigValid: valid });
+        } catch (e) {
+          this.setState({ mergedConfigValid: false });
+        }
       }
     });
   }
@@ -1951,17 +1957,6 @@ class FilterBuilderTool extends React.Component {
           </div>
         )}
 
-        {/* Hidden form for validation */}
-        <div style={{ display: "none" }}>
-          <Form
-            validator={validator}
-            onError={this.onValidationError}
-            schema={this.props.schemaContent ? this.props.schemaContent : {}}
-            formData={this.state.mergedConfig ? this.state.mergedConfig : {}}
-            onSubmit={this.onSubmit}
-            ref={(form) => { yourForm = form; }}
-          />
-        </div>
 
         {/* Spacer */}
         <div><br /><br /><br /><br /><br /><br /></div>
