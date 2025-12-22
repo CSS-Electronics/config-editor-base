@@ -107,7 +107,14 @@ class OBDTool extends React.Component {
   }
 
   handleModeChange(selectedOption) {
-    this.setState({ toolMode: selectedOption.value }, () => {
+    // Clear generated config state when switching modes
+    this.setState({ 
+      toolMode: selectedOption.value,
+      generatedConfig: {},
+      combinedConfig: {},
+      mergedConfig: {},
+      mergedConfigValid: "Unknown"
+    }, () => {
       if (selectedOption.value === "test") {
         this.generateTestConfig();
       }
@@ -557,7 +564,7 @@ class OBDTool extends React.Component {
         {/* CSV Upload for supported PIDs mode */}
         {toolMode === "supported" && (
           <div className="form-group pl0 field-string">
-            <p className="reduced-margin" style={{fontSize: "12px", marginBottom: "5px"}}>Load mdf2csv output with your supported PIDs test:</p>
+            <p className="reduced-margin" style={{fontSize: "12px", marginBottom: "5px"}}>Load 'mdf2csv' output with supported PIDs test:</p>
             <div className="text-area-wrapper row no-gutters reduced-margin">
               <div className="file-dropzone">
                 <Files

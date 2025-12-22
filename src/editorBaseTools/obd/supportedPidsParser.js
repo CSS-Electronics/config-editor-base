@@ -11,8 +11,13 @@ import { parseCanFrameCsv, getReceiveFrames, isObdResponse29Bit } from '../canFr
  * @returns {Object} Object containing supported PIDs info and detected settings
  */
 export function parseSupportedPids(csvContent) {
-  const frames = parseCanFrameCsv(csvContent);
-  const receiveFrames = getReceiveFrames(frames);
+  const parseResult = parseCanFrameCsv(csvContent);
+  
+  if (parseResult.error) {
+    throw new Error(parseResult.error);
+  }
+  
+  const receiveFrames = getReceiveFrames(parseResult.frames);
   
   // Separate 11-bit and 29-bit OBD responses
   const obd11BitResponses = receiveFrames.filter(f => f.ide === 0 && f.id === '7E8');
@@ -77,7 +82,7 @@ export function parseSupportedPids(csvContent) {
     transmitId: use29Bit ? '18DB33F1' : '7DF',
     canIdType: use29Bit ? '29bit' : '11bit',
     responseCount: relevantResponses.length,
-    totalFrames: frames.length,
+    totalFrames: parseResult.frames.length,
     hasMixedIds: hasBothIdTypes,
     hasMixedProtocols: hasMixedProtocols,
     allProtocolsDetected: Array.from(protocolsDetected),

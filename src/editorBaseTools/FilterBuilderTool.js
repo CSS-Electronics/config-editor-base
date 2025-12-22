@@ -814,7 +814,7 @@ class FilterBuilderTool extends React.Component {
    * Generate filter configuration from selected entries
    */
   generateFilterConfig() {
-    const { mergedEntries, groupJ1939Pgns, filterType, prescalerType, prescalerValue, dataPrescalerMask } = this.state;
+    const { mergedEntries, groupJ1939Pgns, filterType, prescalerType, prescalerValue, dataPrescalerMask, csvData } = this.state;
 
     // Get selected entries
     const selectedEntries = mergedEntries.filter(e => e.selected);
@@ -962,20 +962,48 @@ class FilterBuilderTool extends React.Component {
           filters.push(filter);
         } else if (isCanmodRouter) {
           // CANmod.router: use mask method only (no range support)
-          // For exact ID match: f1 = ID, f2 = 7FF (11-bit) or 1FFFFFFF (29-bit)
           // CANmod.router uses different filter structure: frame_format instead of method/type
           const isExtended = entry.idInt > 0x7FF;
           const idHex = parseInt(entry.id, 16).toString(16).toUpperCase(); // Normalize ID
 
-          const filter = {
-            name: (entry.messageName || idHex).substring(0, 16),
-            state: 1,
-            id_format: isExtended ? 1 : 0,
-            frame_format: 2, // 2 = Both (CAN + CAN FD)
-            f1: idHex,
-            f2: isExtended ? "1FFFFFFF" : "7FF", // Full mask for exact match
-            prescaler_type: prescaler_type
-          };
+          // Special case: DBC-only J1939 29-bit IDs should use PGN mask method
+          const isDbcOnlyJ1939 = !csvData && entry.isJ1939 && isExtended;
+
+          let filter;
+          if (isDbcOnlyJ1939) {
+            // Use PGN mask method for J1939 DBC-only entries
+            const pgn = extractPgn(entry.idInt);
+            const isPdu1 = (pgn & 0xFF00) < 0xF000;
+
+            // For mask method: f1 = filter ID, f2 = mask
+            // PDU1: mask 3FF0000 (ignores destination + source)
+            // PDU2: mask 3FFFF00 (ignores source only)
+            const mask = isPdu1 ? "3FF0000" : "3FFFF00";
+            const filterId = isPdu1
+              ? ((pgn & 0x3FF00) << 8).toString(16).toUpperCase()
+              : (pgn << 8).toString(16).toUpperCase();
+
+            filter = {
+              name: (entry.messageName || `PGN ${pgn.toString(16).toUpperCase()}`).substring(0, 16),
+              state: 1,
+              id_format: 1, // Extended (29-bit)
+              frame_format: 2, // 2 = Both (CAN + CAN FD)
+              f1: filterId,
+              f2: mask,
+              prescaler_type: prescaler_type
+            };
+          } else {
+            // For exact ID match: f1 = ID, f2 = 7FF (11-bit) or 1FFFFFFF (29-bit)
+            filter = {
+              name: (entry.messageName || idHex).substring(0, 16),
+              state: 1,
+              id_format: isExtended ? 1 : 0,
+              frame_format: 2, // 2 = Both (CAN + CAN FD)
+              f1: idHex,
+              f2: isExtended ? "1FFFFFFF" : "7FF", // Full mask for exact match
+              prescaler_type: prescaler_type
+            };
+          }
 
           if (prescaler_value !== undefined) {
             filter.prescaler_value = prescaler_value;
@@ -983,20 +1011,50 @@ class FilterBuilderTool extends React.Component {
 
           filters.push(filter);
         } else {
-          // CANedge: Individual ID - use range method
+          // CANedge: Individual ID
           const isExtended = entry.idInt > 0x7FF;
           const idHex = entry.id.toUpperCase();
 
-          const filter = {
-            name: (entry.messageName || idHex).substring(0, 16),
-            state: 1,
-            type: filterTypeValue,
-            id_format: isExtended ? 1 : 0,
-            method: 0, // Range
-            f1: idHex,
-            f2: idHex,
-            prescaler_type: prescaler_type
-          };
+          // Special case: DBC-only J1939 29-bit IDs should use PGN mask method
+          const isDbcOnlyJ1939 = !csvData && entry.isJ1939 && isExtended;
+
+          let filter;
+          if (isDbcOnlyJ1939) {
+            // Use PGN mask method for J1939 DBC-only entries
+            const pgn = extractPgn(entry.idInt);
+            const isPdu1 = (pgn & 0xFF00) < 0xF000;
+
+            // For mask method: f1 = filter ID, f2 = mask
+            // PDU1: mask 3FF0000 (ignores destination + source)
+            // PDU2: mask 3FFFF00 (ignores source only)
+            const mask = isPdu1 ? "3FF0000" : "3FFFF00";
+            const filterId = isPdu1
+              ? ((pgn & 0x3FF00) << 8).toString(16).toUpperCase()
+              : (pgn << 8).toString(16).toUpperCase();
+
+            filter = {
+              name: (entry.messageName || `PGN ${pgn.toString(16).toUpperCase()}`).substring(0, 16),
+              state: 1,
+              type: filterTypeValue,
+              id_format: 1, // Extended (29-bit)
+              method: 1, // Mask
+              f1: filterId,
+              f2: mask,
+              prescaler_type: prescaler_type
+            };
+          } else {
+            // Standard range method
+            filter = {
+              name: (entry.messageName || idHex).substring(0, 16),
+              state: 1,
+              type: filterTypeValue,
+              id_format: isExtended ? 1 : 0,
+              method: 0, // Range
+              f1: idHex,
+              f2: idHex,
+              prescaler_type: prescaler_type
+            };
+          }
 
           if (prescaler_value !== undefined) {
             filter.prescaler_value = prescaler_value;
