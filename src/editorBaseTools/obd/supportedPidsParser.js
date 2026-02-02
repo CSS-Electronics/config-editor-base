@@ -36,6 +36,10 @@ export function parseSupportedPids(csvContent) {
   const protocolsDetected = new Set();
   const supportedPidsSet = new Set();
   
+  // Track which supported PID query responses we found and which indicate more ranges
+  const foundSupportedPidQueries = new Set();
+  const rangesIndicatingMore = new Set(); // Ranges where bit 0 is set (indicating next range exists)
+  
   for (const frame of relevantResponses) {
     const data = frame.dataBytes.toUpperCase();
     
@@ -49,7 +53,14 @@ export function parseSupportedPids(csvContent) {
       if (!SUPPORTED_PIDS_QUERY_VALUES.includes(pidRangeStart)) continue;
       
       protocolsDetected.add('OBD2');
+      foundSupportedPidQueries.add(pidRangeStart);
       const supportBits = data.substring(6, 14); // Bytes 4-7 contain the support bitmap
+      
+      // Check if bit 0 (LSB) is set - indicates next range should be queried
+      const bitmapValue = parseInt(supportBits, 16);
+      if (bitmapValue & 1) {
+        rangesIndicatingMore.add(pidRangeStart);
+      }
       
       extractSupportedPidsFromBitmap(pidRangeStart, supportBits, supportedPidsSet);
     }
@@ -61,9 +72,37 @@ export function parseSupportedPids(csvContent) {
       if (!SUPPORTED_PIDS_QUERY_VALUES.includes(pidRangeStart)) continue;
       
       protocolsDetected.add('WWH-OBD');
+      foundSupportedPidQueries.add(pidRangeStart);
       const supportBits = data.substring(8, 16); // Last 4 bytes contain the support bitmap
       
+      // Check if bit 0 (LSB) is set - indicates next range should be queried
+      const bitmapValue = parseInt(supportBits, 16);
+      if (bitmapValue & 1) {
+        rangesIndicatingMore.add(pidRangeStart);
+      }
+      
       extractSupportedPidsFromBitmap(pidRangeStart, supportBits, supportedPidsSet);
+    }
+  }
+  
+  // Determine which supported PID query responses are missing
+  // PID 00 is always expected if any supported PIDs test was run
+  // Each subsequent range (20, 40, 60, 80, A0, C0) is expected if the previous range indicated more
+  const missingSupportedPidQueries = [];
+  if (foundSupportedPidQueries.size > 0) {
+    // Always expect 00 if we found any supported PID responses
+    if (!foundSupportedPidQueries.has(0x00)) {
+      missingSupportedPidQueries.push('00');
+    }
+    // Check each range - if previous range indicated more PIDs, we expect this range
+    const rangeChain = [0x00, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0];
+    for (let i = 0; i < rangeChain.length - 1; i++) {
+      const currentRange = rangeChain[i];
+      const nextRange = rangeChain[i + 1];
+      // If current range indicated more PIDs exist, we should have the next range
+      if (rangesIndicatingMore.has(currentRange) && !foundSupportedPidQueries.has(nextRange)) {
+        missingSupportedPidQueries.push(nextRange.toString(16).toUpperCase().padStart(2, '0'));
+      }
     }
   }
   
@@ -87,7 +126,8 @@ export function parseSupportedPids(csvContent) {
     hasMixedProtocols: hasMixedProtocols,
     allProtocolsDetected: Array.from(protocolsDetected),
     obd11BitCount: obd11BitResponses.length,
-    obd29BitCount: obd29BitResponses.length
+    obd29BitCount: obd29BitResponses.length,
+    missingSupportedPidQueries
   };
 }
 

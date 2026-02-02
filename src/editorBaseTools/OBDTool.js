@@ -122,13 +122,30 @@ class OBDTool extends React.Component {
   }
 
   handleSettingChange(setting, selectedOption) {
-    this.setState({ [setting]: selectedOption.value }, () => {
-      if (this.state.toolMode === "test") {
-        this.generateTestConfig();
-      } else if (this.getSelectedPids().length > 0) {
-        this.generateTransmitList();
-      }
-    });
+    // If switching to WWH-OBD, deselect OBD2-only PIDs (DTC and VIN)
+    if (setting === "obdMode" && selectedOption.value === "WWH-OBD") {
+      this.setState(prevState => ({
+        [setting]: selectedOption.value,
+        pids: prevState.pids.map(pid => {
+          const isObd2OnlyPid = (pid.service === "03" && pid.pid === "AA") || (pid.service === "09" && pid.pid === "02");
+          return isObd2OnlyPid ? { ...pid, selected: false } : pid;
+        })
+      }), () => {
+        if (this.state.toolMode === "test") {
+          this.generateTestConfig();
+        } else if (this.getSelectedPids().length > 0) {
+          this.generateTransmitList();
+        }
+      });
+    } else {
+      this.setState({ [setting]: selectedOption.value }, () => {
+        if (this.state.toolMode === "test") {
+          this.generateTestConfig();
+        } else if (this.getSelectedPids().length > 0) {
+          this.generateTransmitList();
+        }
+      });
+    }
   }
 
   generateTestConfig() {
@@ -184,25 +201,41 @@ class OBDTool extends React.Component {
   }
 
   getFilteredPids() {
-    const { pids, searchQuery, toolMode, supportedPids } = this.state;
+    const { pids, searchQuery, toolMode, supportedPids, obdMode } = this.state;
     
     let filtered = pids;
     
-    // In "supported" mode, mark unsupported PIDs as disabled (grayed out)
+    // In "supported" mode, hide unsupported PIDs (only show supported ones)
     if (toolMode === "supported" && supportedPids.length > 0) {
       const supportedSet = new Set(supportedPids);
-      filtered = filtered.map(pid => ({
-        ...pid,
-        disabled: !supportedSet.has(pid.pid),
-        // Deselect unsupported PIDs
-        selected: supportedSet.has(pid.pid) ? pid.selected : false
-      }));
+      // Filter to only include supported PIDs
+      filtered = filtered.filter(pid => supportedSet.has(pid.pid));
+      // Then apply OBD2-only logic to the remaining PIDs
+      filtered = filtered.map(pid => {
+        // Service 03 PID AA (stored DTCs) and Service 09 PID 02 (VIN) are only available for OBD2, not WWH-OBD
+        const isObd2OnlyPid = (pid.service === "03" && pid.pid === "AA") || (pid.service === "09" && pid.pid === "02");
+        const obd2OnlyDisabled = isObd2OnlyPid && obdMode === "WWH-OBD";
+        return {
+          ...pid,
+          disabled: obd2OnlyDisabled,
+          selected: obd2OnlyDisabled ? false : pid.selected,
+          // Add "(ISO TP)" suffix to description for isotp PIDs
+          displayDescription: pid.isotp ? `${pid.description} (ISO TP)` : pid.description
+        };
+      });
     } else {
-      // In other modes, no PIDs are disabled
-      filtered = filtered.map(pid => ({
-        ...pid,
-        disabled: false
-      }));
+      // In other modes, only OBD2-only PIDs may be disabled (for WWH-OBD)
+      filtered = filtered.map(pid => {
+        const isObd2OnlyPid = (pid.service === "03" && pid.pid === "AA") || (pid.service === "09" && pid.pid === "02");
+        const obd2OnlyDisabled = isObd2OnlyPid && obdMode === "WWH-OBD";
+        return {
+          ...pid,
+          disabled: obd2OnlyDisabled,
+          selected: obd2OnlyDisabled ? false : pid.selected,
+          // Add "(ISO TP)" suffix to description for isotp PIDs
+          displayDescription: pid.isotp ? `${pid.description} (ISO TP)` : pid.description
+        };
+      });
     }
     
     // Filter by search query
@@ -255,10 +288,23 @@ class OBDTool extends React.Component {
       }
       
       this.setState(stateUpdate);
-      this.props.showAlert(
-        "success", 
-        `Loaded ${result.totalFrames} frames`
-      );
+      
+      // Build the base message with frame count, supported PIDs count, response ID and protocol
+      const responseId = result.canIdType === '29bit' ? '18DAF1XX' : '7E8';
+      const baseMessage = `Loaded ${result.totalFrames} frames: ${result.supportedPids.length} PIDs are supported with response CAN ID ${responseId} and protocol ${result.protocol || 'Unknown'}.`;
+      
+      // Show warning if some supported PID query responses are missing
+      if (result.missingSupportedPidQueries && result.missingSupportedPidQueries.length > 0) {
+        this.props.showAlert(
+          "warning", 
+          `${baseMessage}\n\nWarning: No response data was found for the following 'supported PID' PIDs: ${result.missingSupportedPidQueries.join(', ')}.\n\nTo properly evaluate supported PIDs, use the mode 'Identify supported PIDs' to create your evaluation Configuration File.`
+        );
+      } else {
+        this.props.showAlert(
+          "success", 
+          baseMessage
+        );
+      }
     } catch (e) {
       this.props.showAlert("danger", "Error parsing CSV file: " + e.message);
     }
@@ -280,7 +326,11 @@ class OBDTool extends React.Component {
       return;
     }
 
-    // Calculate period: max offset + spacing
+    // For ISO-TP PIDs, the flow control frame is sent 50ms after request
+    // but this doesn't affect the period calculation - each PID counts as 1 entry
+    const isotpFlowControlOffset = 50; // ms offset for flow control frame
+    
+    // Calculate period based on number of PIDs (not frames)
     const maxOffset = (selectedPids.length - 1) * spacing;
     const period = maxOffset + spacing;
 
@@ -288,25 +338,60 @@ class OBDTool extends React.Component {
     const idFormat = canId === "7DF" ? 0 : 1; // 0 for 11-bit, 1 for 29-bit
     
     // Generate transmit messages
-    const transmitList = selectedPids.map((pid, index) => {
-      const delay = index * spacing;
-      const data = this.generateDataPayload(pid.pid, obdMode);
+    const transmitList = [];
+    let currentDelay = 0;
+    
+    for (const pid of selectedPids) {
       const namePrefix = canId === "7DF" ? "11" : "29";
       const modePrefix = obdMode === "OBD2" ? "OBD" : "OBDU";
       
-      return {
-        name: `${namePrefix}_${modePrefix}_PID_${pid.pid}`,
+      // Special case: Service 03 PID AA (stored DTCs) has a fixed payload
+      const isDtcPid = pid.service === "03" && pid.pid === "AA";
+      const data = isDtcPid ? "0103555555555555" : this.generateDataPayload(pid.pid, obdMode, pid.service);
+      
+      // For ISO-TP PIDs, use different CAN IDs:
+      // - 11-bit: 7E0 (instead of 7DF)
+      // - 29-bit: 18DA00F1 (instead of 18DB33F1)
+      let requestId = canId;
+      let flowControlId = canId === "7DF" ? "7E0" : "18DA00F1";
+      if (pid.isotp) {
+        requestId = canId === "7DF" ? "7E0" : "18DA00F1";
+      }
+      
+      // Add the request frame
+      transmitList.push({
+        name: `${namePrefix}_${modePrefix}_S${parseInt(pid.service, 10)}_${pid.pid}`,
         state: 1,
         id_format: idFormat,
         frame_format: 0,
         brs: 0,
         log: 0,
         period: period,
-        delay: delay,
-        id: canId,
+        delay: currentDelay,
+        id: requestId,
         data: data
-      };
-    });
+      });
+      
+      // For ISO-TP PIDs, add a flow control frame
+      if (pid.isotp) {
+        currentDelay += isotpFlowControlOffset;
+        transmitList.push({
+          name: `${namePrefix}_${modePrefix}_FC_S${parseInt(pid.service, 10)}_${pid.pid}`,
+          state: 1,
+          id_format: idFormat,
+          frame_format: 0,
+          brs: 0,
+          log: 0,
+          period: period,
+          delay: currentDelay,
+          id: flowControlId,
+          data: "3000000000000000" // Flow control frame payload
+        });
+        currentDelay += (spacing - isotpFlowControlOffset);
+      } else {
+        currentDelay += spacing;
+      }
+    }
 
     // Build the config structure using selected channel
     const generatedConfig = {
@@ -332,13 +417,14 @@ class OBDTool extends React.Component {
     });
   }
 
-  generateDataPayload(pidHex, obdMode) {
+  generateDataPayload(pidHex, obdMode, serviceHex) {
     // Ensure PID is uppercase and 2 characters
     const pid = pidHex.toUpperCase().padStart(2, '0');
+    const service = serviceHex.toUpperCase().padStart(2, '0');
     
     if (obdMode === "OBD2") {
-      // OBD2/OBDonEDS format: 02 01 {PID} 55 55 55 55 55
-      return `0201${pid}5555555555`;
+      // OBD2/OBDonEDS format: 02 {SERVICE} {PID} 55 55 55 55 55
+      return `02${service}${pid}5555555555`;
     } else {
       // WWH-OBD/OBDonUDS format: 03 22 F4 {PID} 55 55 55 55
       return `0322F4${pid}55555555`;
@@ -734,11 +820,11 @@ class OBDTool extends React.Component {
                     className="binary-text-alt-2" 
                     style={{ 
                       marginRight: "8px", 
-                      minWidth: "24px", 
+                      minWidth: "42px", 
                       flexShrink: 0 
                     }}
                   >
-                    {pid.pid}
+                    S{parseInt(pid.service, 10)} {pid.pid}
                   </span>
                   <span 
                     style={{ 
@@ -747,9 +833,9 @@ class OBDTool extends React.Component {
                       overflow: "hidden", 
                       textOverflow: "ellipsis" 
                     }}
-                    title={pid.description}
+                    title={pid.displayDescription || pid.description}
                   >
-                    {pid.description}
+                    {pid.displayDescription || pid.description}
                   </span>
                 </div>
               ))}
@@ -766,6 +852,11 @@ class OBDTool extends React.Component {
         {toolMode !== "test" && (
           <div style={{ fontSize: "12px", marginBottom: "10px" }}>
             Period: {selectedPids.length > 0 ? period : 0} ms &nbsp;|&nbsp; PIDs selected: {selectedPids.length}
+            {period > 10000 && (
+              <div style={{ color: "orange", marginTop: "4px" }}>
+                Warning: This selection will result in an infrequent update frequency of each PID of <strong>{(period / 1000).toFixed(1)}</strong> s
+              </div>
+            )}
           </div>
         )}
 
