@@ -744,6 +744,26 @@ export const checkRTCAdjustment = (content) => {
 }
 
 
+// function for testing if the RTC synchronization method is set to 'Manual update' (sync = 1)
+export const checkRTCSyncManual = (content) => {
+
+  return function (dispatch) {
+    if (content.rtc != undefined && content.rtc.sync === 1) {
+
+      dispatch(
+        alertActions.set({
+          type: "warning",
+          message: "You have set the RTC synchronization method to 'Manual update'. This is only intended for one-off RTC resets. Once you have properly reset the RTC, change the method to one of the other methods",
+          autoClear: false,
+        })
+      );
+
+
+    }
+  }
+}
+
+
 
 // function for testing if S3 settings contains http:// and port 443
 export const checkConfigTlsPort = (content) => {
@@ -984,6 +1004,7 @@ export const runConfigurationWarningChecks = (content) => {
       dispatch(checkWiFiEncryptedPasswordsNoKpub(content))
       dispatch(checkFileSplitOffsetPeriod(content))
       dispatch(checkRTCAdjustment(content))
+      dispatch(checkRTCSyncManual(content))
       dispatch(checkConfigTlsPort(content))
       dispatch(checkFileSplitValue(content))
       dispatch(checkMissingAPN(content))
@@ -1038,6 +1059,11 @@ export const saveUpdatedConfiguration = (filename, content) => {
 
 export const setUpdatedFormData = (formData) => {
   return function (dispatch) {
+    // note: configContent (the rjsf Form's formData prop) must NOT be synced
+    // here - a per-keystroke prop change remounts the focused field and drops
+    // focus. The form stays uncontrolled while typing; configContent is synced
+    // from formData via setConfigContentPreSubmit at every UI transition that
+    // can re-render/reset the form
     dispatch(setUpdatedFormDataValue(formData));
     dispatch(calcCrc32EditorLive());
   };

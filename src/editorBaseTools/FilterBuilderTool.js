@@ -560,12 +560,23 @@ class FilterBuilderTool extends React.Component {
         );
       }
 
-      this.setState({ dbcData, isLoading: false }, () => {
+      const validFileNames = dbcData.parsedFiles
+        .filter(f => f.hasValidPrefix)
+        .map(f => f.filename);
+
+      this.setState({ dbcData, dbcFileNames: validFileNames, isLoading: false }, () => {
         this.mergeData();
       });
 
-      const validFiles = dbcData.parsedFiles.filter(f => f.hasValidPrefix).length;
-      this.props.showAlert("success", `Loaded ${validFiles} DBC file(s) with valid prefix`);
+      const validFiles = validFileNames.length;
+      if (validFiles === 0) {
+        this.props.showAlert(
+          "warning",
+          `Loaded 0 DBC file(s) with valid prefix - add a prefix such as 'can1-' or 'can2-' in order to use the DBC`
+        );
+      } else {
+        this.props.showAlert("success", `Loaded ${validFiles} DBC file(s) with valid prefix`);
+      }
     } catch (e) {
       this.props.showAlert("danger", "Error parsing DBC files: " + e.message);
       this.setState({ isLoading: false });

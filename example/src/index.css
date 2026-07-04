@@ -393,6 +393,11 @@ fieldset[disabled] .btn {
     color: #7b7b7b;
 }
 
+.expand-toggle {
+    right: 45px;
+    top: 15px;
+}
+
 /*----------------------------
     Animations
 -----------------------------*/
@@ -808,6 +813,12 @@ fieldset[disabled] .btn {
     padding: 15px;
     overflow-y: auto;
     overflow-x: hidden;
+    transition: width 0.1s ease;
+}
+
+.tools-side-bar-expanded {
+    width: 50% !important;
+    min-width: 320px;
 }
 
 @media (max-width: 991px) {
@@ -818,6 +829,10 @@ fieldset[disabled] .btn {
 
 .encryption-padding {
     padding-right: 340px !important;
+}
+
+.encryption-padding-expanded {
+    padding-right: calc(50% + 20px) !important;
 }
 
 /*----------------------------

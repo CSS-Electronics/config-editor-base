@@ -23,6 +23,11 @@ const regexRevision = new RegExp('\\d{2}\\.\\d{2}\\.json', 'g')
 let isDownloadConfig = false
 let activatedTab
 
+// applyNav returns a new component class per call - it must be created once at
+// module scope, as a new class identity in render() makes React remount the
+// entire form on every re-render (discarding any unsaved user edits)
+const FormWithNavStable = applyNav(Form, EditorNavs)
+
 export class EditorSection extends React.Component {
   constructor(props) {
     super(props)
@@ -49,14 +54,10 @@ export class EditorSection extends React.Component {
       isDownloadConfig: false,
       isCompareChanges: false,
       activeSideBar: 'schema-modal',
-      showNewToolsHighlight: true
+      isSideBarExpanded: false
     }
 
-    // Fade out new tools highlight after 10 seconds
-    setTimeout(() => {
-      this.setState({ showNewToolsHighlight: false });
-    }, 10000);
-
+    this.toggleSideBarExpand = this.toggleSideBarExpand.bind(this)
     this.input = ''
     this.s3 = this.props.fetchFileContentExt ? true : false
   }
@@ -70,17 +71,25 @@ export class EditorSection extends React.Component {
   subMenuBtnClick(name) {
     let sideBar = this.state.activeSideBar == name ? 'none' : name
 
-    this.setState(
-      {
-        activeSideBar: sideBar
-      },
-      () => {
-        this.props.setConfigContentPreSubmit()
-      }
-    )
+    // sync configContent from the live formData before the state change
+    // re-renders the form, so pending edits are not reset
+    this.props.setConfigContentPreSubmit()
+
+    this.setState({
+      activeSideBar: sideBar,
+      isSideBarExpanded: sideBar === 'none' ? false : this.state.isSideBarExpanded
+    })
+  }
+
+  toggleSideBarExpand() {
+    // sync configContent from the live formData before the state change
+    // re-renders the form, so pending edits are not reset
+    this.props.setConfigContentPreSubmit()
+    this.setState({ isSideBarExpanded: !this.state.isSideBarExpanded })
   }
 
   hideUischemaModal(){
+    this.props.setConfigContentPreSubmit()
     this.setState({ showUischemaModal: false })
   }
   
@@ -137,7 +146,7 @@ export class EditorSection extends React.Component {
     document.addEventListener('keydown', this.escFunction, false)
   }
 
-  componentWillUnMount() {
+  componentWillUnmount() {
     document.removeEventListener('keydown', this.escFunction, false)
   }
 
@@ -309,7 +318,7 @@ export class EditorSection extends React.Component {
     let editorUIAdvancedSimpleTest = editorUISchemaFile.includes("Simple") || editorUISchemaFile.includes("Advanced")
 
     // add navigation bar
-    let FormWithNav = schemaContent ? applyNav(Form, EditorNavs) : Form
+    let FormWithNav = schemaContent ? applyNav(Form, EditorNavs) : Form // BISECT-TEST
 
     // add the default 'base modals' to the modals list
     let editorToolsFull = editorTools.concat(
@@ -345,7 +354,8 @@ export class EditorSection extends React.Component {
         <div
           className={classNames({
             'config-editor fe-header': true,
-            'encryption-padding': this.state.activeSideBar != 'none'
+            'encryption-padding': this.state.activeSideBar != 'none' && !this.state.isSideBarExpanded,
+            'encryption-padding-expanded': this.state.activeSideBar != 'none' && this.state.isSideBarExpanded
           })}
         >
           <header className='top-header-offline' />
@@ -359,7 +369,10 @@ export class EditorSection extends React.Component {
             >
               <EditorToolModalWrapper
                 modal={modal.modal}
+                name={modal.name}
                 onClick={() => this.subMenuBtnClick('none')}
+                isExpanded={this.state.isSideBarExpanded}
+                onToggleExpand={this.toggleSideBarExpand}
               />
             </div>
           ))}
@@ -467,19 +480,7 @@ export class EditorSection extends React.Component {
                         className={modal.class}
                       />
                     ))}
-                    {this.state.showNewToolsHighlight && (
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          color: '#337ab7',
-                          marginLeft: '10px',
-                          transition: 'opacity 1s ease-out',
-                          opacity: this.state.showNewToolsHighlight ? 1 : 0
-                        }}
-                      >
-                        Tip: New editor tools added
-                      </span>
-                    )}
+              
                   </div>
                 </div>
               </FormWithNav>
