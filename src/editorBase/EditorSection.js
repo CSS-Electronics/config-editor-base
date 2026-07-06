@@ -23,11 +23,6 @@ const regexRevision = new RegExp('\\d{2}\\.\\d{2}\\.json', 'g')
 let isDownloadConfig = false
 let activatedTab
 
-// applyNav returns a new component class per call - it must be created once at
-// module scope, as a new class identity in render() makes React remount the
-// entire form on every re-render (discarding any unsaved user edits)
-const FormWithNavStable = applyNav(Form, EditorNavs)
-
 export class EditorSection extends React.Component {
   constructor(props) {
     super(props)
@@ -318,7 +313,7 @@ export class EditorSection extends React.Component {
     let editorUIAdvancedSimpleTest = editorUISchemaFile.includes("Simple") || editorUISchemaFile.includes("Advanced")
 
     // add navigation bar
-    let FormWithNav = schemaContent ? applyNav(Form, EditorNavs) : Form // BISECT-TEST
+    let FormWithNav = schemaContent ? applyNav(Form, EditorNavs) : Form
 
     // add the default 'base modals' to the modals list
     let editorToolsFull = editorTools.concat(
