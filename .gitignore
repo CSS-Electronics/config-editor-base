@@ -23,3 +23,8 @@ yarn-error.log*
 *package-lock*
 
 TEMP/*
+# packed tarballs (local cross-repo dev only)
+*.tgz
+
+# personal AI-assistant notes (not committed)
+CLAUDE.md
