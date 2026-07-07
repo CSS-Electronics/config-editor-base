@@ -4,6 +4,7 @@ import Files from "react-files";
 import * as actionsEditor from "../editorBase/actions";
 import Ajv from "ajv";
 import { parseCanFrameCsv } from "./canFrameCsvParser";
+import CollapsiblePreview from "./CollapsiblePreview";
 import { parseDbcFiles, findDbcMatch, extractPgn } from "./dbcParser";
 import { evaluateFilters } from "./filterEvaluator";
 import SimpleDropdown from "./SimpleDropdown";
@@ -2070,13 +2071,6 @@ class FilterBuilderTool extends React.Component {
                           >
                             Merge files
                           </button>
-                          <button
-                            className="btn btn-default"
-                            onClick={this.onDownload}
-                            disabled={Object.keys(this.state.generatedFilterConfig).length === 0}
-                          >
-                            Download JSON
-                          </button>
                         </div>
                         {/* Show reason why merge is disabled */}
                         {(() => {
@@ -2106,27 +2100,14 @@ class FilterBuilderTool extends React.Component {
                     );
                   })()}
 
-                  {/* Preview toggle */}
+                  {/* Preview toggle (Download JSON lives at the bottom of the preview) */}
                   {Object.keys(this.state.generatedFilterConfig).length > 0 && (
-                    <div style={{ marginTop: "10px" }}>
-                      <label style={{ display: "flex", alignItems: "center", cursor: "pointer", fontSize: "12px" }}>
-                        <input
-                          type="checkbox"
-                          checked={this.state.showFilterPreview}
-                          onChange={() => this.setState({ showFilterPreview: !this.state.showFilterPreview })}
-                          style={{ marginRight: "6px", marginBottom: "4px" }}
-                        />
-                        Show partial config preview
-                      </label>
-
-                      {this.state.showFilterPreview && (
-                        <div style={{ marginTop: "10px" }}>
-                          <pre className="browse-file-preview" style={{ maxHeight: "300px", overflow: "auto", fontSize: "11px" }}>
-                            {JSON.stringify(this.state.generatedFilterConfig, null, 2)}
-                          </pre>
-                        </div>
-                      )}
-                    </div>
+                    <CollapsiblePreview
+                      open={this.state.showFilterPreview}
+                      onToggle={() => this.setState({ showFilterPreview: !this.state.showFilterPreview })}
+                      data={this.state.generatedFilterConfig}
+                      onDownload={this.onDownload}
+                    />
                   )}
                 </div>
               );

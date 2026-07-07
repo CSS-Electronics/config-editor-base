@@ -141,19 +141,22 @@ class PartialConfigLoader extends React.Component {
                     {formData ? (
                       <div>
                         {mergedConfigValid ? (
-                          <span>
-                            {" "}
-                            <p className="btn-highlight">
-                              <i className="fa fa-check" /> &nbsp;Merged
-                              Configuration File validated
-                            </p>
-                          </span>
+                          <div
+                            className="btn-highlight"
+                            style={{ fontSize: "12px", marginBottom: "8px" }}
+                          >
+                            <i className="fa fa-check" /> Merged Configuration
+                            File validated
+                          </div>
                         ) : null}
                         {!mergedConfigValid ? (
-                          <p className="red-text">
-                            <i className="fa fa-times" /> &nbsp;Merged
-                            Configuration File is invalid
-                          </p>
+                          <div
+                            className="red-text"
+                            style={{ fontSize: "12px", marginBottom: "8px" }}
+                          >
+                            <i className="fa fa-times" /> Merged Configuration
+                            File is invalid
+                          </div>
                         ) : null}
                         <button
                           className="btn btn-primary"

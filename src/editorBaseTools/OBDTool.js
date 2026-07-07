@@ -4,6 +4,7 @@ import Files from "react-files";
 import * as actionsEditor from "../editorBase/actions";
 import Ajv from "ajv";
 import SimpleDropdown from "./SimpleDropdown";
+import CollapsiblePreview from "./CollapsiblePreview";
 
 // Import PID data, control signal config, and identify supported PIDs config
 import obdPids from "../editorBaseTools/obd/obd-pids-service-01.json";
@@ -935,53 +936,32 @@ class OBDTool extends React.Component {
 
         {/* Validation error */}
         {mergedConfigValid === false && (
-          <p className="red-text">
+          <div className="red-text" style={{ fontSize: "12px", marginBottom: "8px" }}>
             <i className="fa fa-times" /> Merged Configuration File is invalid
-          </p>
+          </div>
         )}
 
         {/* Action Buttons */}
         <div>
           <div>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={this.onMerge}
               disabled={!formData || Object.keys(formData).length === 0 || mergedConfigValid !== true}
             >
               Merge files
             </button>
-            <button 
-              className="btn btn-default"
-              onClick={this.onDownload}
-              disabled={Object.keys(generatedConfig).length === 0}
-              style={{ marginLeft: "10px" }}
-            >
-              Download JSON
-            </button>
           </div>
         </div>
 
-        {/* Preview Toggle */}
+        {/* Preview toggle (Download JSON lives at the bottom of the preview) */}
         {Object.keys(generatedConfig).length > 0 && (
-          <div>
-            <label style={{ display: "flex", alignItems: "center", cursor: "pointer", fontSize: "12px", marginTop: "8px"}}>
-              <input
-                type="checkbox"
-                checked={showPreview}
-                onChange={() => this.setState({ showPreview: !showPreview })}
-                style={{ marginRight: "6px" ,marginBottom: "4px" }}
-              />
-              Show partial config preview
-            </label>
-            
-            {showPreview && (
-              <div style={{ marginTop: "10px" }}>
-                <pre className="browse-file-preview">
-                  {JSON.stringify(combinedConfig, null, 2)}
-                </pre>
-              </div>
-            )}
-          </div>
+          <CollapsiblePreview
+            open={showPreview}
+            onToggle={() => this.setState({ showPreview: !showPreview })}
+            data={combinedConfig}
+            onDownload={this.onDownload}
+          />
         )}
         </div>
         )}
