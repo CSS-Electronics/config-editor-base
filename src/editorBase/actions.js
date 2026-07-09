@@ -1018,10 +1018,31 @@ export const runConfigurationWarningChecks = (content) => {
       dispatch(checkConfigControlSignalZeroScalingFactor(content))
     }
 
-    // if CANmod, warn if unexpected content in Configuration File 
+    // if CANmod, warn if unexpected content in Configuration File
     dispatch(checkCANmodMonitoringMode(content))
   }
 }
+
+// Pure warning collector: runs the exact same checks as
+// runConfigurationWarningChecks but captures the alert/SET warning dispatches
+// into a list instead of showing them - for consumers (e.g. the CANcloud OTA
+// batch manager) that need the warnings per config rather than as alerts
+export const collectConfigurationWarnings = (content) => {
+  const messages = [];
+  const capture = (action) => {
+    if (typeof action === "function") return action(capture, () => ({}));
+    if (
+      action &&
+      action.type === "alert/SET" &&
+      action.alert &&
+      action.alert.type === "warning"
+    ) {
+      messages.push(action.alert.message);
+    }
+  };
+  capture(runConfigurationWarningChecks(content));
+  return messages;
+};
 
 // ------------------------------------------------------------
 

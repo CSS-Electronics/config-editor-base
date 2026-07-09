@@ -445,6 +445,8 @@ export class EditorSection extends React.Component {
                   closeChangesModal={this.closeChangesModal}
                   enableDownload={this.enableDownload.bind(this)}
                   externalSubmit={this.props.fetchFileContentExt ? true : false}
+                  showAlert={this.props.showAlert}
+                  onTransferPartial={this.props.onTransferPartial}
                 />
 
                 <div

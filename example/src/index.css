@@ -15,8 +15,8 @@
     @grey: #f5f5f5;
     @mediumgrey: #e6e6e6;
     @dark-blue: #0084d3;
-    @blue-css: #3d85c6;
-    @blue: #50b2ff;
+    @blue-css: #46a5e0;
+    @blue: #46a5e0;
     @white: #ffffff;
     @black: #1b1e25;
     @green: #33d46f;
@@ -171,7 +171,7 @@ button {
 
 .form-control:focus {
     outline: none;
-    border-bottom-color: #50b2ff;
+    border-bottom-color: #46a5e0;
 }
 
 .form-group {
@@ -212,6 +212,12 @@ fieldset {
     cursor: pointer;
 }
 
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .btn:hover,
 .btn:focus {
     opacity: 0.9;
@@ -219,13 +225,25 @@ fieldset {
 
 .btn-primary {
     color: #ffffff;
-    background-color: #50b2ff;
+    background-color: #46a5e0;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
     color: #ffffff;
     background-color: #3aa3f0;
+}
+
+.btn-white {
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.btn-white:hover,
+.btn-white:focus {
+    color: #333;
+    background-color: #f0f0f0;
 }
 
 .btn-danger {
@@ -263,7 +281,7 @@ fieldset {
 
 .btn-info {
     color: #ffffff;
-    background-color: #50b2ff;
+    background-color: #46a5e0;
 }
 
 .btn-info:hover {
@@ -321,7 +339,7 @@ fieldset[disabled] .btn {
 }
 
 .alert.alert-info {
-    background: #50b2ff;
+    background: #46a5e0;
 }
 
 .alert .close {
@@ -334,7 +352,7 @@ fieldset[disabled] .btn {
     height: 5px;
     box-shadow: none;
     border-radius: 2px;
-    background-color: #50b2ff;
+    background-color: #46a5e0;
     overflow: hidden;
 }
 
@@ -418,7 +436,7 @@ fieldset[disabled] .btn {
 @keyframes fadeInDropdown {
     0% { color: #8e8e8e; }
     50% { color: #8e8e8e; }
-    70% { color: #50b2ff; }
+    70% { color: #46a5e0; }
     100% { color: #8e8e8e; }
 }
 
@@ -693,7 +711,7 @@ fieldset[disabled] .btn {
 }
 
 .blue-text {
-    color: #3d85c6;
+    color: #46a5e0;
 }
 
 .editor-schema-button {
@@ -706,7 +724,7 @@ fieldset[disabled] .btn {
 }
 
 .editor-schema-button:hover {
-    color: #50b2ff;
+    color: #46a5e0;
 }
 
 .btn-refresh {
@@ -779,9 +797,14 @@ fieldset[disabled] .btn {
 
 .config-bar-btn {
     width: 30px;
+    height: 30px;
+    padding: 0;
     border-radius: 20px !important;
     color: #8e8e8e;
     font-size: 14px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .config-bar-background {
@@ -789,7 +812,7 @@ fieldset[disabled] .btn {
 }
 
 .btn-highlight {
-    color: #50b2ff;
+    color: #46a5e0;
 }
 
 .simple-editor-btn-position {
@@ -877,6 +900,12 @@ fieldset[disabled] .btn {
 .field-description-shift {
     margin-right: 340px;
     bottom: 35px;
+}
+
+/* tool-button hover tooltips (config-bar) must clear the fixed config-bar
+   (~60px tall) instead of overlapping it at the bottom */
+.btn-field-description.field-description-shift {
+    bottom: 75px;
 }
 
 .field-object .field-description {
@@ -1053,45 +1082,46 @@ fieldset[disabled] .btn {
     font-family: Consolas;
 }
 
+/* Single, reusable checkbox (kept identical to CANcloud / config-editor):
+   white box + grey border, bright-blue fill + white SVG checkmark when checked */
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    border: 1px solid #8e8e8e;
+    border-radius: 2px;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px;
+    cursor: pointer;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #46a5e0;
+    border-color: #46a5e0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8l3 3 5-6'/%3E%3C/svg%3E");
+}
+
+input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
 .checkbox-design {
     display: inline-flex;
+    align-items: center;
     cursor: pointer;
-    position: relative;
 }
 
 .checkbox-design > span {
     padding: 0.25rem 0.25rem;
-}
-
-.checkbox-design > input {
-    height: 12px;
-    width: 12px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border: 1px solid #8e8e8e;
-    border-radius: 2px;
-    background-color: white;
-    cursor: pointer;
-}
-
-.checkbox-design > input:checked {
-    border: 1px solid #8e8e8e;
-    background-color: white;
-}
-
-.checkbox-design > input:checked + span::before {
-    content: '\2713';
-    display: block;
-    text-align: center;
-    color: #8e8e8e;
-    position: absolute;
-    left: 0.2rem;
-    top: 0.2rem;
-}
-
-.checkbox-design > input:active {
-    border: 1px solid #8e8e8e;
 }
 
 /*----------------------------
@@ -1131,11 +1161,11 @@ fieldset[disabled] .btn {
     Navigation
 -----------------------------*/
 .nav-active {
-    color: #50b2ff !important;
+    color: #46a5e0 !important;
 }
 
 .bottom-border {
-    border-bottom: 2px solid #50b2ff;
+    border-bottom: 2px solid #46a5e0;
 }
 
 .bold-text {
@@ -1156,7 +1186,7 @@ div[class*="rjsf-array-list"] > div > div[class*="form-group field field-object"
 
 .navbar-nav > li > a:hover {
     background-color: transparent !important;
-    color: #50b2ff !important;
+    color: #46a5e0 !important;
     transition: 0s !important;
 }
 

@@ -3,6 +3,8 @@ import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { connect } from "react-redux";
 import Select from "react-select";
 import _ from "lodash";
+import { saveAs } from "file-saver";
+import { computeConfigDelta } from "./configDelta";
 
 
 const selectOptions = (Files) => {
@@ -15,6 +17,7 @@ const selectOptions = (Files) => {
 
 let pastCrc32 = "N/A";
 
+// detect() returns null for unrecognized environments (e.g. jsdom)
 const { detect } = require("detect-browser");
 const browser = detect();
 
@@ -24,7 +27,7 @@ let crcBrowserSupport = [
   "opera",
   "safari",
   "edge",
-].includes(browser.name);
+].includes(browser && browser.name);
 
 class EditorChangesComparison extends React.Component {
   constructor(props) {
@@ -49,6 +52,79 @@ class EditorChangesComparison extends React.Component {
     );
   };
 
+  // compute the partial config (change delta vs. the Previous Configuration
+  // File) - returns null (with a user alert) when there is nothing to emit
+  getPartialDelta = () => {
+    const { past, current, showAlert } = this.props;
+
+    let pastObj = null;
+    try {
+      pastObj = JSON.parse(past);
+    } catch (e) {
+      pastObj = null;
+    }
+    if (!pastObj || typeof pastObj !== "object") {
+      if (showAlert) {
+        showAlert("info", "Select a Previous Configuration File first");
+      }
+      return null;
+    }
+
+    const { partial, deletions } = computeConfigDelta(pastObj, current);
+
+    if (!Object.keys(partial).length) {
+      if (showAlert) {
+        showAlert(
+          "info",
+          "No changes detected vs. the Previous Configuration File"
+        );
+      }
+      return null;
+    }
+
+    if (deletions.length && showAlert) {
+      showAlert(
+        "warning",
+        `${deletions.length} deleted setting(s) cannot be expressed in a partial config and were excluded: ${deletions.join(
+          ", "
+        )}`
+      );
+    }
+
+    return { partial, deletions };
+  };
+
+  onDownloadPartial = () => {
+    const delta = this.getPartialDelta();
+    if (!delta) {
+      return;
+    }
+    const { revisedConfigFile } = this.props;
+    const fileName =
+      "partial-" +
+      ((revisedConfigFile && revisedConfigFile.value) || "config.json");
+    const blob = new Blob([JSON.stringify(delta.partial, null, 2)], {
+      type: "text/json",
+    });
+    saveAs(blob, fileName);
+  };
+
+  onTransferClick = () => {
+    const delta = this.getPartialDelta();
+    if (!delta) {
+      return;
+    }
+    const { onTransferPartial, closeChangesModal, revisedConfigFile } =
+      this.props;
+    // restore body scrolling before the host navigates away
+    closeChangesModal();
+    onTransferPartial({
+      partial: delta.partial,
+      deletions: delta.deletions,
+      configName: (revisedConfigFile && revisedConfigFile.value) || null,
+    });
+  };
+
   render() {
     const {
       options,
@@ -70,6 +146,20 @@ class EditorChangesComparison extends React.Component {
       pastCrc32 = crc32(past).toString(16).toUpperCase().padStart(8, "0");
     } else {
       pastCrc32 = "N/A";
+    }
+
+    // the partial-JSON buttons are only usable when a Previous Configuration
+    // File is selected AND it yields a non-empty delta vs. the current config;
+    // otherwise they render disabled (greyed) rather than alerting on click
+    let partialAvailable = false;
+    try {
+      const pastObj = past ? JSON.parse(past) : null;
+      if (pastObj && typeof pastObj === "object") {
+        partialAvailable =
+          Object.keys(computeConfigDelta(pastObj, current).partial).length > 0;
+      }
+    } catch (e) {
+      partialAvailable = false;
     }
 
     return (
@@ -188,6 +278,28 @@ class EditorChangesComparison extends React.Component {
               {" "}
               Download to disk{" "}
             </button>
+            <button
+              type="button"
+              onClick={this.onDownloadPartial}
+              className="btn btn-white ml15"
+              disabled={!partialAvailable}
+              title="Download the delta changes as a partial config JSON e.g. for application across multiple devices"
+            >
+              {" "}
+              Download partial JSON to disk{" "}
+            </button>
+            {typeof this.props.onTransferPartial === "function" ? (
+              <button
+                type="button"
+                onClick={this.onTransferClick}
+                className="btn btn-white ml15"
+                disabled={!partialAvailable}
+                title="Transfer the delta changes as a partial config JSON to the OTA batch manager for application across multiple devices"
+              >
+                {" "}
+                Transfer to OTA batch manager{" "}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

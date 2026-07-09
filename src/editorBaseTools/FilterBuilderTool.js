@@ -1411,7 +1411,7 @@ class FilterBuilderTool extends React.Component {
         style={{
           width: `${barWidth}px`,
           height: "10px",
-          backgroundColor: "#4a90d9",
+          backgroundColor: "#46a5e0",
           borderRadius: "2px",
           display: "inline-block"
         }}
@@ -1843,22 +1843,22 @@ class FilterBuilderTool extends React.Component {
             <div style={{ fontSize: "12px", marginTop: "4px", marginBottom: "6px" }}>
               <span style={{ color: "#666" }}>Select: </span>
               <span
-                style={{ color: "#337ab7", cursor: "pointer", marginLeft: "4px" }}
+                style={{ color: "#46a5e0", cursor: "pointer", marginLeft: "4px" }}
                 onClick={() => this.selectTop(30)}
               >Top 30</span>
               <span style={{ color: "#666", margin: "0 4px" }}>|</span>
               <span
-                style={{ color: "#337ab7", cursor: "pointer" }}
+                style={{ color: "#46a5e0", cursor: "pointer" }}
                 onClick={() => this.selectTop(50)}
               >Top 50</span>
               <span style={{ color: "#666", margin: "0 4px" }}>|</span>
               <span
-                style={{ color: "#337ab7", cursor: "pointer" }}
+                style={{ color: "#46a5e0", cursor: "pointer" }}
                 onClick={() => this.selectMatched(true)}
               >Matched</span>
               <span style={{ color: "#666", margin: "0 4px" }}>|</span>
               <span
-                style={{ color: "#337ab7", cursor: "pointer" }}
+                style={{ color: "#46a5e0", cursor: "pointer" }}
                 onClick={() => this.selectMatched(false)}
               >Unmatched</span>
             </div>

@@ -94,11 +94,9 @@ class PartialConfigLoader extends React.Component {
     return (
       <div>
         <h4>Partial config loader</h4>
-        <br />
 
         <div>
           <div className="form-group pl0 field-string">
-            <p className="reduced-margin">Upload partial Configuration File</p>
             <p className="field-description field-description-shift">
               Select a JSON file containing a partial Configuration File. This
               lets you e.g. load a list of transmit messages or filters. The
@@ -127,13 +125,18 @@ class PartialConfigLoader extends React.Component {
                     minFileSize={0}
                     clickable
                   >
-                    <button className="btn btn-primary">Load JSON file</button>
+                    <button
+                      className="btn btn-primary"
+                      title="Upload a partial Configuration File to merge it"
+                    >
+                      Load JSON file
+                    </button>
                     <div className="browse-file-name">{jsonFileName}</div>
                   </Files>
                 </div>
 
                 {Object.keys(jsonFile).length ? (
-                  <div>
+                  <div className="text-area-wrapper row no-gutters">
                     <pre className="browse-file-preview">
                       {JSON.stringify(jsonFile, null, 2)}
                     </pre>

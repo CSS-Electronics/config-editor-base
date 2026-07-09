@@ -3,6 +3,13 @@ import editor from './editorBase/reducer'
 import * as editorActions from './editorBase/actions'
 import OBDTool from './editorBaseTools/OBDTool'
 import FilterBuilderTool from './editorBaseTools/FilterBuilderTool'
+import { computeConfigDelta } from './editorBase/configDelta'
 
-
-export {EditorSection, editor, editorActions, OBDTool, FilterBuilderTool}
+export {
+  EditorSection,
+  editor,
+  editorActions,
+  OBDTool,
+  FilterBuilderTool,
+  computeConfigDelta
+}
