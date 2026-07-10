@@ -883,7 +883,7 @@ class OBDTool extends React.Component {
                     }
                   });
                 }}
-                style={{ marginRight: "6px", marginBottom: "4px" }}
+                style={{ marginRight: "6px" }}
               />
               Add filter to only log OBD data on {channel === "can_1" ? "CAN-1" : "CAN-2"}
             </label>
@@ -917,7 +917,7 @@ class OBDTool extends React.Component {
                   });
                 }}
                 disabled={!hasGnssSupport}
-                style={{ marginRight: "6px", marginBottom: "4px" }}
+                style={{ marginRight: "6px" }}
               />
               Add GPS-based speed control signal
             </label>

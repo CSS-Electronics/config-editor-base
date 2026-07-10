@@ -658,6 +658,26 @@ export const checkConfigAwsEndpoint = (content) => {
   }
 }
 
+// function for testing if the S3 OTA update interval is disabled (0)
+export const checkS3OtaDisabled = (content) => {
+
+  return function (dispatch) {
+    if (content.connect != undefined && content.connect.s3 != undefined && content.connect.s3.sync != undefined) {
+
+      if (content.connect.s3.sync.ota != undefined && content.connect.s3.sync.ota == 0) {
+        dispatch(
+          alertActions.set({
+            type: "warning",
+            message: "Your S3 firmware/config/certificate update interval (OTA) is set to 0, which disables over-the-air updates. The device will not fetch future configuration changes remotely. Set a non-zero interval unless this is intentional",
+            autoClear: false,
+          })
+        );
+      }
+
+    }
+  }
+}
+
 // function for testing if S3 password is set as encrypted without kpub
 export const checkS3EncryptedPasswordsNoKpub = (content) => {
 
@@ -1000,6 +1020,7 @@ export const runConfigurationWarningChecks = (content) => {
       dispatch(checkConfigFilterLimits(content))
       dispatch(checkConfigTls(content))
       dispatch(checkConfigAwsEndpoint(content))
+      dispatch(checkS3OtaDisabled(content))
       dispatch(checkS3EncryptedPasswordsNoKpub(content))
       dispatch(checkWiFiEncryptedPasswordsNoKpub(content))
       dispatch(checkFileSplitOffsetPeriod(content))

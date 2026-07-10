@@ -1082,6 +1082,17 @@ fieldset[disabled] .btn {
     font-family: Consolas;
 }
 
+/* the OBD PID rows wrap the checkbox in a fixed-width span; make that first
+   span a flex box and center the checkbox within it so the small box lines up
+   with the PID text instead of sitting high on the text baseline */
+.checkbox-white-space > span:first-child {
+    display: inline-flex;
+    align-items: center;
+}
+.checkbox-white-space > span:first-child > .checkbox-design {
+    margin: auto 0;
+}
+
 /* Single, reusable checkbox (kept identical to CANcloud / config-editor):
    white box + grey border, bright-blue fill + white SVG checkmark when checked */
 input[type="checkbox"] {
@@ -1089,15 +1100,15 @@ input[type="checkbox"] {
     -moz-appearance: none;
     -o-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     margin: 0;
     border: 1px solid #8e8e8e;
     border-radius: 2px;
     background-color: #fff;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 12px;
+    background-size: 10px;
     cursor: pointer;
     vertical-align: middle;
     flex-shrink: 0;
@@ -1109,6 +1120,11 @@ input[type="checkbox"]:checked {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8l3 3 5-6'/%3E%3C/svg%3E");
 }
 
+input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 input[type="checkbox"]:disabled {
     opacity: 0.5;
     cursor: default;
@@ -1118,6 +1134,7 @@ input[type="checkbox"]:disabled {
     display: inline-flex;
     align-items: center;
     cursor: pointer;
+    vertical-align: middle;
 }
 
 .checkbox-design > span {

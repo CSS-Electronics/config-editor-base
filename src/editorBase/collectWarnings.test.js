@@ -42,4 +42,19 @@ describe("collectConfigurationWarnings", () => {
     };
     expect(collectConfigurationWarnings(content)).toEqual([]);
   });
+
+  it("warns (non-blocking) when the S3 OTA update interval is disabled (sync.ota == 0)", () => {
+    const content = {
+      can_1: { transmit: [], phy: { mode: 0 }, filter: { id: [{ name: "f1", state: 1 }] } },
+      can_2: { transmit: [], phy: { mode: 0 }, filter: { id: [{ name: "f1", state: 1 }] } },
+      connect: {
+        s3: {
+          sync: { ota: 0, heartbeat: 300, logfiles: 1 },
+          server: { endpoint: "http://s3.example.com", port: 80 },
+        },
+      },
+    };
+    const warnings = collectConfigurationWarnings(content);
+    expect(warnings.some((w) => w.includes("OTA") && w.includes("disables"))).toBe(true);
+  });
 });

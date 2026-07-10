@@ -1528,7 +1528,7 @@ class FilterBuilderTool extends React.Component {
                     this.mergeData();
                   });
                 }}
-                style={{ marginRight: "6px", marginBottom: "2px" }}
+                style={{ marginRight: "6px" }}
               />
               Group 29-bit IDs as PGNs
             </label>
@@ -1557,7 +1557,7 @@ class FilterBuilderTool extends React.Component {
                   checked={this.state.showFilteredSummary}
                   onChange={() => this.toggleFilteredSummary()}
                   disabled={!isEnabled}
-                  style={{ marginRight: "6px", marginBottom: "2px" }}
+                  style={{ marginRight: "6px" }}
                 />
                 Show summary with current filters
               </label>
