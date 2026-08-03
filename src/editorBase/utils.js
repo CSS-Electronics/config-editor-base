@@ -61,15 +61,3 @@ export const loadFile = (fileName) => {
   }
 }
 
-// CRC32: Calculate crc32 of Configuration File
-// (detect() returns null for unrecognized environments, e.g. jsdom)
-const { detect } = require('detect-browser')
-const browser = detect()
-
-export const crcBrowserSupport = [
-  'chrome',
-  'firefox',
-  'opera',
-  'safari',
-  'edge'
-].includes(browser && browser.name)

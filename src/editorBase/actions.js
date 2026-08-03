@@ -33,7 +33,6 @@ import {
   isValidConfig,
   loadFile,
   demoConfig,
-  crcBrowserSupport,
   getFileType,
 } from "./utils";
 
@@ -43,7 +42,7 @@ export const calcCrc32EditorLive = () => {
   return function (dispatch, getState) {
     let formData = getState().editor.formData;
 
-    if (crcBrowserSupport == 1 && formData) {
+    if (formData) {
       const { crc32 } = require("crc");
       let crc32EditorLive = crc32(JSON.stringify(formData, null, 2))
         .toString(16)

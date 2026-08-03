@@ -1,11 +1,3 @@
-// detect-browser is resolved by the consuming app (undeclared external of the
-// dist build) - mock it so actions.js can be imported in the test env
-jest.mock(
-  "detect-browser",
-  () => ({ detect: () => ({ name: "chrome" }) }),
-  { virtual: true }
-);
-
 import { collectConfigurationWarnings } from "./actions";
 
 describe("collectConfigurationWarnings", () => {

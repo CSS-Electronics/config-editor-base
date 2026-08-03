@@ -17,18 +17,6 @@ const selectOptions = (Files) => {
 
 let pastCrc32 = "N/A";
 
-// detect() returns null for unrecognized environments (e.g. jsdom)
-const { detect } = require("detect-browser");
-const browser = detect();
-
-let crcBrowserSupport = [
-  "chrome",
-  "firefox",
-  "opera",
-  "safari",
-  "edge",
-].includes(browser && browser.name);
-
 class EditorChangesComparison extends React.Component {
   constructor(props) {
     super(props);
@@ -141,7 +129,7 @@ class EditorChangesComparison extends React.Component {
 
     let pastCleaned = past && Object.keys(past).length ? JSON.stringify(JSON.parse(past), null, 2) : "";
 
-    if (crcBrowserSupport == 1 && past && Object.keys(past).length) {
+    if (past && Object.keys(past).length) {
       const { crc32 } = require("crc");
       pastCrc32 = crc32(past).toString(16).toUpperCase().padStart(8, "0");
     } else {
