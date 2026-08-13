@@ -33,7 +33,7 @@ class EditorDropDown extends React.Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
      if (nextProps.selected != "") {
       this.setState({
         defaultOption: {
@@ -57,7 +57,7 @@ class EditorDropDown extends React.Component {
     }
   };
 
-  componentWillMount(){
+  UNSAFE_componentWillMount(){
     this.setState({
       defaultOption: selectOptions(this.props.options)[0]
     });

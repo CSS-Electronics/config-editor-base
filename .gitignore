@@ -7,7 +7,11 @@ node_modules
 # builds
 build
 dist/index*
+example/dist
 .rpt2_cache
+
+# Playwright MCP session artifacts
+.playwright-mcp/
 
 # misc
 .DS_Store
@@ -28,3 +32,6 @@ TEMP/*
 
 # personal AI-assistant notes (not committed)
 CLAUDE.md
+
+# rjsf 6 / Node 24 diagnostic testbed (not committed)
+rjsf6-testbed/

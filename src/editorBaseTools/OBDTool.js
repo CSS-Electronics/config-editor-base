@@ -12,7 +12,7 @@ import controlSignalConfig from "../editorBaseTools/obd/control-signal-internal-
 import identifySupportedPidsConfig from "../editorBaseTools/obd/identify-supported-pids.json";
 import { parseSupportedPids } from "../editorBaseTools/obd/supportedPidsParser";
 
-const merge = require("deepmerge");
+import merge from "deepmerge";
 
 // Options for dropdowns
 const modeOptions = [

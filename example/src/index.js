@@ -1,6 +1,7 @@
+import './requireShim'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 
 import configureStore from './store/configure-store'
@@ -10,9 +11,10 @@ import "./index.css";
 
 const store = configureStore()
 
-ReactDOM.render(
+// No <StrictMode>: the editor relies on UNSAFE_ lifecycles and a per-render
+// remount of the rjsf form (see config-editor-base EditorSection).
+createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
 )

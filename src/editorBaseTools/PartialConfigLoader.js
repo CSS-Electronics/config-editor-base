@@ -2,11 +2,11 @@ import React from "react";
 import { connect } from "react-redux";
 import Files from "react-files";
 import * as actionsEditor from "../editorBase/actions";
-import validator from "@rjsf/validator-ajv6";
+import validator from "@rjsf/validator-ajv8";
 import Form from "@rjsf/core";
 
 let yourForm;
-const merge = require("deepmerge");
+import merge from "deepmerge";
 
 class PartialConfigLoader extends React.Component {
   constructor(props) {

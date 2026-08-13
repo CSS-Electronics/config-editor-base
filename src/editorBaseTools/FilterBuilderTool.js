@@ -14,7 +14,7 @@ import canedgeDefaultFilters from "./filterBuilder/canedge-default-filters-01.09
 import canedgeDefaultFiltersGps from "./filterBuilder/canedge-default-filters-gps-01.09.json";
 import canmodRouterDefaultFilters from "./filterBuilder/canmod-router-default-filters-01.02.json";
 
-const merge = require("deepmerge");
+import merge from "deepmerge";
 
 // Prescaler options
 const prescalerOptions = [

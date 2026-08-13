@@ -10,11 +10,30 @@ This project includes a React based JSON Schema editor.
 npm install --save config-editor-base
 ```
 
+Requirements (v4.x): Node >= 20, React >= 18, `@rjsf/core` 6.x (installed as a
+dependency), `react-redux` >= 8 and `react-select` >= 5 as peers. Two transitive
+packages (`react-files`, `react-gh-like-diff`) declare stale React peer ranges -
+consumers should add npm `overrides` for them or install with
+`--legacy-peer-deps` (see this repo's root `package.json` overrides block for
+the pattern). Consumers should also pin `diff2html` to exactly `3.1.6`
+(dependency + npm override): newer 3.x versions parse the "Review changes"
+diff as zero files, silently emptying the modal.
+
+Note for Vite-based consumers: the embedded schema loader (`loadFile`) uses a
+dynamic CommonJS `require("./schema/...")` that webpack converts to a context
+module automatically. Under Vite, add a small `window.require` shim mapping
+those paths onto an eager `import.meta.glob` of `dist/schema/**/*.json` (see
+`example/src/requireShim.js`).
+
 ---
 
 ### Development testing
 
-You can directly test the "raw" configuration editor by cloning this repository and running below `npm install` in root and in the `example/` folder. After this, run `npm start` in the root as well as in the `example/` folder.
+Use Node >= 20 (e.g. `nvm use 24.13.0`). Clone this repository, then run
+`npm install` in the root and in the `example/` folder. After this, run
+`npm start` in the root (microbundle watch) and `npm start` in the `example/`
+folder (Vite dev server on port 3000). Rebuilds of `dist/` hot-reload in the
+example through its `file:..` link.
 
 ---
 

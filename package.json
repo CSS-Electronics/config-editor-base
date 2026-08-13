@@ -1,6 +1,6 @@
 {
   "name": "config-editor-base",
-  "version": "3.2.4",
+  "version": "4.0.4",
   "description": "React-based JSON Schema editor base-tool",
   "author": "CSS Electronics",
   "license": "MIT",
@@ -9,32 +9,32 @@
   "module": "dist/index.modern.js",
   "source": "src/index.js",
   "engines": {
-    "node": ">=10"
+    "node": ">=20"
   },
   "scripts": {
-    "build": "microbundle-crl --no-compress --format modern,cjs",
-    "start": "microbundle-crl watch --no-compress --format modern,cjs",
+    "build": "microbundle --no-compress --format esm,cjs --jsx React.createElement --jsxFragment React.Fragment",
+    "start": "microbundle watch --no-compress --format esm,cjs --jsx React.createElement --jsxFragment React.Fragment",
     "prepare": "run-s build",
-    "test": "run-s test:unit test:lint test:build",
+    "test": "run-s test:unit test:build",
     "test:build": "run-s build",
     "test:lint": "eslint .",
-    "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
-    "test:watch": "react-scripts test --env=jsdom",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
     "predeploy": "cd example && npm install && npm run build",
-    "deploy": "gh-pages -d example/build"
+    "deploy": "gh-pages -d example/dist"
   },
   "peerDependencies": {
     "classnames": "^2.2.6",
     "crc": "^3.8.0",
     "file-saver": "^2.0.0",
-    "react": "^16.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-files": "^2.4.8",
-    "react-redux": "^5.0.7",
-    "react-select": "^3.1.0"
+    "react-redux": "^8.0.0",
+    "react-select": "^5.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
-    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-standard": "^14.1.0",
@@ -46,23 +46,36 @@
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-standard": "^4.0.1",
     "gh-pages": "^2.2.0",
-    "microbundle-crl": "^0.13.10",
+    "microbundle": "^0.15.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vitest": "^3.0.0"
   },
   "files": [
     "dist"
   ],
+  "overrides": {
+    "diff2html": "3.1.6",
+    "react-gh-like-diff": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "react-files": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
+  },
   "dependencies": {
-    "@rjsf/core": "5.0.0-beta.10",
-    "@rjsf/utils": "5.0.0-beta.10",
-    "@rjsf/validator-ajv6": "5.0.0-beta.10",
-    "ajv": "^6.12.6",
+    "@rjsf/core": "^6.7.1",
+    "@rjsf/utils": "^6.7.1",
+    "@rjsf/validator-ajv8": "^6.7.1",
+    "ajv": "^8.17.1",
     "deepmerge": "^4.1.1",
+    "diff2html": "3.1.6",
+    "lodash": "^4.17.21",
     "react-gh-like-diff": "^2.0.2",
-    "rjsf-tabs": "^0.0.1"
+    "rjsf-tabs": "^0.0.2"
   }
 }

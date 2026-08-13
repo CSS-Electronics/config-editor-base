@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import classNames from 'classnames'
-import validator from "@rjsf/validator-ajv6";
+import validator from "@rjsf/validator-ajv8";
 import Form from "@rjsf/core";
 
 import EditorSchemaModal from '../editorBaseTools/EditorSchemaModal'
@@ -13,7 +13,11 @@ import EditorToolModalWrapper from '../editorBaseTools/EditorToolModalWrapper'
 
 import applyNav from 'rjsf-tabs'
 import EditorNavs from './EditorNavs'
-import ArrayFieldTemplate from './EditorArrayFieldTemplate'
+import { flushSync } from 'react-dom'
+import ArrayFieldTemplate, { ArrayFieldItemTemplate } from './EditorArrayFieldTemplate'
+import FieldTemplate from './EditorFieldTemplate'
+import ObjectFieldTemplate from './EditorObjectFieldTemplate'
+import BaseInputTemplate, { flushPendingInputs } from './EditorBaseInputTemplate'
 import EditorChangesComparison from './EditorChangesComparison'
 
 import * as actionsEditor from './actions'
@@ -22,6 +26,36 @@ import { getFileType } from './utils'
 const regexRevision = new RegExp('\\d{2}\\.\\d{2}\\.json', 'g')
 let isDownloadConfig = false
 let activatedTab
+
+// rjsf 6 skips validation on mount (constructor passes skipLiveValidate=true
+// to getStateFromProps; v5 validated). Because this editor REMOUNTS the Form
+// on every UI transition (tool sidebar open/close, modal close - the remount
+// is load-bearing, see applyNav note), any open validation errors visibly
+// vanished until the next edit. Validate once after mount, mirroring the
+// liveValidate path (errors only - deliberately NOT validateForm(), which
+// would fire onError and pop the "config contains validation errors" alert).
+// A ref wrapper rather than `class extends Form`: microbundle transpiles
+// subclasses to ES5-style constructors, which cannot extend rjsf's native ES
+// class ("Class constructor _Form cannot be invoked without 'new'").
+const LiveValidatedForm = (props) => {
+  const formRef = React.useRef(null)
+  React.useEffect(() => {
+    const form = formRef.current
+    if (!form || !props.liveValidate || props.noValidate) return
+    const schemaValidation = form.validate(form.state.formData)
+    if (schemaValidation.errors.length > 0) {
+      form.setState({
+        errors: schemaValidation.errors,
+        errorSchema: schemaValidation.errorSchema,
+        schemaValidationErrors: schemaValidation.errors,
+        schemaValidationErrorSchema: schemaValidation.errorSchema
+      })
+    }
+    // mount-only: this wrapper remounts together with the Form itself
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return <Form ref={formRef} {...props} />
+}
 
 export class EditorSection extends React.Component {
   constructor(props) {
@@ -66,8 +100,11 @@ export class EditorSection extends React.Component {
   subMenuBtnClick(name) {
     let sideBar = this.state.activeSideBar == name ? 'none' : name
 
-    // sync configContent from the live formData before the state change
-    // re-renders the form, so pending edits are not reset
+    // synchronously flush any debounced pending input edits into the Form and
+    // through its onChange into the store (flushSync forces the setState
+    // callback chain to complete), then sync configContent from the live
+    // formData before the state change re-renders the form
+    flushSync(() => flushPendingInputs())
     this.props.setConfigContentPreSubmit()
 
     this.setState({
@@ -77,13 +114,15 @@ export class EditorSection extends React.Component {
   }
 
   toggleSideBarExpand() {
-    // sync configContent from the live formData before the state change
-    // re-renders the form, so pending edits are not reset
+    // flush pending debounced edits synchronously, then sync configContent
+    // from the live formData before the state change re-renders the form
+    flushSync(() => flushPendingInputs())
     this.props.setConfigContentPreSubmit()
     this.setState({ isSideBarExpanded: !this.state.isSideBarExpanded })
   }
 
   hideUischemaModal(){
+    flushSync(() => flushPendingInputs())
     this.props.setConfigContentPreSubmit()
     this.setState({ showUischemaModal: false })
   }
@@ -119,6 +158,11 @@ export class EditorSection extends React.Component {
   }
 
   closeChangesModal(e) {
+    // triggered via ESC too (no blur happens then) - flush pending debounced
+    // input edits and sync them into configContent before the setState
+    // re-render remounts the form, so they are not reset
+    flushSync(() => flushPendingInputs())
+    this.props.setConfigContentPreSubmit()
     this.setState({
       isCompareChanges: false
     })
@@ -129,7 +173,7 @@ export class EditorSection extends React.Component {
     isDownloadConfig = true
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.publicUiSchemaFiles(
       this.props.uiSchemaAry,
       this.props.schemaAry,
@@ -145,7 +189,7 @@ export class EditorSection extends React.Component {
     document.removeEventListener('keydown', this.escFunction, false)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     let uiLocal = nextProps.editorUISchemaFiles.filter((file) =>
       file.name.includes('(local)')
     )
@@ -313,7 +357,9 @@ export class EditorSection extends React.Component {
     let editorUIAdvancedSimpleTest = editorUISchemaFile.includes("Simple") || editorUISchemaFile.includes("Advanced")
 
     // add navigation bar
-    let FormWithNav = schemaContent ? applyNav(Form, EditorNavs) : Form
+    let FormWithNav = schemaContent
+      ? applyNav(LiveValidatedForm, EditorNavs)
+      : LiveValidatedForm
 
     // add the default 'base modals' to the modals list
     let editorToolsFull = editorTools.concat(
@@ -433,7 +479,7 @@ export class EditorSection extends React.Component {
                 onChange={this.handleChange}
                 onError={this.handleError}
                 onNavChange={this.onNavChange.bind(this)}
-                templates={{ArrayFieldTemplate}}
+                templates={{ArrayFieldTemplate, ArrayFieldItemTemplate, FieldTemplate, ObjectFieldTemplate, BaseInputTemplate}}
                 activeNav={activatedTab}
               >
                 <EditorChangesComparison

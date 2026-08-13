@@ -1,4 +1,5 @@
 import saveAs from "file-saver";
+import { crc32 } from "crc";
 
 export const SET_SCHEMA_LIST = "editor/SET_SCHEMA_LIST";
 export const SET_CONFIG_LIST = "editor/SET_CONFIG_LIST";
@@ -43,7 +44,6 @@ export const calcCrc32EditorLive = () => {
     let formData = getState().editor.formData;
 
     if (formData) {
-      const { crc32 } = require("crc");
       let crc32EditorLive = crc32(JSON.stringify(formData, null, 2))
         .toString(16)
         .toUpperCase()
@@ -219,9 +219,28 @@ export const resetUISchemaList = () => ({
   UISchemaFiles: [],
 });
 
+// rjsf 6 renamed the uiSchema `classNames` directive to `ui:classNames`. Older
+// uischema files (embedded, user-uploaded, device/S3-provided) carry the bare
+// key forever, so normalize at the single point where uiSchema content enters
+// the store.
+const normalizeUiSchema = (node) => {
+  if (Array.isArray(node)) return node.map(normalizeUiSchema);
+  if (node === null || typeof node !== "object") return node;
+  const out = {};
+  for (const key of Object.keys(node)) {
+    const value = node[key];
+    if (key === "classNames" && typeof value === "string") {
+      out["ui:classNames"] = value;
+    } else {
+      out[key] = normalizeUiSchema(value);
+    }
+  }
+  return out;
+};
+
 export const setUISchemaContent = (uiContent) => ({
   type: SET_UI_SCHEMA_DATA,
-  uiContent,
+  uiContent: uiContent ? normalizeUiSchema(uiContent) : uiContent,
 });
 
 export const resetLocalUISchemaList = () => ({

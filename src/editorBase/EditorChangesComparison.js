@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Select from "react-select";
 import _ from "lodash";
 import { saveAs } from "file-saver";
+import { crc32 } from "crc";
 import { computeConfigDelta } from "./configDelta";
 
 
@@ -130,7 +131,6 @@ class EditorChangesComparison extends React.Component {
     let pastCleaned = past && Object.keys(past).length ? JSON.stringify(JSON.parse(past), null, 2) : "";
 
     if (past && Object.keys(past).length) {
-      const { crc32 } = require("crc");
       pastCrc32 = crc32(past).toString(16).toUpperCase().padStart(8, "0");
     } else {
       pastCrc32 = "N/A";
