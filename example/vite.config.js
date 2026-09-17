@@ -54,7 +54,15 @@ export default defineConfig({
     port: 3000,
     fs: { allow: ['..'] }
   },
+  // Always re-bundle dependencies on dev-server start. Vite keys its
+  // node_modules/.vite pre-bundle cache on THIS package.json/lockfile, but the
+  // rjsf packages it bundles are declared only by the linked config-editor-base
+  // (file:..). A root dependency bump therefore left a stale @rjsf in the cache
+  // and the browser silently kept running the old version (2026-09-17: the
+  // 6.7.1 omit hang reappeared after upgrading to 6.10.1). The app is small, so
+  // the extra seconds per start are cheaper than a misleading test.
   optimizeDeps: {
+    force: true,
     esbuildOptions: {
       loader: { '.js': 'jsx' },
       plugins: [esbuildPatchDifflib]
