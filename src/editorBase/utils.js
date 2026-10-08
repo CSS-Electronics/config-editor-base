@@ -27,6 +27,14 @@ export const isValidConfig = (file) => {
   return regexConfig.test(file)
 }
 
+// Non-revisioned files (e.g. webcan-settings-v1.json + webcan-settings-schema-v1.json)
+// can be uploaded too, but never trigger the embedded schema auto-load
+export const isGenericConfig = (file) => /\.json$/i.test(file)
+
+export const isGenericSchema = (file) => /schema.*\.json$/i.test(file)
+
+export const isGenericUISchema = (file) => /uischema.*\.json$/i.test(file)
+
 export const getFileType = (dropdown) => {
   let type = ''
   switch (true) {

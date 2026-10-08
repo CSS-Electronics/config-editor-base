@@ -286,9 +286,15 @@ export class EditorSection extends React.Component {
 
         let revisedConfigFileSchema = this.state.schema
 
-        let revisedConfigFile = `config-${revisedConfigFileSchema.match(
-          regexRevision
-        )}`
+        // revisioned schema -> config-XX.YY.json; otherwise (e.g. a webCAN
+        // settings schema) keep the name of the loaded config file
+        const schemaRevision = revisedConfigFileSchema.match(regexRevision)
+        const loadedConfigName = this.props.editorConfigFiles.length
+          ? this.props.editorConfigFiles[0].name.replace(' (local)', '')
+          : 'config.json'
+        let revisedConfigFile = schemaRevision
+          ? `config-${schemaRevision}`
+          : loadedConfigName
 
         if (this.state.isCompareChanges === false) {
           // Run all configuration warning checks when Review Changes button is clicked

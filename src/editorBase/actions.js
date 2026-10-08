@@ -32,6 +32,9 @@ import {
   isValidUISchema,
   isValidSchema,
   isValidConfig,
+  isGenericUISchema,
+  isGenericSchema,
+  isGenericConfig,
   loadFile,
   demoConfig,
   getFileType,
@@ -158,25 +161,33 @@ export const handleUploadedFile = (file, dropdown, schemaAry, uiSchemaAry) => {
 
       if (contentJSON != null) {
         switch (true) {
-          case type == "uischema" && isValidUISchema(file.name):
+          case type == "uischema" && (isValidUISchema(file.name) || isGenericUISchema(file.name)):
             dispatch(setUISchemaContent(contentJSON));
             dispatch(resetLocalUISchemaList());
             dispatch(setUISchemaFile([fileNameDisplay]));
 
             break;
-          case type == "schema" && isValidSchema(file.name):
+          case type == "schema" && (isValidSchema(file.name) || isGenericSchema(file.name)):
             dispatch(setSchemaContent(contentJSON));
             dispatch(resetLocalSchemaList());
             dispatch(setSchemaFile([fileNameDisplay]));
             break;
-          case type == "config" && isValidConfig(file.name):
+          case type == "config" && (isValidConfig(file.name) || (isGenericConfig(file.name) && typeof contentJSON === "object" && !Array.isArray(contentJSON))):
             // load the matching schema files if a schema file is not already uploaded
 
             const localSchema = getState().editor.editorSchemaFiles[0] && getState().editor.editorSchemaFiles[0].name.includes("(local)") ? true : false;
 
-            if (file && file.name && file.name.length && localSchema == false && schemaAry && schemaAry.length) {
+            if (isValidConfig(file.name)) {
+              if (file && file.name && file.name.length && localSchema == false && schemaAry && schemaAry.length) {
 
-              dispatch(publicSchemaFiles(file.name, schemaAry, contentJSON, uiSchemaAry));
+                dispatch(publicSchemaFiles(file.name, schemaAry, contentJSON, uiSchemaAry));
+              }
+            } else if (localSchema == false) {
+              // non-revisioned config (e.g. webcan-settings-v1.json): no auto-load, and
+              // drop a leftover embedded CANedge schema so it cannot render (and
+              // liveOmit-strip) this data - the user uploads the matching schema
+              dispatch(resetSchemaFiles());
+              dispatch(setSchemaContent(null));
             }
 
 

@@ -118,7 +118,7 @@ The [config editor](https://github.com/CSS-Electronics/config-editor) can take a
 
 Note that the parsed list of files should match the actual files that are included in the config-editor-base `dist/` folder.
 
-For example, the Rule Schema for `"schema-01.02.json | CANedge2"` should be contained in `dist/schema/CANedge2/schema-01.02.json`.
+For example, the Rule Schema for `"schema-01.09.json | CANedge2 GNSS"` should be contained in `dist/schema/CANedge2 GNSS/schema-01.09.json`.
 
 The syntax for parsing these lists is as below (in the [config-editor](https://github.com/CSS-Electronics/config-editor) repo `Editor.js` file):
 
@@ -126,15 +126,16 @@ The syntax for parsing these lists is as below (in the [config-editor](https://g
 
 // define UIschema and Rule Schema names for auto-loading embedded schema files
 export const uiSchemaAry = [
-  "uischema-01.02.json | Simple",
-  "uischema-01.02.json | Advanced",
+  "uischema-01.09.json | Simple",
+  "uischema-01.09.json | Advanced",
 ];
 
 export const schemaAry = [
-  "schema-01.02.json | CANedge2",
-  "schema-01.02.json | CANedge1",
-  "schema-00.07.json | CANedge2",
-  "schema-00.07.json | CANedge1",
+  "schema-01.09.json | CANedge1",
+  "schema-01.09.json | CANedge1 GNSS",
+  "schema-01.09.json | CANedge2",
+  "schema-01.09.json | CANedge2 GNSS",
+  "schema-01.09.json | CANedge3 GNSS",
 ];
 
 ...
@@ -149,8 +150,15 @@ export const schemaAry = [
 
 ```
 
-Note that the code distinguishes between a `config-XX.YY.json` file loaded from a CANedge1 and CANedge2 unit. This is done by evaluating whether a `connect` section exists or not in the Configuration File. Based on this test, the editor either loads the Rule Schema for the CANedge2 (if `connect` exists) or the CANedge1.
+The revision (`XX.YY`) is taken from the Configuration File name (`config-XX.YY.json`, optionally with a prefix such as `XYZ_config-01.09.json`). The device type is detected from the content of the Configuration File: CANedge1/2/3 are told apart by the `connect` section (none, `connect.wifi` or `connect.cellular`), the GNSS variants by a `gnss` section, and the CANmod variants (`CANmod.gps`, `CANmod.input`, `CANmod.router`, `CANmod.temp`) by their `sensor`/`phy` sections. The editor then loads the matching Rule Schema and UIschema. Auto-loading is skipped if a Rule Schema has already been uploaded manually.
 
+### Loading non-revisioned files
+
+Configuration Files without an `XX.YY` revision in the name (e.g. the CANsub webCAN settings file `webcan-settings-v1.json`) can also be loaded via the Configuration File dropdown, as long as they are JSON objects with a `.json` extension. For these files:
+
+- No Rule Schema/UIschema is auto-loaded. Upload the matching files manually via the Rule Schema and Presentation Mode dropdowns. Names without a revision are accepted as long as they contain `schema` / `uischema` (e.g. `webcan-settings-schema-v1.json`, `webcan-settings-uischema-v1.json`).
+- A previously auto-loaded (embedded) Rule Schema is cleared, so it does not render the new file. A manually uploaded Rule Schema is kept.
+- When saving, the file keeps the name of the loaded Configuration File if the Rule Schema name has no revision. With a revisioned Rule Schema it is saved as `config-XX.YY.json`, as before.
 
 ---
 
@@ -253,11 +261,13 @@ The module expects to find JSON Schema files in the structure below to facilitat
 |-- dist/
 	|-- schema/
 		|-- Advanced/
-			|-- uischema-XX.YY.json 
+			|-- uischema-XX.YY.json
 		|-- Simple/
-			|-- uischema-XX.YY.json 
-		|-- CANedge1/
-			|-- schema-XX.YY.json 
-		|-- CANedge2/
-			|-- schema-XX.YY.json 		
+			|-- uischema-XX.YY.json
+		|-- CANedge1/ (also CANedge2, CANedge1 GNSS, CANedge2 GNSS, CANedge3 GNSS)
+			|-- schema-XX.YY.json
+		|-- CANmod.router/ (also CANmod.gps, CANmod.input, CANmod.temp)
+			|-- config-XX.YY.json
+			|-- schema-XX.YY.json
+			|-- uischema-XX.YY.json
 ```
