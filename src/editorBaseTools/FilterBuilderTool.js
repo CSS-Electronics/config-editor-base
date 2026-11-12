@@ -6,7 +6,7 @@ import Ajv from "ajv";
 import { parseCanFrameCsv } from "./canFrameCsvParser";
 import CollapsiblePreview from "./CollapsiblePreview";
 import { parseDbcFiles, findDbcMatch, extractPgn } from "./dbcParser";
-import { evaluateFilters } from "./filterEvaluator";
+import { evaluateFilters, defaultRouterBaseChannel } from "./filterEvaluator";
 import SimpleDropdown from "./SimpleDropdown";
 
 // Default filter configurations
@@ -85,11 +85,8 @@ class FilterBuilderTool extends React.Component {
       mergedConfig: {},
       mergedConfigValid: "Unknown",
       showFilterPreview: false,
-      // CANmod.router channel mapping (CSV channel numbers for S1-S4)
-      channelMapS1: "11",
-      channelMapS2: "12",
-      channelMapS3: "13",
-      channelMapS4: "14"
+      // CANmod.router channel mapping (CSV channel numbers for S1-S4): CAN11-14 for tunnel ID 0x10, CAN15-18 for 0x12
+      ...FilterBuilderTool.routerChannelState(props.formData)
     };
 
     this.csvFileReader = new FileReader();
@@ -104,6 +101,32 @@ class FilterBuilderTool extends React.Component {
     this.pendingDbcFiles = [];
     this.dbcFilesLoaded = 0;
     this.rawFrames = []; // Store raw frames for filter evaluation
+  }
+
+  /**
+   * Default S1-S4 channel mapping state for a config (by its tunnel ID, see filterEvaluator.defaultRouterBaseChannel)
+   */
+  static routerChannelState(formData) {
+    const base = defaultRouterBaseChannel(formData);
+    return {
+      channelMapS1: String(base),
+      channelMapS2: String(base + 1),
+      channelMapS3: String(base + 2),
+      channelMapS4: String(base + 3)
+    };
+  }
+
+  /**
+   * S1-S4 mapping for the filter evaluator: {can_s1: 11, ...} (the same channels the filter builder uses)
+   */
+  getRouterChannels() {
+    const { channelMapS1, channelMapS2, channelMapS3, channelMapS4 } = this.state;
+    return {
+      can_s1: parseInt(channelMapS1, 10),
+      can_s2: parseInt(channelMapS2, 10),
+      can_s3: parseInt(channelMapS3, 10),
+      can_s4: parseInt(channelMapS4, 10)
+    };
   }
 
   /**
@@ -363,7 +386,8 @@ class FilterBuilderTool extends React.Component {
     }
 
     try {
-      const { filteredFrames, stats, reductionPercent } = evaluateFilters(this.rawFrames, configData, this.props.detectedDeviceType);
+      const { filteredFrames, stats, reductionPercent } = evaluateFilters(this.rawFrames, configData, this.props.detectedDeviceType,
+        this.isCanmodRouter() ? this.getRouterChannels() : undefined);
 
       if (filteredFrames.length === 0) {
         // All frames filtered out

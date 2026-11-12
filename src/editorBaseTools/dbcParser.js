@@ -7,13 +7,14 @@
 /**
  * Extract CAN channel from filename prefix (e.g., "can1-", "can2-", etc.)
  * @param {string} filename - The DBC filename
- * @returns {string|null} - CAN channel number (1-11) or null if no valid prefix
+ * @returns {string|null} - CAN channel number (1-99) or null if no valid prefix. Two-digit channels are the
+ *   CANmod.router channels after demuxing (can11- ... can14- for tunnel ID 0x10, can15- ... can18- for 0x12, ...)
  */
 export function extractCanChannel(filename) {
   const match = filename.toLowerCase().match(/^can(\d{1,2})-/);
   if (match) {
     const channelNum = parseInt(match[1], 10);
-    if (channelNum >= 1 && channelNum <= 11) {
+    if (channelNum >= 1 && channelNum <= 99) {
       return channelNum.toString();
     }
   }

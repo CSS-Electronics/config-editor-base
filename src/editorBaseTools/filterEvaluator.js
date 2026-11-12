@@ -19,35 +19,50 @@
  */
 
 /**
- * Get the mux ID from CANmod.router config
+ * Get the tunnel (mux) message ID of a CANmod.router config
+ * The ID is a HEX string in the config ("10" = 0x10 = 16), at phy.can.route.mux.s2p.message.id (FW 01.02+) or
+ * phy.can.route.mux.output.message.id (FW 01.01)
  * @param {Object} configData - The parsed Configuration File JSON
- * @returns {number} Mux ID (10 or 12)
+ * @returns {number|null} Tunnel ID (e.g. 0x10), or null if not set
  */
-function getMuxIdFromConfig(configData) {
-  if (configData?.phy?.can?.route?.mux?.s2p?.message?.id !== undefined) {
-    // The id is stored as a string in the config (e.g., "10" or "12")
-    return parseInt(configData.phy.can.route.mux.s2p.message.id, 10);
+export function getMuxIdFromConfig(configData) {
+  const mux = configData?.phy?.can?.route?.mux;
+  const id = mux?.s2p?.message?.id ?? mux?.output?.message?.id;
+  if (id === undefined || id === null || id === "") {
+    return null;
   }
-  return 10; // Default to first router
+  const value = parseInt(String(id), 16);
+  return Number.isNaN(value) ? null : value;
+}
+
+/**
+ * Default demuxed CSV channel of S1 for a CANmod.router config (CANedge Intro convention, matches the CANmod.router
+ * DBC): Tunnel ID 0x12 (2nd router) -> CAN15-18, otherwise (0x10 default) -> CAN11-14
+ * @param {Object} configData - The parsed Configuration File JSON
+ * @returns {number} 15 or 11
+ */
+export function defaultRouterBaseChannel(configData) {
+  return getMuxIdFromConfig(configData) === 0x12 ? 15 : 11;
 }
 
 /**
  * Extract filter configuration from the Configuration File for all CAN channels
  * @param {Object} configData - The parsed Configuration File JSON
  * @param {string} detectedDeviceType - Device type from Redux state (e.g., "CANmod.router")
+ * @param {Object} [routerChannels] - CANmod.router only: CSV channel per section, e.g. {can_s1: 11, ...}
  * @returns {Object} Map of channel number to filter config
  */
-export function extractFilters(configData, detectedDeviceType) {
+export function extractFilters(configData, detectedDeviceType, routerChannels) {
   const filters = {};
   
   // Check if this is a CANmod.router config using the detected device type
   if (detectedDeviceType === "CANmod.router") {
     // CANmod.router: filters are in phy.can_sX.filter (direct array)
-    // Reverse map: can_s1-s4 → CAN11-14 (mux 10) or CAN15-18 (mux 12)
-    const muxId = getMuxIdFromConfig(configData);
-    const baseChannel = muxId === 12 ? 15 : 11;
+    // Reverse map: can_s1-s4 → the CSV channels the user mapped S1-S4 to in the filter builder (routerChannels),
+    // else the default for the tunnel ID: CAN11-14 (0x10) or CAN15-18 (0x12)
+    const baseChannel = defaultRouterBaseChannel(configData);
     
-    const canmodChannelMap = {
+    const canmodChannelMap = routerChannels || {
       'can_s1': baseChannel,
       'can_s2': baseChannel + 1,
       'can_s3': baseChannel + 2,
@@ -390,10 +405,12 @@ export function calculateReduction(originalCount, filteredCount) {
  * @param {Array} frames - Array of parsed CAN frame objects from CSV
  * @param {Object} configData - The parsed Configuration File JSON
  * @param {string} detectedDeviceType - Device type from Redux state (e.g., "CANmod.router")
+ * @param {Object} [routerChannels] - CANmod.router only: CSV channel per section, e.g. {can_s1: 11, ...} (the filter
+ *   builder's S1-S4 mapping, so evaluating and building use the same channels)
  * @returns {Object} { filteredFrames, stats, reductionPercent }
  */
-export function evaluateFilters(frames, configData, detectedDeviceType) {
-  const filterConfig = extractFilters(configData, detectedDeviceType);
+export function evaluateFilters(frames, configData, detectedDeviceType, routerChannels) {
+  const filterConfig = extractFilters(configData, detectedDeviceType, routerChannels);
   const { filteredFrames, stats } = applyFilters(frames, filterConfig);
   const reductionPercent = calculateReduction(frames.length, filteredFrames.length);
   
